@@ -314,25 +314,130 @@ i[class^="ri-"] { line-height: 1; }
 }
 .theme-btn:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-lt); }
 
-/* Dark theme */
+/* ══ DARK MODE — to'liq qora ══════════════════════════════════ */
 [data-theme="dark"] {
-  --bg-page:     #0f172a;
-  --bg-white:    #1e293b;
-  --bg-weak:     #162032;
-  --bg-soft:     #1a2844;
-  --text-strong: #f1f5f9;
-  --text-sub:    #94a3b8;
-  --text-soft:   #64748b;
-  --text-hint:   #475569;
-  --stroke:      #2d3f55;
-  --stroke-soft: #1e3048;
-  --primary-lt:  #052e16;
-  --primary-md:  #14532d;
-  --success-bg:  #052e16;
-  --warning-bg:  #1c1008;
-  --danger-bg:   #1c0a0a;
-  --neutral-bg:  #1e293b;
+  /* Backgrounds */
+  --bg-page:     #09090b;
+  --bg-white:    #111113;
+  --bg-weak:     #18181b;
+  --bg-soft:     #1f1f23;
+
+  /* Text */
+  --text-strong: #fafafa;
+  --text-sub:    #a1a1aa;
+  --text-soft:   #71717a;
+  --text-hint:   #3f3f46;
+
+  /* Borders */
+  --stroke:      #27272a;
+  --stroke-soft: #1c1c1f;
+
+  /* Primary — green stays but adjusted */
+  --primary-lt:  #0a1f0f;
+  --primary-md:  #14401e;
+
+  /* Status backgrounds */
+  --success-bg:  #0a1f0f;
+  --warning-bg:  #1a1100;
+  --danger-bg:   #1a0808;
+  --neutral-bg:  #18181b;
+
+  /* Shadows darker */
+  --sh-xs: 0 1px 3px rgba(0,0,0,.4);
+  --sh-sm: 0 2px 6px rgba(0,0,0,.5);
+  --sh-md: 0 4px 12px rgba(0,0,0,.6);
+  --sh-lg: 0 10px 24px rgba(0,0,0,.7);
 }
+
+/* ── Dark overrides for hardcoded colors ─────────────────── */
+[data-theme="dark"] .stat-card { background: #111113; }
+[data-theme="dark"] .stat-icon-wrap.green  { background: #0a1f0f; }
+[data-theme="dark"] .stat-icon-wrap.red    { background: #1a0808; }
+[data-theme="dark"] .stat-icon-wrap.yellow { background: #1a1100; }
+[data-theme="dark"] .stat-icon-wrap.blue   { background: #080f1f; color: #60a5fa; }
+[data-theme="dark"] .stat-trend.up  { background: #0a1f0f; }
+[data-theme="dark"] .stat-trend.down{ background: #1a0808; }
+[data-theme="dark"] .stat-trend.neu { background: #18181b; }
+
+[data-theme="dark"] .w-title-icon[style*="eff6ff"]  { background: #080f1f !important; color: #60a5fa !important; }
+[data-theme="dark"] .w-title-icon[style*="faf5ff"]  { background: #150a1f !important; color: #c084fc !important; }
+[data-theme="dark"] .w-title-icon[style*="primary-lt"] { background: #0a1f0f !important; }
+[data-theme="dark"] .w-title-icon[style*="warning-bg"] { background: #1a1100 !important; }
+
+[data-theme="dark"] .sensor-item { background: #18181b; border-color: #27272a; }
+[data-theme="dark"] .sensor-item:hover { background: #1f1f23; border-color: #3f3f46; }
+
+[data-theme="dark"] .rec-card          { background: #111113; border-color: #27272a; }
+[data-theme="dark"] .rec-card.critical { background: #1a0808; border-color: #3f1010; }
+[data-theme="dark"] .rec-card.soon     { background: #1a1100; border-color: #3f2a00; }
+[data-theme="dark"] .rec-card.ok       { background: #0a1f0f; border-color: #14401e; }
+[data-theme="dark"] .rec-card.neutral  { background: #18181b; border-color: #27272a; }
+[data-theme="dark"] .rec-icon.critical { background: #1a0808; }
+[data-theme="dark"] .rec-icon.soon     { background: #1a1100; }
+[data-theme="dark"] .rec-icon.ok       { background: #0a1f0f; }
+[data-theme="dark"] .rec-icon.neutral  { background: #18181b; }
+
+[data-theme="dark"] .farm-avatar { border-color: #27272a; }
+[data-theme="dark"] .chip { background: rgba(255,255,255,.06); }
+
+[data-theme="dark"] .saving-big {
+  background: linear-gradient(135deg, #0a1f0f, #111f15);
+  border-color: #14401e;
+}
+
+[data-theme="dark"] .refresh-banner {
+  background: linear-gradient(135deg, #0a1f0f, #0d2013);
+  border-color: #14401e;
+}
+
+[data-theme="dark"] .lang-select,
+[data-theme="dark"] .theme-btn {
+  background: #18181b; border-color: #27272a; color: #a1a1aa;
+}
+[data-theme="dark"] .lang-select:hover,
+[data-theme="dark"] .theme-btn:hover {
+  background: #0a1f0f; border-color: var(--primary); color: var(--primary);
+}
+[data-theme="dark"] .btn-ghost { background: #18181b; border-color: #27272a; color: #a1a1aa; }
+[data-theme="dark"] .btn-ghost:hover { background: #1f1f23; color: var(--text-strong); }
+
+[data-theme="dark"] .map-stat-chip {
+  background: rgba(9,9,11,.88);
+  border-color: rgba(255,255,255,.08);
+  color: #fafafa;
+}
+[data-theme="dark"] .map-stat-text { color: #a1a1aa; }
+[data-theme="dark"] .map-legend {
+  background: rgba(9,9,11,.88);
+  border-color: rgba(255,255,255,.08);
+}
+[data-theme="dark"] .map-legend-title { color: #71717a; }
+[data-theme="dark"] .map-legend-item  { color: #a1a1aa; }
+
+[data-theme="dark"] .alert-sev-icon.critical { background: #1a0808; }
+[data-theme="dark"] .alert-sev-icon.warning  { background: #1a1100; }
+[data-theme="dark"] .alert-sev-icon.ok       { background: #0a1f0f; }
+
+[data-theme="dark"] .tab-count { background: #1a0808; }
+[data-theme="dark"] .badge.ok   { background: #0a1f0f; }
+[data-theme="dark"] .badge.warn { background: #1a1100; }
+[data-theme="dark"] .badge.err  { background: #1a0808; }
+[data-theme="dark"] .badge.off  { background: #18181b; }
+
+[data-theme="dark"] .nav-badge   { background: #1a0808; }
+[data-theme="dark"] .nav-badge.g { background: #0a1f0f; }
+[data-theme="dark"] .nav-item.active { background: #0a1f0f; }
+[data-theme="dark"] .user-row:hover  { background: #18181b; }
+[data-theme="dark"] .tb-icon:hover   { background: #18181b; }
+
+/* Leaflet dark mode */
+[data-theme="dark"] .leaflet-tile { filter: brightness(.7) invert(1) contrast(2) hue-rotate(200deg) saturate(.3) brightness(.7); }
+[data-theme="dark"] .leaflet-container { background: #09090b; }
+[data-theme="dark"] .leaflet-popup-content-wrapper { background: #111113; border: 1px solid #27272a; }
+[data-theme="dark"] .leaflet-popup-tip { background: #111113; }
+[data-theme="dark"] .map-popup { color: #fafafa; }
+[data-theme="dark"] .map-popup-title { color: #fafafa; }
+[data-theme="dark"] .map-popup-row   { color: #a1a1aa; }
 
 /* ── Stat Cards Row ────────────────────────────────────────── */
 .stats-grid {
@@ -1310,13 +1415,42 @@ style.textContent = '@keyframes spin{to{transform:rotate(360deg)}}';
 document.head.appendChild(style);
 
 // ── Theme toggle ──────────────────────────────────────────
+function isDarkMode() {
+  return document.documentElement.getAttribute('data-theme') === 'dark';
+}
+
+function applyChartTheme() {
+  const dark = isDarkMode();
+  const gridColor  = dark ? '#27272a' : '#f1f5f9';
+  const tickColor  = dark ? '#71717a' : '#94a3b8';
+  Chart.defaults.color = tickColor;
+  Chart.defaults.borderColor = gridColor;
+  // Re-render charts with new theme colors
+  if (moistureChart) {
+    moistureChart.options.scales.y.grid.color = gridColor;
+    moistureChart.options.scales.x.grid.color = gridColor;
+    moistureChart.options.scales.y.ticks.color = tickColor;
+    moistureChart.options.scales.x.ticks.color = tickColor;
+    moistureChart.update();
+  }
+  if (savingChart) {
+    savingChart.options.scales.y.grid.color = gridColor;
+    savingChart.options.scales.x.grid.color = gridColor;
+    savingChart.options.scales.y.ticks.color = tickColor;
+    savingChart.options.scales.x.ticks.color = tickColor;
+    savingChart.update();
+  }
+}
+
 function toggleTheme() {
   const html = document.documentElement;
-  const isDark = html.getAttribute('data-theme') === 'dark';
+  const isDark = isDarkMode();
   html.setAttribute('data-theme', isDark ? 'light' : 'dark');
   document.getElementById('theme-icon').className = isDark ? 'ri-moon-line' : 'ri-sun-line';
   localStorage.setItem('theme', isDark ? 'light' : 'dark');
+  applyChartTheme();
 }
+
 // Load saved theme
 const savedTheme = localStorage.getItem('theme') || 'light';
 if (savedTheme === 'dark') {

@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: tomchi-tech-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: starter          # $7/mo — always on, no sleep
+    region: frankfurt      # Markaziy Osiyo'ga eng yaqin
+    branch: main
+    healthCheckPath: /health
+    envVars:
+      - key: APP_ENV
+        value: production

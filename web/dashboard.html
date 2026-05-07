@@ -4,403 +4,1065 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Tomchi Tech — Admin Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
 <style>
-/* ── AlignUI Tokens ─────────────────────────── */
+/* ── Design Tokens (AlignUI + Tomchi Tech) ─────────────────── */
 :root {
-  --bg-white:     #ffffff;
-  --bg-weak:      #f7f7f7;
-  --bg-soft:      #f0f0f0;
-  --text-strong:  #171717;
-  --text-sub:     #5c5c5c;
-  --text-soft:    #a3a3a3;
-  --stroke:       #ebebeb;
-  --primary:      #16a34a;
-  --primary-lt:   #dcfce7;
-  --r4: 4px; --r6: 6px; --r8: 8px; --r10: 10px; --rfull: 999px;
-  --sh-xs: 0 1px 2px rgba(10,13,20,.03);
-  --sh-sm: 0 2px 4px rgba(27,28,29,.04);
+  /* Colors */
+  --bg-page:     #f4f6f8;
+  --bg-white:    #ffffff;
+  --bg-weak:     #f7f8fa;
+  --bg-soft:     #eef0f3;
+
+  --text-strong: #0f172a;
+  --text-sub:    #64748b;
+  --text-soft:   #94a3b8;
+  --text-hint:   #cbd5e1;
+
+  --stroke:      #e2e8f0;
+  --stroke-soft: #f1f5f9;
+
+  --primary:     #16a34a;
+  --primary-d:   #15803d;
+  --primary-lt:  #f0fdf4;
+  --primary-md:  #bbf7d0;
+
+  --success:     #22c55e;
+  --success-bg:  #f0fdf4;
+  --warning:     #f59e0b;
+  --warning-bg:  #fffbeb;
+  --danger:      #ef4444;
+  --danger-bg:   #fef2f2;
+  --neutral:     #94a3b8;
+  --neutral-bg:  #f8fafc;
+
+  /* Radius */
+  --r4: 4px; --r6: 6px; --r8: 8px;
+  --r10: 10px; --r12: 12px; --r16: 16px;
+  --rfull: 9999px;
+
+  /* Shadows */
+  --sh-xs: 0 1px 2px rgba(15,23,42,.04);
+  --sh-sm: 0 1px 3px rgba(15,23,42,.08), 0 1px 2px rgba(15,23,42,.04);
+  --sh-md: 0 4px 6px rgba(15,23,42,.06), 0 2px 4px rgba(15,23,42,.04);
+  --sh-lg: 0 10px 15px rgba(15,23,42,.08), 0 4px 6px rgba(15,23,42,.04);
+
+  /* Sidebar */
+  --sb-width: 260px;
 }
-*{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Inter',sans-serif;background:var(--bg-weak);color:var(--text-strong);height:100vh;display:flex;overflow:hidden;font-feature-settings:'ss11' 1,'calt' 0,'liga' 0;}
 
-/* ── Sidebar ──────────────────────────────── */
-.sidebar{width:272px;height:100vh;background:var(--bg-white);border-right:1px solid var(--stroke);display:flex;flex-direction:column;flex-shrink:0;}
-.sb-header{padding:12px;border-bottom:1px solid var(--stroke);}
-.sb-brand{display:flex;align-items:center;gap:12px;padding:12px;border-radius:var(--r10);cursor:pointer;}
-.sb-brand:hover{background:var(--bg-weak);}
-.brand-logo{width:40px;height:40px;background:var(--primary);border-radius:var(--rfull);display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;flex-shrink:0;}
-.brand-name{font-size:14px;font-weight:500;letter-spacing:-.084px;}
-.brand-sub{font-size:12px;color:var(--text-sub);margin-top:1px;}
-.sb-content{flex:1;padding:20px;display:flex;flex-direction:column;gap:20px;overflow-y:auto;}
-.nav-label{padding:4px;font-size:12px;font-weight:500;letter-spacing:.48px;text-transform:uppercase;color:var(--text-soft);}
-.nav-items{display:flex;flex-direction:column;gap:4px;}
-.nav-item{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:var(--r8);cursor:pointer;text-decoration:none;position:relative;}
-.nav-item:hover{background:var(--bg-weak);}
-.nav-item.active{background:var(--bg-weak);}
-.nav-item.active::before{content:'';position:absolute;left:-20px;top:8px;width:4px;height:20px;background:var(--primary);border-radius:0 4px 4px 0;}
-.nav-icon{width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
-.nav-text{flex:1;font-size:14px;font-weight:500;letter-spacing:-.084px;color:var(--text-sub);}
-.nav-item.active .nav-text{color:var(--text-strong);}
-.nav-badge{background:#fee2e2;color:#dc2626;font-size:11px;font-weight:600;padding:2px 7px;border-radius:var(--rfull);}
-.nav-badge.g{background:var(--primary-lt);color:var(--primary);}
-.sb-footer{border-top:1px solid var(--stroke);padding:12px;}
-.user-card{display:flex;align-items:center;gap:12px;padding:12px;border-radius:var(--r10);cursor:pointer;}
-.user-card:hover{background:var(--bg-weak);}
-.user-av{width:40px;height:40px;background:#ffecc0;border-radius:var(--rfull);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
-.user-name{font-size:14px;font-weight:500;color:var(--text-strong);}
-.user-email{font-size:12px;color:var(--text-sub);}
+/* ── Reset & Base ──────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 14px; }
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--bg-page);
+  color: var(--text-strong);
+  height: 100vh;
+  display: flex;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+a { text-decoration: none; color: inherit; }
+button { font-family: inherit; cursor: pointer; }
+i[class^="ri-"] { line-height: 1; }
 
-/* ── Main ─────────────────────────────────── */
-.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+/* ── Scrollbar ─────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--stroke); border-radius: var(--rfull); }
+::-webkit-scrollbar-thumb:hover { background: var(--text-hint); }
 
-/* ── Header ───────────────────────────────── */
-.header{background:var(--bg-white);border-bottom:1px solid var(--stroke);padding:16px 32px;display:flex;align-items:center;gap:12px;flex-shrink:0;}
-.hdr-left{display:flex;align-items:center;gap:14px;flex:1;}
-.hdr-av{width:48px;height:48px;background:#ffecc0;border-radius:var(--rfull);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
-.hdr-name{font-size:18px;font-weight:500;letter-spacing:-.27px;}
-.hdr-sub{font-size:14px;color:var(--text-sub);letter-spacing:-.084px;}
-.hdr-actions{display:flex;align-items:center;gap:8px;}
-.icon-btn{width:40px;height:40px;border-radius:var(--r10);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;position:relative;}
-.icon-btn:hover{background:var(--bg-weak);}
-.notif-dot{position:absolute;top:8px;right:8px;width:8px;height:8px;background:#ef4444;border-radius:var(--rfull);border:2px solid #fff;}
-.btn-outline{display:flex;align-items:center;gap:6px;padding:9px 14px;border:1px solid var(--stroke);border-radius:var(--r10);background:var(--bg-white);box-shadow:var(--sh-xs);cursor:pointer;font-size:14px;font-weight:500;color:var(--text-sub);font-family:'Inter',sans-serif;}
-.btn-outline:hover{background:var(--bg-weak);}
-.btn-primary{display:flex;align-items:center;gap:6px;padding:9px 14px;border:none;border-radius:var(--r10);background:var(--primary);cursor:pointer;font-size:14px;font-weight:500;color:#fff;font-family:'Inter',sans-serif;}
-.btn-primary:hover{background:#15803d;}
+/* ══════════════════════════════════════════════════════════════
+   SIDEBAR
+══════════════════════════════════════════════════════════════ */
+.sidebar {
+  width: var(--sb-width);
+  height: 100vh;
+  background: var(--bg-white);
+  border-right: 1px solid var(--stroke);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  transition: width .25s ease;
+  z-index: 100;
+}
 
-/* refresh indicator */
-.refresh-bar{background:var(--primary-lt);border-bottom:1px solid #bbf7d0;padding:6px 32px;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--primary);font-weight:500;flex-shrink:0;}
-.refresh-dot{width:7px;height:7px;background:var(--primary);border-radius:var(--rfull);animation:pulse 2s infinite;}
-@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+/* Brand */
+.sb-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 24px;
+  height: 72px;
+  border-bottom: 1px solid var(--stroke-soft);
+  flex-shrink: 0;
+}
+.brand-logo {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-d));
+  border-radius: var(--r10);
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 18px;
+  box-shadow: 0 2px 8px rgba(22,163,74,.35);
+  flex-shrink: 0;
+}
+.brand-name {
+  font-size: 15px; font-weight: 700;
+  color: var(--text-strong); letter-spacing: -.3px;
+}
+.brand-version {
+  font-size: 10px; font-weight: 600;
+  background: var(--primary-lt); color: var(--primary);
+  padding: 1px 6px; border-radius: var(--rfull);
+  letter-spacing: .3px;
+}
 
-/* ── Content ──────────────────────────────── */
-.content{flex:1;overflow-y:auto;padding:20px 24px;display:grid;grid-template-columns:352px 352px 1fr;grid-template-rows:auto auto;gap:16px;align-content:start;}
+/* Nav */
+.sb-nav {
+  flex: 1; overflow-y: auto;
+  padding: 16px 14px;
+  display: flex; flex-direction: column; gap: 2px;
+}
+.nav-section { margin-bottom: 16px; }
+.nav-section-label {
+  font-size: 10px; font-weight: 600;
+  color: var(--text-soft); letter-spacing: .8px;
+  text-transform: uppercase;
+  padding: 0 8px 6px;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 10px;
+  border-radius: var(--r8);
+  cursor: pointer; position: relative;
+  transition: all .15s ease;
+  color: var(--text-sub);
+}
+.nav-item:hover {
+  background: var(--bg-weak); color: var(--text-strong);
+}
+.nav-item.active {
+  background: var(--primary-lt); color: var(--primary);
+}
+.nav-item.active .nav-icon { color: var(--primary); }
+.nav-item.active::before {
+  content: ''; position: absolute; left: -10px; top: 50%;
+  transform: translateY(-50%);
+  width: 3px; height: 20px;
+  background: var(--primary); border-radius: 0 var(--r4) var(--r4) 0;
+}
+.nav-icon {
+  width: 20px; height: 20px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0; color: var(--text-soft);
+  transition: color .15s;
+}
+.nav-item:hover .nav-icon { color: var(--text-strong); }
+.nav-label { flex: 1; font-size: 13px; font-weight: 500; }
+.nav-badge {
+  font-size: 10px; font-weight: 700;
+  padding: 1px 6px; border-radius: var(--rfull);
+  background: var(--danger-bg); color: var(--danger);
+}
+.nav-badge.g { background: var(--primary-lt); color: var(--primary); }
 
-/* ── Widget ───────────────────────────────── */
-.widget{background:var(--bg-white);border:1px solid var(--stroke);border-radius:var(--r10);overflow:hidden;display:flex;flex-direction:column;}
-.widget.tall{grid-row:1/3;}
-.widget.wide{grid-column:1/3;}
-.w-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 0;}
-.w-title{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:500;color:var(--text-strong);}
-.w-see-all{font-size:13px;font-weight:500;color:var(--primary);cursor:pointer;}
-.w-body{flex:1;padding:14px 20px 20px;overflow:hidden;display:flex;flex-direction:column;gap:10px;}
+/* Sidebar footer */
+.sb-footer {
+  border-top: 1px solid var(--stroke-soft);
+  padding: 12px 14px;
+}
+.user-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 10px; border-radius: var(--r8);
+  cursor: pointer; transition: background .15s;
+}
+.user-row:hover { background: var(--bg-weak); }
+.user-av {
+  width: 34px; height: 34px;
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  border-radius: var(--rfull);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; flex-shrink: 0;
+  color: white; font-weight: 700;
+}
+.user-name { font-size: 13px; font-weight: 600; color: var(--text-strong); }
+.user-role { font-size: 11px; color: var(--text-soft); }
 
-/* badges */
-.badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:var(--rfull);}
-.ok   {background:#dcfce7;color:#16a34a;}
-.warn {background:#fef9c3;color:#ca8a04;}
-.err  {background:#fee2e2;color:#dc2626;}
-.off  {background:#f1f5f9;color:#94a3b8;}
+/* ══════════════════════════════════════════════════════════════
+   MAIN
+══════════════════════════════════════════════════════════════ */
+.main {
+  flex: 1; display: flex; flex-direction: column;
+  overflow: hidden; min-width: 0;
+}
 
-/* stat cards */
-.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:4px;}
-.stat-card{background:var(--bg-white);border:1px solid var(--stroke);border-radius:var(--r10);padding:12px;border-left-width:3px;box-shadow:var(--sh-xs);}
-.stat-num{font-size:22px;font-weight:700;color:var(--text-strong);}
-.stat-lbl{font-size:11px;color:var(--text-soft);margin-top:2px;}
-.stat-sub{font-size:11px;font-weight:500;margin-top:2px;}
+/* ── Topbar ────────────────────────────────────────────────── */
+.topbar {
+  background: var(--bg-white);
+  border-bottom: 1px solid var(--stroke);
+  padding: 0 24px;
+  display: flex; align-items: center; gap: 12px;
+  height: 72px; flex-shrink: 0;
+  box-shadow: var(--sh-xs);
+}
+.topbar-title { font-size: 16px; font-weight: 700; flex: 1; color: var(--text-strong); }
+.topbar-sub { font-size: 12px; color: var(--text-soft); font-weight: 400; margin-left: 8px; }
 
-/* sensor list */
-.sensor-row{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--r8);border:1px solid var(--stroke);}
-.s-dot{width:8px;height:8px;border-radius:var(--rfull);flex-shrink:0;}
-.s-info{flex:1;}
-.s-name{font-size:13px;font-weight:500;}
-.s-meta{font-size:11px;color:var(--text-soft);}
-.s-right{text-align:right;}
-.s-pct{font-size:14px;font-weight:600;}
+/* Search */
+.search-wrap {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--bg-weak); border: 1px solid var(--stroke);
+  border-radius: var(--r8); padding: 6px 12px;
+  width: 200px; transition: all .2s;
+}
+.search-wrap:focus-within {
+  border-color: var(--primary); background: var(--bg-white);
+  box-shadow: 0 0 0 3px rgba(22,163,74,.1);
+}
+.search-wrap i { color: var(--text-soft); font-size: 15px; }
+.search-wrap input {
+  border: none; background: transparent; outline: none;
+  font-family: inherit; font-size: 13px; color: var(--text-strong);
+  width: 100%;
+}
+.search-wrap input::placeholder { color: var(--text-soft); }
 
-/* recommendation card */
-.rec-card{border:1px solid var(--stroke);border-radius:var(--r8);padding:12px;display:flex;flex-direction:column;gap:6px;}
-.rec-head{display:flex;align-items:center;gap:8px;}
-.rec-name{font-size:13px;font-weight:500;flex:1;}
-.rec-msg{font-size:12px;color:var(--text-sub);line-height:1.5;}
-.rec-chips{display:flex;gap:6px;flex-wrap:wrap;}
-.chip{font-size:11px;color:var(--text-soft);background:var(--bg-weak);padding:2px 8px;border-radius:var(--r4);}
+/* Icon buttons */
+.tb-icon {
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: var(--r8); cursor: pointer;
+  color: var(--text-sub); font-size: 18px;
+  transition: all .15s; position: relative;
+}
+.tb-icon:hover { background: var(--bg-weak); color: var(--text-strong); }
+.tb-dot {
+  position: absolute; top: 6px; right: 6px;
+  width: 7px; height: 7px;
+  background: var(--danger); border-radius: var(--rfull);
+  border: 2px solid var(--bg-white);
+}
 
-/* map */
-#map{flex:1;min-height:300px;border-radius:0 0 var(--r10) var(--r10);}
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 14px; border-radius: var(--r8);
+  font-size: 13px; font-weight: 500; border: none;
+  cursor: pointer; transition: all .15s; font-family: inherit;
+}
+.btn i { font-size: 16px; }
+.btn-ghost {
+  background: transparent; color: var(--text-sub);
+  border: 1px solid var(--stroke);
+}
+.btn-ghost:hover { background: var(--bg-weak); color: var(--text-strong); }
+.btn-primary {
+  background: var(--primary); color: #fff;
+  box-shadow: 0 1px 3px rgba(22,163,74,.3);
+}
+.btn-primary:hover { background: var(--primary-d); }
 
-/* alert list */
-.alert-item{display:flex;flex-direction:column;gap:3px;padding:12px 0;border-bottom:1px solid var(--stroke);cursor:pointer;}
-.alert-item:last-child{border-bottom:none;}
-.alert-top{display:flex;align-items:flex-start;gap:8px;}
-.alert-sev{width:7px;height:7px;border-radius:var(--rfull);margin-top:6px;flex-shrink:0;}
-.alert-title{flex:1;font-size:13px;font-weight:500;}
-.alert-desc{font-size:12px;color:var(--text-sub);padding-left:15px;}
-.alert-foot{display:flex;align-items:center;justify-content:space-between;padding-left:15px;margin-top:2px;}
-.alert-type{font-size:10px;font-weight:600;padding:2px 7px;border-radius:var(--r4);}
-.alert-time{font-size:11px;color:var(--text-soft);}
+/* Refresh banner */
+.refresh-banner {
+  background: linear-gradient(135deg, var(--primary-lt), #f0fdf4);
+  border-bottom: 1px solid var(--primary-md);
+  padding: 6px 24px;
+  display: flex; align-items: center; gap: 8px;
+  flex-shrink: 0;
+}
+.refresh-pulse {
+  width: 8px; height: 8px;
+  background: var(--primary); border-radius: var(--rfull);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.85)} }
+.refresh-text { font-size: 12px; color: var(--primary); font-weight: 500; flex: 1; }
+.refresh-time { font-size: 11px; color: var(--text-soft); }
 
-/* chart containers */
-.chart-wrap{position:relative;flex:1;min-height:120px;}
+/* ── Content Area ──────────────────────────────────────────── */
+.content {
+  flex: 1; overflow-y: auto;
+  padding: 24px 24px 24px;
+}
 
-/* farm row */
-.farm-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--stroke);}
-.farm-row:last-child{border-bottom:none;}
-.farm-av{width:34px;height:34px;border-radius:var(--rfull);display:flex;align-items:center;justify-content:center;font-size:14px;background:var(--bg-soft);flex-shrink:0;}
-.farm-info{flex:1;min-width:0;}
-.farm-name{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.farm-meta{font-size:11px;color:var(--text-soft);}
-.farm-r{text-align:right;}
-.farm-pct{font-size:13px;font-weight:600;}
+/* ── Theme & Lang selectors ────────────────────────────────── */
+.tb-separator { width: 1px; height: 28px; background: var(--stroke); margin: 0 4px; }
 
-/* loading skeleton */
-.skeleton{background:linear-gradient(90deg,var(--bg-soft) 25%,var(--stroke) 50%,var(--bg-soft) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:var(--r8);height:16px;}
-@keyframes shimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
+.lang-select {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 10px; border-radius: var(--r8);
+  border: 1px solid var(--stroke); background: var(--bg-white);
+  font-size: 12px; font-weight: 600; color: var(--text-sub);
+  cursor: pointer; transition: all .15s; font-family: inherit;
+  height: 36px;
+}
+.lang-select:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-lt); }
+.lang-select i { font-size: 15px; }
 
-/* scrollbar */
-::-webkit-scrollbar{width:4px;}
-::-webkit-scrollbar-thumb{background:var(--stroke);border-radius:4px;}
+.theme-btn {
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: var(--r8); border: 1px solid var(--stroke);
+  background: var(--bg-white); cursor: pointer;
+  color: var(--text-sub); font-size: 17px;
+  transition: all .15s;
+}
+.theme-btn:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-lt); }
 
-/* tabs */
-.tabs{display:flex;gap:0;border-bottom:1px solid var(--stroke);padding:0 20px;}
-.tab{padding:10px 12px;font-size:13px;font-weight:500;color:var(--text-soft);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;}
-.tab.active{color:var(--text-strong);border-bottom-color:var(--text-strong);}
+/* Dark theme */
+[data-theme="dark"] {
+  --bg-page:     #0f172a;
+  --bg-white:    #1e293b;
+  --bg-weak:     #162032;
+  --bg-soft:     #1a2844;
+  --text-strong: #f1f5f9;
+  --text-sub:    #94a3b8;
+  --text-soft:   #64748b;
+  --text-hint:   #475569;
+  --stroke:      #2d3f55;
+  --stroke-soft: #1e3048;
+  --primary-lt:  #052e16;
+  --primary-md:  #14532d;
+  --success-bg:  #052e16;
+  --warning-bg:  #1c1008;
+  --danger-bg:   #1c0a0a;
+  --neutral-bg:  #1e293b;
+}
+
+/* ── Stat Cards Row ────────────────────────────────────────── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px; margin-bottom: 18px;
+}
+.stat-card {
+  background: var(--bg-white);
+  border: 1px solid var(--stroke);
+  border-radius: var(--r12);
+  padding: 16px;
+  display: flex; flex-direction: column; gap: 12px;
+  box-shadow: var(--sh-xs);
+  transition: box-shadow .2s, transform .2s;
+  position: relative; overflow: hidden;
+}
+.stat-card:hover { box-shadow: var(--sh-md); transform: translateY(-1px); }
+.stat-card::before {
+  content: ''; position: absolute;
+  top: 0; left: 0; right: 0; height: 3px;
+  border-radius: var(--r12) var(--r12) 0 0;
+}
+.stat-card.green::before  { background: linear-gradient(90deg,#16a34a,#22c55e); }
+.stat-card.red::before    { background: linear-gradient(90deg,#ef4444,#f97316); }
+.stat-card.yellow::before { background: linear-gradient(90deg,#f59e0b,#fbbf24); }
+.stat-card.blue::before   { background: linear-gradient(90deg,#3b82f6,#6366f1); }
+
+.stat-top { display: flex; align-items: flex-start; justify-content: space-between; }
+.stat-icon-wrap {
+  width: 38px; height: 38px; border-radius: var(--r10);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+}
+.stat-icon-wrap.green  { background: var(--primary-lt);  color: var(--primary); }
+.stat-icon-wrap.red    { background: var(--danger-bg);   color: var(--danger); }
+.stat-icon-wrap.yellow { background: var(--warning-bg);  color: var(--warning); }
+.stat-icon-wrap.blue   { background: #eff6ff; color: #3b82f6; }
+
+.stat-trend {
+  display: flex; align-items: center; gap: 3px;
+  font-size: 11px; font-weight: 600;
+  padding: 3px 7px; border-radius: var(--rfull);
+}
+.stat-trend.up   { background: var(--primary-lt); color: var(--primary); }
+.stat-trend.down { background: var(--danger-bg);  color: var(--danger); }
+.stat-trend.neu  { background: var(--bg-soft);    color: var(--text-sub); }
+
+.stat-num { font-size: 26px; font-weight: 800; letter-spacing: -.5px; color: var(--text-strong); }
+.stat-label { font-size: 12px; color: var(--text-soft); font-weight: 500; }
+.stat-sub { font-size: 11px; color: var(--text-hint); margin-top: 2px; }
+
+/* ── Main Grid ─────────────────────────────────────────────── */
+.main-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 340px;
+  grid-template-rows: auto auto;
+  gap: 14px;
+}
+
+/* ── Widget Base ───────────────────────────────────────────── */
+.widget {
+  background: var(--bg-white);
+  border: 1px solid var(--stroke);
+  border-radius: var(--r12);
+  overflow: hidden;
+  display: flex; flex-direction: column;
+  box-shadow: var(--sh-xs);
+  transition: box-shadow .2s;
+}
+.widget:hover { box-shadow: var(--sh-sm); }
+.widget.tall { grid-row: 1 / 3; }
+
+.w-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 18px 0;
+}
+.w-title {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; font-weight: 600; color: var(--text-strong);
+}
+.w-title-icon {
+  width: 28px; height: 28px; border-radius: var(--r8);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px;
+}
+.w-action {
+  font-size: 12px; font-weight: 500; color: var(--primary);
+  cursor: pointer; display: flex; align-items: center; gap: 3px;
+  padding: 4px 8px; border-radius: var(--r6);
+  transition: background .15s;
+}
+.w-action:hover { background: var(--primary-lt); }
+
+.w-body { flex: 1; padding: 14px 18px 18px; display: flex; flex-direction: column; gap: 10px; overflow: hidden; }
+.w-body.scroll { overflow-y: auto; }
+
+/* ── Sensor Items ──────────────────────────────────────────── */
+.sensor-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--r10);
+  border: 1px solid var(--stroke-soft);
+  background: var(--bg-weak);
+  transition: all .15s; cursor: pointer;
+}
+.sensor-item:hover { border-color: var(--stroke); background: var(--bg-white); box-shadow: var(--sh-xs); }
+.s-status {
+  width: 8px; height: 8px; border-radius: var(--rfull); flex-shrink: 0;
+  box-shadow: 0 0 0 2px white, 0 0 0 3px currentColor;
+}
+.s-info { flex: 1; min-width: 0; }
+.s-name { font-size: 12px; font-weight: 600; color: var(--text-strong); }
+.s-meta { font-size: 11px; color: var(--text-soft); margin-top: 1px; }
+.s-right { text-align: right; flex-shrink: 0; }
+.s-pct { font-size: 14px; font-weight: 700; }
+.s-bar { width: 60px; height: 4px; background: var(--stroke); border-radius: var(--rfull); margin-top: 4px; overflow: hidden; }
+.s-bar-fill { height: 100%; border-radius: var(--rfull); transition: width .5s ease; }
+
+/* ── Badge ─────────────────────────────────────────────────── */
+.badge {
+  display: inline-flex; align-items: center; gap: 3px;
+  font-size: 10px; font-weight: 600;
+  padding: 2px 7px; border-radius: var(--rfull);
+  letter-spacing: .1px;
+}
+.badge i { font-size: 11px; }
+.badge.ok    { background: var(--success-bg); color: #16a34a; }
+.badge.warn  { background: var(--warning-bg); color: #b45309; }
+.badge.err   { background: var(--danger-bg);  color: #dc2626; }
+.badge.off   { background: var(--neutral-bg); color: var(--neutral); }
+
+/* ── Recommendation Cards ──────────────────────────────────── */
+.rec-card {
+  border-radius: var(--r10); padding: 12px;
+  border: 1px solid var(--stroke);
+  display: flex; flex-direction: column; gap: 7px;
+  transition: box-shadow .15s; cursor: pointer;
+}
+.rec-card:hover { box-shadow: var(--sh-sm); }
+.rec-card.critical { border-color: #fca5a5; background: #fff5f5; }
+.rec-card.soon     { border-color: #fde68a; background: #fffef0; }
+.rec-card.ok       { border-color: var(--primary-md); background: var(--primary-lt); }
+.rec-card.neutral  { border-color: var(--stroke); background: var(--bg-weak); }
+
+.rec-head { display: flex; align-items: center; gap: 8px; }
+.rec-icon {
+  width: 30px; height: 30px; border-radius: var(--r8);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; flex-shrink: 0;
+}
+.rec-icon.critical { background: var(--danger-bg); color: var(--danger); }
+.rec-icon.soon     { background: var(--warning-bg); color: var(--warning); }
+.rec-icon.ok       { background: var(--primary-lt); color: var(--primary); }
+.rec-icon.neutral  { background: var(--neutral-bg); color: var(--neutral); }
+
+.rec-name { flex: 1; font-size: 12px; font-weight: 600; color: var(--text-strong); }
+.rec-msg  { font-size: 12px; color: var(--text-sub); line-height: 1.5; }
+.rec-chips { display: flex; gap: 5px; flex-wrap: wrap; }
+.chip {
+  font-size: 11px; color: var(--text-sub);
+  background: rgba(0,0,0,.05);
+  padding: 2px 8px; border-radius: var(--r4);
+  display: flex; align-items: center; gap: 3px;
+}
+.chip i { font-size: 11px; }
+
+/* ── Map Panel ─────────────────────────────────────────────── */
+.map-panel {
+  position: relative;
+  flex: 1; min-height: 200px;
+  border-radius: 0 0 var(--r12) var(--r12);
+  overflow: hidden;
+}
+#map {
+  width: 100%; height: 100%;
+  border-radius: 0 0 var(--r12) var(--r12);
+}
+.map-overlay-stats {
+  position: absolute; top: 12px; left: 12px; z-index: 1000;
+  display: flex; flex-direction: column; gap: 6px;
+  pointer-events: none;
+}
+.map-stat-chip {
+  display: flex; align-items: center; gap: 7px;
+  background: rgba(255,255,255,.92);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,.6);
+  border-radius: var(--r8); padding: 6px 10px;
+  box-shadow: var(--sh-sm); pointer-events: all;
+}
+.map-stat-dot { width: 8px; height: 8px; border-radius: var(--rfull); flex-shrink: 0; }
+.map-stat-text { font-size: 11px; font-weight: 600; color: var(--text-strong); white-space: nowrap; }
+.map-stat-val { font-size: 11px; font-weight: 700; margin-left: 4px; }
+
+.map-legend {
+  position: absolute; bottom: 12px; left: 12px; z-index: 1000;
+  background: rgba(255,255,255,.92); backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,.6);
+  border-radius: var(--r8); padding: 8px 10px;
+  box-shadow: var(--sh-sm); display: flex; flex-direction: column; gap: 5px;
+}
+.map-legend-title { font-size: 10px; font-weight: 700; color: var(--text-soft); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 2px; }
+.map-legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-sub); font-weight: 500; }
+.map-legend-dot { width: 10px; height: 10px; border-radius: var(--rfull); border: 2px solid white; box-shadow: 0 0 0 1px currentColor; flex-shrink: 0; }
+.leaflet-popup-content-wrapper {
+  border-radius: var(--r10) !important;
+  box-shadow: var(--sh-lg) !important;
+  padding: 0 !important;
+}
+.leaflet-popup-content { margin: 0 !important; }
+.map-popup {
+  padding: 12px; min-width: 170px;
+  font-family: 'Inter', sans-serif;
+}
+.map-popup-title { font-size: 13px; font-weight: 700; margin-bottom: 8px; color: var(--text-strong); }
+.map-popup-row { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-sub); margin-bottom: 4px; }
+.map-popup-row i { font-size: 13px; }
+.map-popup-status {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 11px; font-weight: 600;
+  padding: 3px 8px; border-radius: var(--rfull);
+  margin-top: 6px;
+}
+
+/* ── Alert List ────────────────────────────────────────────── */
+.alert-item {
+  display: flex; flex-direction: column; gap: 5px;
+  padding: 12px 0; border-bottom: 1px solid var(--stroke-soft);
+  cursor: pointer; transition: padding .15s;
+}
+.alert-item:last-child { border-bottom: none; }
+.alert-item:hover { padding-left: 4px; }
+.alert-top { display: flex; align-items: flex-start; gap: 10px; }
+.alert-sev-icon {
+  width: 28px; height: 28px; border-radius: var(--r8);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; flex-shrink: 0; margin-top: 1px;
+}
+.alert-sev-icon.critical { background: var(--danger-bg);  color: var(--danger);  }
+.alert-sev-icon.error    { background: var(--danger-bg);  color: var(--danger);  }
+.alert-sev-icon.warning  { background: var(--warning-bg); color: var(--warning); }
+.alert-sev-icon.ok       { background: var(--success-bg); color: var(--success); }
+.alert-title { flex: 1; font-size: 12px; font-weight: 600; color: var(--text-strong); line-height: 1.4; }
+.alert-desc  { font-size: 11px; color: var(--text-sub); padding-left: 38px; line-height: 1.4; }
+.alert-foot  { display: flex; align-items: center; gap: 6px; padding-left: 38px; }
+.alert-tag   { font-size: 10px; font-weight: 600; padding: 1px 6px; border-radius: var(--r4); letter-spacing: .2px; }
+.alert-time  { font-size: 11px; color: var(--text-soft); margin-left: auto; display: flex; align-items: center; gap: 3px; }
+.alert-time i { font-size: 11px; }
+
+/* ── Farm List ─────────────────────────────────────────────── */
+.farm-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 0; border-bottom: 1px solid var(--stroke-soft);
+  cursor: pointer; transition: all .15s;
+}
+.farm-item:last-child { border-bottom: none; }
+.farm-item:hover { padding-left: 4px; }
+.farm-avatar {
+  width: 36px; height: 36px; border-radius: var(--r10);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0;
+  border: 1px solid var(--stroke);
+}
+.farm-info { flex: 1; min-width: 0; }
+.farm-name { font-size: 12px; font-weight: 600; color: var(--text-strong); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.farm-meta { font-size: 11px; color: var(--text-soft); margin-top: 2px; display: flex; align-items: center; gap: 4px; }
+.farm-meta i { font-size: 11px; }
+.farm-right { text-align: right; flex-shrink: 0; }
+.farm-pct { font-size: 13px; font-weight: 700; }
+
+/* ── Chart container ───────────────────────────────────────── */
+.chart-wrap { position: relative; flex: 1; min-height: 0; }
+
+/* ── Saving summary ────────────────────────────────────────── */
+.saving-big {
+  text-align: center; padding: 10px 0 8px;
+  border-radius: var(--r10);
+  background: linear-gradient(135deg, var(--primary-lt), #f0fdf4);
+  border: 1px solid var(--primary-md);
+}
+.saving-num { font-size: 36px; font-weight: 800; color: var(--primary); letter-spacing: -1px; line-height: 1.1; }
+.saving-label { font-size: 11px; color: var(--text-sub); margin-top: 3px; }
+
+/* ── Tabs ──────────────────────────────────────────────────── */
+.tabs { display: flex; border-bottom: 1px solid var(--stroke); padding: 0 18px; flex-shrink: 0; }
+.tab { padding: 10px 12px; font-size: 12px; font-weight: 500; color: var(--text-soft); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all .15s; display: flex; align-items: center; gap: 5px; }
+.tab:hover { color: var(--text-strong); }
+.tab.active { color: var(--text-strong); border-bottom-color: var(--text-strong); }
+.tab-count { font-size: 10px; font-weight: 700; padding: 1px 5px; border-radius: var(--rfull); background: var(--danger-bg); color: var(--danger); }
+
+/* ── Divider ───────────────────────────────────────────────── */
+.divider { height: 1px; background: var(--stroke-soft); }
+
+/* ── Skeleton ──────────────────────────────────────────────── */
+.skel {
+  background: linear-gradient(90deg, var(--bg-soft) 25%, var(--stroke) 50%, var(--bg-soft) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--r8);
+}
+@keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+/* ══════════════════════════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════════════════════════ */
+@media (max-width: 1280px) {
+  .main-grid { grid-template-columns: 1fr 1fr; }
+  .widget.tall { grid-row: auto; grid-column: 1 / 3; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 900px) {
+  :root { --sb-width: 220px; }
+  .main-grid { grid-template-columns: 1fr; }
+  .widget.tall { grid-column: auto; }
+  .search-wrap { width: 160px; }
+}
+@media (max-width: 680px) {
+  .sidebar { position: fixed; left: -100%; transition: left .25s; }
+  .sidebar.open { left: 0; }
+  .content { padding: 14px 14px 20px; }
+  .stats-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .topbar { padding: 0 14px; }
+  .search-wrap { display: none; }
+}
 </style>
 </head>
 <body>
 
-<!-- SIDEBAR -->
-<nav class="sidebar">
-  <div class="sb-header">
-    <div class="sb-brand">
-      <div class="brand-logo">🌱</div>
-      <div>
-        <div class="brand-name">Tomchi Tech</div>
-        <div class="brand-sub">Agrotexnik Panel</div>
-      </div>
+<!-- ══ SIDEBAR ══════════════════════════════════════════════ -->
+<nav class="sidebar" id="sidebar">
+  <div class="sb-brand">
+    <div class="brand-logo"><i class="ri-leaf-line"></i></div>
+    <div style="flex:1">
+      <div class="brand-name">Tomchi Tech</div>
     </div>
+    <span class="brand-version">v0.1</span>
   </div>
-  <div class="sb-content">
-    <div>
-      <div class="nav-label">Asosiy</div>
-      <div class="nav-items" style="margin-top:8px">
-        <a class="nav-item active" href="#"><div class="nav-icon">⊞</div><span class="nav-text">Dashboard</span></a>
-        <a class="nav-item" href="#"><div class="nav-icon">📡</div><span class="nav-text">Sensorlar</span><span class="nav-badge g" id="nb-sensors">6</span></a>
-        <a class="nav-item" href="#"><div class="nav-icon">🌾</div><span class="nav-text">Fermalar</span></a>
-        <a class="nav-item" href="#"><div class="nav-icon">💡</div><span class="nav-text">Tavsiyalar</span></a>
-        <a class="nav-item" href="#"><div class="nav-icon">🔔</div><span class="nav-text">Alertlar</span><span class="nav-badge" id="nb-alerts">—</span></a>
-        <a class="nav-item" href="#"><div class="nav-icon">📊</div><span class="nav-text">Hisobot</span></a>
+
+  <div class="sb-nav">
+    <div class="nav-section">
+      <div class="nav-section-label">Asosiy</div>
+      <a class="nav-item active" href="#">
+        <div class="nav-icon"><i class="ri-dashboard-3-line"></i></div>
+        <span class="nav-label">Dashboard</span>
+      </a>
+      <a class="nav-item" href="#">
+        <div class="nav-icon"><i class="ri-radar-line"></i></div>
+        <span class="nav-label">Sensorlar</span>
+        <span class="nav-badge g" id="nb-sensors">6</span>
+      </a>
+      <a class="nav-item" href="#">
+        <div class="nav-icon"><i class="ri-plant-line"></i></div>
+        <span class="nav-label">Fermalar</span>
+      </a>
+      <a class="nav-item" href="#">
+        <div class="nav-icon"><i class="ri-lightbulb-line"></i></div>
+        <span class="nav-label">Tavsiyalar</span>
+      </a>
+      <a class="nav-item" href="#">
+        <div class="nav-icon"><i class="ri-notification-3-line"></i></div>
+        <span class="nav-label">Alertlar</span>
+        <span class="nav-badge" id="nb-alerts">—</span>
+      </a>
+      <a class="nav-item" href="#">
+        <div class="nav-icon"><i class="ri-bar-chart-2-line"></i></div>
+        <span class="nav-label">Hisobotlar</span>
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-label">Tez kirish</div>
+      <div id="quick-nav">
+        <div class="nav-item" style="opacity:.4">
+          <div class="nav-icon"><i class="ri-loader-4-line"></i></div>
+          <span class="nav-label">Yuklanmoqda...</span>
+        </div>
       </div>
     </div>
-    <div>
-      <div class="nav-label">Tez kirish</div>
-      <div class="nav-items" id="quick-nav" style="margin-top:8px">
-        <div class="nav-item"><div class="nav-icon">🌱</div><span class="nav-text">Yuklanmoqda...</span></div>
-      </div>
-    </div>
+
     <div style="flex:1"></div>
-    <div class="nav-items">
-      <a class="nav-item" href="#"><div class="nav-icon">⚙️</div><span class="nav-text">Sozlamalar</span></a>
-    </div>
+
+    <a class="nav-item" href="#">
+      <div class="nav-icon"><i class="ri-settings-3-line"></i></div>
+      <span class="nav-label">Sozlamalar</span>
+    </a>
+    <a class="nav-item" href="#">
+      <div class="nav-icon"><i class="ri-question-line"></i></div>
+      <span class="nav-label">Yordam</span>
+    </a>
   </div>
+
   <div class="sb-footer">
-    <div class="user-card">
-      <div class="user-av">👨‍💼</div>
-      <div>
-        <div class="user-name">Xurshid Istamov ✓</div>
-        <div class="user-email">designerwebapk@gmail.com</div>
+    <div class="user-row">
+      <div class="user-av">X</div>
+      <div style="flex:1;min-width:0">
+        <div class="user-name">Xurshid Istamov</div>
+        <div class="user-role">Agrotexnik · Admin</div>
       </div>
+      <i class="ri-more-2-fill" style="color:var(--text-soft);font-size:16px"></i>
     </div>
   </div>
 </nav>
 
-<!-- MAIN -->
+<!-- ══ MAIN ════════════════════════════════════════════════ -->
 <div class="main">
-  <header class="header">
-    <div class="hdr-left">
-      <div class="hdr-av">👨‍💼</div>
-      <div>
-        <div class="hdr-name">Xurshid Istamov</div>
-        <div class="hdr-sub">Tomchi Tech'ga xush kelibsiz 👋</div>
-      </div>
-    </div>
-    <div class="hdr-actions">
-      <div class="icon-btn">🔍</div>
-      <div class="icon-btn">🔔<div class="notif-dot" id="notif-dot" style="display:none"></div></div>
-      <button class="btn-outline" onclick="fetchAll()">🔄 Yangilash</button>
-      <button class="btn-primary">＋ Sensor qo'shish</button>
-    </div>
-  </header>
 
-  <div class="refresh-bar">
-    <div class="refresh-dot"></div>
-    <span id="refresh-status">Ma'lumotlar yuklanmoqda...</span>
+  <!-- Topbar -->
+  <div class="topbar">
+    <div style="font-size:18px;cursor:pointer;color:var(--text-sub);display:none" id="menu-btn" onclick="document.getElementById('sidebar').classList.toggle('open')">
+      <i class="ri-menu-line"></i>
+    </div>
+    <div class="topbar-title">
+      Dashboard
+      <span class="topbar-sub">Barcha sensorlar monitoringi</span>
+    </div>
+    <div class="search-wrap">
+      <i class="ri-search-2-line"></i>
+      <input type="text" placeholder="Qidirish..."/>
+    </div>
+    <div class="tb-icon" onclick="fetchAll()" title="Yangilash">
+      <i class="ri-refresh-line" id="refresh-icon"></i>
+    </div>
+    <div class="tb-icon" title="Ogohlantirishlar">
+      <i class="ri-notification-3-line"></i>
+      <div class="tb-dot" id="notif-dot" style="display:none"></div>
+    </div>
+    <div class="tb-separator"></div>
+
+    <!-- Language selector -->
+    <div class="lang-select" id="lang-btn" onclick="cycleLang()" title="Tilni o'zgartirish">
+      <i class="ri-global-line"></i>
+      <span id="lang-label">UZ</span>
+    </div>
+
+    <!-- Theme toggle -->
+    <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="Mavzuni o'zgartirish">
+      <i class="ri-moon-line" id="theme-icon"></i>
+    </button>
+
+    <div class="tb-separator"></div>
+
+    <button class="btn btn-ghost">
+      <i class="ri-calendar-check-line"></i> Jadval
+    </button>
+    <button class="btn btn-primary">
+      <i class="ri-add-line"></i> Sensor qo'shish
+    </button>
   </div>
 
+  <!-- Refresh banner -->
+  <div class="refresh-banner">
+    <div class="refresh-pulse" id="live-dot"></div>
+    <span class="refresh-text" id="refresh-status">Ma'lumotlar yuklanmoqda...</span>
+    <span class="refresh-time" id="refresh-time"></span>
+  </div>
+
+  <!-- Content -->
   <div class="content">
 
-    <!-- STAT CARDS (wide) -->
-    <div class="widget wide" style="padding:16px 20px;flex-direction:row;align-items:stretch;gap:12px;grid-column:1/3;">
-      <div class="stat-card" style="border-left-color:#16a34a;flex:1">
-        <div class="stat-num" id="st-online">—</div>
-        <div class="stat-lbl">Online sensorlar</div>
-        <div class="stat-sub" style="color:#16a34a" id="st-online-sub">—</div>
-      </div>
-      <div class="stat-card" style="border-left-color:#ef4444;flex:1">
-        <div class="stat-num" id="st-critical" style="color:#ef4444">—</div>
-        <div class="stat-lbl">Kritik alertlar</div>
-        <div class="stat-sub" style="color:#ef4444" id="st-critical-sub">—</div>
-      </div>
-      <div class="stat-card" style="border-left-color:#eab308;flex:1">
-        <div class="stat-num" id="st-soon" style="color:#eab308">—</div>
-        <div class="stat-lbl">Tez sug'or</div>
-        <div class="stat-sub" style="color:#eab308">Tavsiyalar</div>
-      </div>
-      <div class="stat-card" style="border-left-color:#16a34a;flex:1">
-        <div class="stat-num" id="st-saving" style="color:#16a34a">—</div>
-        <div class="stat-lbl">O'rtacha tejash</div>
-        <div class="stat-sub" style="color:#16a34a">vs an'anaviy</div>
-      </div>
-    </div>
-
-    <!-- WIDGET 1: Sensorlar holati + Chart -->
-    <div class="widget">
-      <div class="w-header">
-        <div class="w-title">📡 Sensor holati</div>
-        <span class="w-see-all">Barchasi</span>
-      </div>
-      <div class="w-body">
-        <div class="chart-wrap" style="min-height:160px">
-          <canvas id="moistureChart"></canvas>
+    <!-- Stat cards -->
+    <div class="stats-grid">
+      <div class="stat-card green">
+        <div class="stat-top">
+          <div class="stat-icon-wrap green"><i class="ri-radar-line"></i></div>
+          <span class="stat-trend neu" id="st-online-trend">—</span>
         </div>
-        <div id="sensor-list"></div>
-      </div>
-    </div>
-
-    <!-- WIDGET 2: Tavsiyalar -->
-    <div class="widget">
-      <div class="w-header">
-        <div class="w-title">💡 Sug'orish tavsiyalari</div>
-        <span class="w-see-all">Barchasi</span>
-      </div>
-      <div class="w-body" id="rec-list" style="overflow-y:auto">
-        <div class="skeleton"></div>
-        <div class="skeleton" style="height:80px;margin-top:8px"></div>
-      </div>
-    </div>
-
-    <!-- WIDGET 3: Xarita (tall) -->
-    <div class="widget tall">
-      <div class="w-header" style="padding-bottom:12px">
-        <div class="w-title">🗺️ Sensorlar xaritasi</div>
-        <span class="w-see-all" id="map-count">6 sensor</span>
-      </div>
-      <div id="map"></div>
-    </div>
-
-    <!-- WIDGET 4: Suv tejash Chart -->
-    <div class="widget">
-      <div class="w-header">
-        <div class="w-title">💧 Suv tejash</div>
-        <span class="w-see-all">Hisobot</span>
-      </div>
-      <div class="w-body">
-        <div style="text-align:center;padding:8px 0">
-          <div style="font-size:32px;font-weight:700;color:var(--primary)" id="total-saving">— %</div>
-          <div style="font-size:12px;color:var(--text-soft);margin-top:2px">O'rtacha tejash · an'anaviy usulga nisbatan</div>
+        <div>
+          <div class="stat-num" id="st-online">—</div>
+          <div class="stat-label">Online sensorlar</div>
+          <div class="stat-sub" id="st-online-sub">jami 6 ta</div>
         </div>
-        <div class="chart-wrap" style="min-height:130px">
-          <canvas id="savingChart"></canvas>
+      </div>
+      <div class="stat-card red">
+        <div class="stat-top">
+          <div class="stat-icon-wrap red"><i class="ri-error-warning-line"></i></div>
+          <span class="stat-trend down" id="st-alert-trend">
+            <i class="ri-arrow-up-s-line"></i> Kritik
+          </span>
+        </div>
+        <div>
+          <div class="stat-num" id="st-critical" style="color:var(--danger)">—</div>
+          <div class="stat-label">Faol alertlar</div>
+          <div class="stat-sub" id="st-alert-sub">—</div>
+        </div>
+      </div>
+      <div class="stat-card yellow">
+        <div class="stat-top">
+          <div class="stat-icon-wrap yellow"><i class="ri-drop-line"></i></div>
+          <span class="stat-trend neu" id="st-irr-trend">Tavsiya</span>
+        </div>
+        <div>
+          <div class="stat-num" id="st-soon" style="color:var(--warning)">—</div>
+          <div class="stat-label">Sug'orish kerak</div>
+          <div class="stat-sub">sensor bo'yicha</div>
+        </div>
+      </div>
+      <div class="stat-card blue">
+        <div class="stat-top">
+          <div class="stat-icon-wrap blue"><i class="ri-recycle-line"></i></div>
+          <span class="stat-trend up" id="st-save-trend">
+            <i class="ri-arrow-up-s-line"></i> Yaxshi
+          </span>
+        </div>
+        <div>
+          <div class="stat-num" id="st-saving" style="color:#3b82f6">—</div>
+          <div class="stat-label">O'rtacha tejash</div>
+          <div class="stat-sub">an'anaviy vs smart</div>
         </div>
       </div>
     </div>
 
-    <!-- WIDGET 5: Fermalar -->
-    <div class="widget">
-      <div class="w-header">
-        <div class="w-title">🌾 Fermalar</div>
-        <span class="w-see-all">Barchasi</span>
-      </div>
-      <div class="w-body" id="farm-list" style="overflow-y:auto">
-        <div class="skeleton"></div>
-        <div class="skeleton" style="margin-top:8px"></div>
-      </div>
-    </div>
+    <!-- Main grid -->
+    <div class="main-grid">
 
+      <!-- Widget 1: Sensorlar -->
+      <div class="widget">
+        <div class="w-head">
+          <div class="w-title">
+            <div class="w-title-icon" style="background:var(--primary-lt);color:var(--primary)">
+              <i class="ri-radar-line"></i>
+            </div>
+            Sensor holati
+          </div>
+          <span class="w-action"><i class="ri-external-link-line"></i> Barchasi</span>
+        </div>
+        <div class="w-body">
+          <div class="chart-wrap" style="min-height:150px">
+            <canvas id="moistureChart"></canvas>
+          </div>
+          <div class="divider"></div>
+          <div id="sensor-list" class="scroll" style="display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto">
+            <div class="skel" style="height:44px"></div>
+            <div class="skel" style="height:44px"></div>
+            <div class="skel" style="height:44px"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Widget 2: Tavsiyalar -->
+      <div class="widget">
+        <div class="w-head">
+          <div class="w-title">
+            <div class="w-title-icon" style="background:var(--warning-bg);color:var(--warning)">
+              <i class="ri-lightbulb-flash-line"></i>
+            </div>
+            Sug'orish tavsiyalari
+          </div>
+          <span class="w-action"><i class="ri-external-link-line"></i> Barchasi</span>
+        </div>
+        <div class="w-body scroll" id="rec-list" style="gap:8px;max-height:440px;overflow-y:auto">
+          <div class="skel" style="height:80px"></div>
+          <div class="skel" style="height:80px"></div>
+        </div>
+      </div>
+
+      <!-- Widget 3: Xarita (tall) -->
+      <div class="widget tall">
+        <div class="w-head">
+          <div class="w-title">
+            <div class="w-title-icon" style="background:#eff6ff;color:#3b82f6">
+              <i class="ri-map-2-line"></i>
+            </div>
+            Sensorlar xaritasi
+          </div>
+          <span class="w-action" id="map-count"><i class="ri-map-pin-2-line"></i> 6 sensor</span>
+        </div>
+
+        <div class="map-panel">
+          <!-- Overlay: sensor stats -->
+          <div class="map-overlay-stats" id="map-overlay-stats">
+            <div class="map-stat-chip">
+              <div class="map-stat-dot" style="background:#16a34a"></div>
+              <span class="map-stat-text">Online</span>
+              <span class="map-stat-val" id="mo-online" style="color:#16a34a">—</span>
+            </div>
+            <div class="map-stat-chip">
+              <div class="map-stat-dot" style="background:#f59e0b"></div>
+              <span class="map-stat-text">Diqqat</span>
+              <span class="map-stat-val" id="mo-warn" style="color:#f59e0b">—</span>
+            </div>
+            <div class="map-stat-chip">
+              <div class="map-stat-dot" style="background:#ef4444"></div>
+              <span class="map-stat-text">Kritik</span>
+              <span class="map-stat-val" id="mo-crit" style="color:#ef4444">—</span>
+            </div>
+            <div class="map-stat-chip">
+              <div class="map-stat-dot" style="background:#94a3b8"></div>
+              <span class="map-stat-text">Offline</span>
+              <span class="map-stat-val" id="mo-off" style="color:#94a3b8">—</span>
+            </div>
+          </div>
+
+          <!-- Legend -->
+          <div class="map-legend">
+            <div class="map-legend-title">Holat</div>
+            <div class="map-legend-item"><div class="map-legend-dot" style="background:#16a34a;color:#16a34a"></div>Yaxshi</div>
+            <div class="map-legend-item"><div class="map-legend-dot" style="background:#f59e0b;color:#f59e0b"></div>Diqqat</div>
+            <div class="map-legend-item"><div class="map-legend-dot" style="background:#ef4444;color:#ef4444"></div>Kritik</div>
+            <div class="map-legend-item"><div class="map-legend-dot" style="background:#94a3b8;color:#94a3b8"></div>Offline</div>
+          </div>
+
+          <div id="map"></div>
+        </div>
+      </div>
+
+      <!-- Widget 4: Suv tejash -->
+      <div class="widget">
+        <div class="w-head">
+          <div class="w-title">
+            <div class="w-title-icon" style="background:var(--primary-lt);color:var(--primary)">
+              <i class="ri-water-percent-line"></i>
+            </div>
+            Suv tejash tahlili
+          </div>
+          <span class="w-action"><i class="ri-download-2-line"></i> Hisobot</span>
+        </div>
+        <div class="w-body">
+          <div class="saving-big">
+            <div class="saving-num" id="total-saving">—</div>
+            <div class="saving-label"><i class="ri-arrow-up-line" style="color:var(--primary)"></i> O'rtacha suv tejash · an'anaviy usulga nisbatan</div>
+          </div>
+          <div class="chart-wrap" style="min-height:140px">
+            <canvas id="savingChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Widget 5: Fermalar + Alertlar -->
+      <div class="widget">
+        <div class="w-head" style="padding-bottom:0">
+          <div class="w-title">
+            <div class="w-title-icon" style="background:#faf5ff;color:#9333ea">
+              <i class="ri-community-line"></i>
+            </div>
+            Fermalar va alertlar
+          </div>
+        </div>
+        <div class="tabs">
+          <div class="tab active" onclick="switchTab(this,'farms-tab')">
+            <i class="ri-plant-line"></i> Fermalar
+          </div>
+          <div class="tab" onclick="switchTab(this,'alerts-tab')">
+            <i class="ri-alarm-warning-line"></i> Alertlar
+            <span class="tab-count" id="tab-alert-count">0</span>
+          </div>
+        </div>
+        <div class="w-body scroll" id="farms-tab" style="max-height:280px;overflow-y:auto">
+          <div class="skel" style="height:40px"></div>
+          <div class="skel" style="height:40px;margin-top:8px"></div>
+        </div>
+        <div class="w-body scroll" id="alerts-tab" style="display:none;max-height:280px;overflow-y:auto">
+          <div class="skel" style="height:60px"></div>
+        </div>
+      </div>
+
+    </div><!-- /main-grid -->
   </div><!-- /content -->
 </div><!-- /main -->
 
 <script>
 const API = 'https://tomchi-tech-api.onrender.com/api/v1';
 
-const CROP_EMOJI = {
-  pomidor:"🍅", kartoshka:"🥔", paxta:"🌿",
-  uzum:"🍇", bugdoy:"🌾", "makkajo'xori":"🌽", piyoz:"🧅"
-};
+const CROP_EMOJI = { pomidor:'🍅', kartoshka:'🥔', paxta:'🌿', uzum:'🍇', bugdoy:'🌾', "makkajo'xori":'🌽', piyoz:'🧅' };
 
-let moistureChart = null;
-let savingChart   = null;
-let leafletMap    = null;
-let markers       = {};
+let moistureChart = null, savingChart = null, map = null, markers = {};
 
-// ── Leaflet Map init ──────────────────────────────────────────
-function initMap() {
-  leafletMap = L.map('map', { zoomControl: true, scrollWheelZoom: true })
-    .setView([40.5, 69.0], 6);
-
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap',
-    maxZoom: 18,
-  }).addTo(leafletMap);
+// ── Tab switch ────────────────────────────────────────────
+function switchTab(el, tabId) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  ['farms-tab','alerts-tab'].forEach(id => {
+    document.getElementById(id).style.display = id === tabId ? 'flex' : 'none';
+  });
 }
 
-function getMarkerColor(status, moisture, threshold) {
+// ── Status helpers ────────────────────────────────────────
+function statusColor(status, m, thr) {
   if (status === 'offline') return '#94a3b8';
-  if (status === 'warning') return '#eab308';
-  if (moisture < threshold - 15) return '#ef4444';
-  if (moisture < threshold)      return '#eab308';
+  if (m < thr - 15) return '#ef4444';
+  if (m < thr)      return '#f59e0b';
   return '#16a34a';
+}
+function statusLabel(status, m, thr) {
+  if (status === 'offline') return ['off','Offline'];
+  if (m < thr - 15) return ['err','Darhol!'];
+  if (m < thr)      return ['warn','Tez sug\'or'];
+  return ['ok','Yaxshi'];
+}
+
+// ── Map ───────────────────────────────────────────────────
+function initMap() {
+  map = L.map('map', { scrollWheelZoom: true, zoomControl: true }).setView([40.8, 64.0], 5);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    attribution: '© CartoDB', maxZoom: 18,
+  }).addTo(map);
 }
 
 function updateMarkers(readings, configs) {
   configs.forEach(cfg => {
-    const reading = readings.find(r => r.sensor_id === cfg.sensor_id);
-    const moisture = reading ? reading.soil_moisture : 0;
-    const color = getMarkerColor(cfg.status, moisture, cfg.irrigation_threshold);
+    const r = readings.find(x => x.sensor_id === cfg.sensor_id);
+    const m = r ? r.soil_moisture : 0;
+    const color = statusColor(cfg.status, m, cfg.irrigation_threshold);
+    const [cls, lbl] = statusLabel(cfg.status, m, cfg.irrigation_threshold);
+
+    const clsColors = { ok:'#16a34a', warn:'#f59e0b', err:'#ef4444', off:'#94a3b8' };
+    const clsBgs    = { ok:'#f0fdf4', warn:'#fffbeb', err:'#fef2f2', off:'#f8fafc' };
 
     const icon = L.divIcon({
       className: '',
-      html: `<div style="
-        width:32px;height:32px;background:${color};border:3px solid white;
-        border-radius:50%;display:flex;align-items:center;justify-content:center;
-        font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,0.3);cursor:pointer;
-      ">${CROP_EMOJI[cfg.crop_type] || '🌱'}</div>`,
-      iconSize: [32, 32],
-      iconAnchor: [16, 16],
+      html: `<div style="width:38px;height:38px;background:${clsBgs[cls]};border:2.5px solid ${color};border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;box-shadow:0 3px 10px ${color}44;cursor:pointer;transition:transform .2s" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'">${CROP_EMOJI[cfg.crop_type]||'🌱'}</div>`,
+      iconSize: [38,38], iconAnchor: [19,19],
     });
 
-    const popup = `
-      <div style="font-family:Inter,sans-serif;min-width:160px">
-        <div style="font-weight:600;margin-bottom:4px">${cfg.sensor_id} · ${cfg.crop_type}</div>
-        <div style="color:#555;font-size:12px">📍 ${cfg.field_area_ha} ga</div>
-        <div style="margin-top:8px;font-size:13px">
-          💧 Namlik: <b style="color:${color}">${moisture > 0 ? moisture.toFixed(1)+'%' : '—'}</b>
-        </div>
-        <div style="font-size:12px;margin-top:2px">
-          🌡 Harorat: ${reading ? reading.temperature.toFixed(1)+'°C' : '—'}
-        </div>
-        <div style="font-size:12px;margin-top:2px">
-          🔋 Batareya: ${reading ? reading.battery_level.toFixed(0)+'%' : '—'}
-        </div>
-        <div style="margin-top:6px">
-          <span style="background:${color};color:white;border-radius:4px;padding:2px 8px;font-size:11px;font-weight:600">${cfg.status.toUpperCase()}</span>
-        </div>
-      </div>`;
+    const popup = `<div class="map-popup">
+      <div class="map-popup-title">${cfg.sensor_id} · ${cfg.crop_type}</div>
+      <div class="map-popup-row"><i class="ri-map-pin-2-line" style="color:var(--primary)"></i> ${cfg.field_area_ha} ga · ${cfg.farm_id}</div>
+      <div class="map-popup-row"><i class="ri-drop-line" style="color:#3b82f6"></i> Namlik: <b style="color:${color}">${cfg.status==='offline'?'—':m.toFixed(1)+'%'}</b></div>
+      <div class="map-popup-row"><i class="ri-temp-hot-line" style="color:#ef4444"></i> Harorat: ${r?r.temperature.toFixed(1)+'°C':'—'}</div>
+      <div class="map-popup-row"><i class="ri-battery-2-charge-line" style="color:${r&&r.battery_level<20?'#ef4444':'#16a34a'}"></i> Batareya: ${r?r.battery_level.toFixed(0)+'%':'—'}</div>
+      <div><span class="map-popup-status" style="background:${clsBgs[cls]};color:${clsColors[cls]}">${lbl}</span></div>
+    </div>`;
 
-    if (markers[cfg.sensor_id]) {
-      leafletMap.removeLayer(markers[cfg.sensor_id]);
-    }
+    if (markers[cfg.sensor_id]) map.removeLayer(markers[cfg.sensor_id]);
     markers[cfg.sensor_id] = L.marker([cfg.location_lat, cfg.location_lon], { icon })
-      .addTo(leafletMap)
-      .bindPopup(popup);
+      .addTo(map).bindPopup(popup, { maxWidth: 220 });
   });
 }
 
-// ── Charts ────────────────────────────────────────────────────
+// ── Charts ────────────────────────────────────────────────
 function initMoistureChart(labels, data, colors) {
   const ctx = document.getElementById('moistureChart').getContext('2d');
   if (moistureChart) moistureChart.destroy();
@@ -409,21 +1071,20 @@ function initMoistureChart(labels, data, colors) {
     data: {
       labels,
       datasets: [{
-        data,
-        backgroundColor: colors.map(c => c + '99'),
-        borderColor: colors,
-        borderWidth: 2,
-        borderRadius: 6,
+        data, borderRadius: 6, borderSkipped: false,
+        backgroundColor: colors.map(c => c + '30'),
+        borderColor: colors, borderWidth: 2,
       }]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false }, tooltip: {
-        callbacks: { label: ctx => ` ${ctx.parsed.y.toFixed(1)}% namlik` }
-      }},
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: c => ` ${c.parsed.y.toFixed(1)}% namlik` } }
+      },
       scales: {
-        y: { min: 0, max: 100, ticks: { callback: v => v+'%', font: { size: 10 } }, grid: { color: '#f0f0f0' } },
-        x: { ticks: { font: { size: 10 } }, grid: { display: false } }
+        y: { min:0, max:100, grid: { color:'#f1f5f9' }, ticks: { callback: v=>v+'%', font:{size:10}, color:'#94a3b8' } },
+        x: { grid: { display:false }, ticks: { font:{size:10}, color:'#94a3b8' } }
       }
     }
   });
@@ -437,206 +1098,269 @@ function initSavingChart(labels, data) {
     data: {
       labels,
       datasets: [{
-        label: 'Tejash %',
-        data,
-        backgroundColor: data.map(v => v > 50 ? '#16a34a99' : '#eab30899'),
-        borderColor:     data.map(v => v > 50 ? '#16a34a'   : '#eab308'),
+        label: 'Tejash %', data, borderRadius: 6, borderSkipped: false,
+        backgroundColor: data.map(v => v >= 80 ? '#16a34a30' : v >= 50 ? '#f59e0b30' : '#ef444430'),
+        borderColor:     data.map(v => v >= 80 ? '#16a34a'   : v >= 50 ? '#f59e0b'   : '#ef4444'),
         borderWidth: 2,
-        borderRadius: 6,
       }]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false }, tooltip: {
-        callbacks: { label: ctx => ` ${ctx.parsed.y.toFixed(1)}% tejash` }
-      }},
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: c => ` ${c.parsed.y.toFixed(1)}% tejash` } }
+      },
       scales: {
-        y: { min: 0, max: 100, ticks: { callback: v => v+'%', font: { size: 10 } }, grid: { color: '#f0f0f0' } },
-        x: { ticks: { font: { size: 10 } }, grid: { display: false } }
+        y: { min:0, max:100, grid:{color:'#f1f5f9'}, ticks:{callback:v=>v+'%',font:{size:10},color:'#94a3b8'} },
+        x: { grid:{display:false}, ticks:{font:{size:10},color:'#94a3b8'} }
       }
     }
   });
 }
 
-// ── Render helpers ────────────────────────────────────────────
-function statusColor(status, moisture, threshold) {
-  if (status === 'offline') return '#94a3b8';
-  if (moisture < threshold - 15) return '#ef4444';
-  if (moisture < threshold)      return '#eab308';
-  return '#16a34a';
-}
-
-function statusBadge(status, moisture, threshold) {
-  if (status === 'offline') return `<span class="badge off">Offline</span>`;
-  if (moisture < threshold - 15) return `<span class="badge err">Darhol!</span>`;
-  if (moisture < threshold)      return `<span class="badge warn">Tez sug'or</span>`;
-  return `<span class="badge ok">Yaxshi</span>`;
-}
-
+// ── Render ────────────────────────────────────────────────
 function renderSensors(readings, configs) {
-  const list = document.getElementById('sensor-list');
-  const labels = [], data = [], colors = [];
-
-  list.innerHTML = readings.map(r => {
+  const labels=[], data=[], colors=[];
+  const html = readings.map(r => {
     const cfg = configs.find(c => c.sensor_id === r.sensor_id) || {};
-    const color = statusColor(cfg.status, r.soil_moisture, cfg.irrigation_threshold || 45);
-    labels.push(r.sensor_id);
-    data.push(r.soil_moisture);
-    colors.push(color);
-    return `
-      <div class="sensor-row">
-        <div class="s-dot" style="background:${color}"></div>
-        <div class="s-info">
-          <div class="s-name">${r.sensor_id} · ${cfg.crop_type || '—'}</div>
-          <div class="s-meta">${cfg.field_area_ha || '—'} ga · ${cfg.farm_id || '—'}</div>
-        </div>
-        <div class="s-right">
-          <div class="s-pct" style="color:${color}">${cfg.status==='offline'?'—':r.soil_moisture.toFixed(1)+'%'}</div>
-          ${statusBadge(cfg.status, r.soil_moisture, cfg.irrigation_threshold||45)}
-        </div>
-      </div>`;
+    const thr = cfg.irrigation_threshold || 45;
+    const color = statusColor(cfg.status, r.soil_moisture, thr);
+    const [cls, lbl] = statusLabel(cfg.status, r.soil_moisture, thr);
+    const pct = cfg.status === 'offline' ? 0 : r.soil_moisture;
+    labels.push(r.sensor_id); data.push(pct); colors.push(color);
+    return `<div class="sensor-item">
+      <div class="s-status" style="color:${color};background:${color}"></div>
+      <div class="s-info">
+        <div class="s-name">${r.sensor_id} · ${cfg.crop_type||'—'}</div>
+        <div class="s-meta"><i class="ri-map-pin-line"></i> ${cfg.field_area_ha||'—'} ga · ${cfg.farm_id||'—'}</div>
+      </div>
+      <div class="s-right">
+        <div class="s-pct" style="color:${color}">${cfg.status==='offline'?'—':pct.toFixed(1)+'%'}</div>
+        <div class="s-bar"><div class="s-bar-fill" style="width:${pct}%;background:${color}"></div></div>
+      </div>
+    </div>`;
   }).join('');
-
+  document.getElementById('sensor-list').innerHTML = html;
   initMoistureChart(labels, data, colors);
 }
 
 function renderRecommendations(recs) {
-  const el = document.getElementById('rec-list');
-  if (!recs.length) { el.innerHTML = '<div style="text-align:center;color:var(--text-soft);padding:20px">Ma\'lumot yo\'q</div>'; return; }
-
-  const priority = { IRRIGATE_NOW: 0, IRRIGATE_SOON: 1, STOP_IRRIGATION: 2, NO_ACTION: 3 };
-  const sorted = [...recs].sort((a, b) => (priority[a.action]||3) - (priority[b.action]||3));
-
-  const ACTION = {
-    IRRIGATE_NOW:    { icon:'🚨', cls:'err',  border:'#fca5a5', bg:'#fff5f5' },
-    IRRIGATE_SOON:   { icon:'⚠️', cls:'warn', border:'#fde68a', bg:'#fffdf0' },
-    STOP_IRRIGATION: { icon:'🛑', cls:'off',  border:'#e2e8f0', bg:'#f8fafc' },
-    NO_ACTION:       { icon:'✅', cls:'ok',   border:'var(--stroke)', bg:'var(--bg-white)' },
+  const priority = { IRRIGATE_NOW:0, IRRIGATE_SOON:1, STOP_IRRIGATION:2, NO_ACTION:3 };
+  const sorted = [...recs].sort((a,b) => (priority[a.action]||3)-(priority[b.action]||3));
+  const MAP = {
+    IRRIGATE_NOW:    { cls:'critical', icon:'ri-alarm-warning-fill', label:'Darhol sug\'or' },
+    IRRIGATE_SOON:   { cls:'soon',     icon:'ri-time-line',          label:'Tez sug\'or'   },
+    STOP_IRRIGATION: { cls:'neutral',  icon:'ri-stop-circle-line',   label:'To\'xtat'      },
+    NO_ACTION:       { cls:'ok',       icon:'ri-check-double-line',  label:'Yaxshi holat'  },
   };
-
-  el.innerHTML = sorted.map(r => {
-    const a = ACTION[r.action] || ACTION.NO_ACTION;
-    return `
-      <div class="rec-card" style="border-color:${a.border};background:${a.bg}">
-        <div class="rec-head">
-          <span>${a.icon}</span>
-          <span class="rec-name">${r.sensor_id} · ${r.crop_type}</span>
-          <span class="badge ${a.cls}">${r.action.replace(/_/g,' ')}</span>
-        </div>
-        <div class="rec-msg">${r.message}</div>
-        <div class="rec-chips">
-          <span class="chip">💧 ${r.water_needed_liters.toLocaleString()} L</span>
-          <span class="chip">📉 ${r.current_moisture.toFixed(1)}%</span>
-          <span class="chip">♻️ ${r.water_saving_pct.toFixed(1)}% tejash</span>
-        </div>
-      </div>`;
+  document.getElementById('rec-list').innerHTML = sorted.map(r => {
+    const m = MAP[r.action] || MAP.NO_ACTION;
+    return `<div class="rec-card ${m.cls}">
+      <div class="rec-head">
+        <div class="rec-icon ${m.cls}"><i class="${m.icon}"></i></div>
+        <span class="rec-name">${r.sensor_id} · ${r.crop_type}</span>
+        <span class="badge ${m.cls === 'critical'?'err': m.cls === 'soon'?'warn': m.cls === 'ok'?'ok':'off'}">${m.label}</span>
+      </div>
+      <div class="rec-msg">${r.message}</div>
+      <div class="rec-chips">
+        <span class="chip"><i class="ri-drop-line"></i>${r.water_needed_liters.toLocaleString()} L</span>
+        <span class="chip"><i class="ri-percent-line"></i>${r.current_moisture.toFixed(1)}% namlik</span>
+        <span class="chip"><i class="ri-recycle-line"></i>${r.water_saving_pct.toFixed(1)}% tejash</span>
+      </div>
+    </div>`;
   }).join('');
 }
 
 function renderFarms(farms, readings, configs) {
-  const el = document.getElementById('farm-list');
-  el.innerHTML = farms.map(f => {
+  document.getElementById('farms-tab').innerHTML = farms.map(f => {
     const cfg = configs.find(c => c.farm_id === f.farm_id);
-    const reading = cfg ? readings.find(r => r.sensor_id === cfg.sensor_id) : null;
-    const moisture = reading ? reading.soil_moisture : null;
-    const threshold = cfg ? cfg.irrigation_threshold : 45;
-    const status = cfg ? cfg.status : 'offline';
-    const color = moisture !== null ? statusColor(status, moisture, threshold) : '#94a3b8';
-    const emoji = CROP_EMOJI[f.crop_type] || '🌱';
-    return `
-      <div class="farm-row">
-        <div class="farm-av">${emoji}</div>
-        <div class="farm-info">
-          <div class="farm-name">${f.farmer_name}</div>
-          <div class="farm-meta">${f.crop_type} · ${f.district} · ${f.total_area_ha} ga</div>
-        </div>
-        <div class="farm-r">
-          <div class="farm-pct" style="color:${color}">${moisture!==null&&status!=='offline'?moisture.toFixed(1)+'%':'—'}</div>
-          ${statusBadge(status, moisture||0, threshold)}
-        </div>
-      </div>`;
+    const r   = cfg ? readings.find(x => x.sensor_id === cfg.sensor_id) : null;
+    const m   = r ? r.soil_moisture : null;
+    const thr = cfg ? cfg.irrigation_threshold : 45;
+    const sts = cfg ? cfg.status : 'offline';
+    const color = m !== null ? statusColor(sts, m, thr) : '#94a3b8';
+    const [cls] = statusLabel(sts, m||0, thr);
+    const labels = { ok:'Yaxshi', warn:'Tez sug\'or', err:'Darhol!', off:'Offline' };
+    return `<div class="farm-item">
+      <div class="farm-avatar">${CROP_EMOJI[f.crop_type]||'🌱'}</div>
+      <div class="farm-info">
+        <div class="farm-name">${f.farmer_name}</div>
+        <div class="farm-meta"><i class="ri-map-pin-line"></i>${f.district} · ${f.total_area_ha} ga · ${f.crop_type}</div>
+      </div>
+      <div class="farm-right">
+        <div class="farm-pct" style="color:${color}">${m!==null&&sts!=='offline'?m.toFixed(1)+'%':'—'}</div>
+        <span class="badge ${cls}">${labels[cls]}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderAlerts(alerts) {
+  document.getElementById('tab-alert-count').textContent = alerts.length;
+  if (!alerts.length) {
+    document.getElementById('alerts-tab').innerHTML = `<div style="text-align:center;padding:24px;color:var(--text-soft)">
+      <i class="ri-checkbox-circle-line" style="font-size:32px;color:var(--primary);display:block;margin-bottom:8px"></i>
+      Faol ogohlantirishlar yo'q
+    </div>`; return;
+  }
+  const SEV = {
+    critical: { cls:'critical', icon:'ri-alarm-warning-fill', tag:'err', tagLbl:'Kritik' },
+    error:    { cls:'critical', icon:'ri-error-warning-fill', tag:'err', tagLbl:'Xato'   },
+    warning:  { cls:'warning',  icon:'ri-alert-fill',         tag:'warn',tagLbl:'Diqqat' },
+  };
+  document.getElementById('alerts-tab').innerHTML = alerts.map(a => {
+    const s = SEV[a.severity] || SEV.warning;
+    const time = new Date(a.at).toLocaleTimeString('uz-UZ',{hour:'2-digit',minute:'2-digit'});
+    return `<div class="alert-item">
+      <div class="alert-top">
+        <div class="alert-sev-icon ${s.cls}"><i class="${s.icon}"></i></div>
+        <div class="alert-title">${a.message}</div>
+      </div>
+      <div class="alert-desc">${a.sensor_id} · ${a.farm_id}${a.value!=null?' · '+a.value.toFixed(1):''}</div>
+      <div class="alert-foot">
+        <span class="alert-tag badge ${s.tag}">${a.type.replace(/_/g,' ')}</span>
+        <span class="alert-time"><i class="ri-time-line"></i>${time}</span>
+      </div>
+    </div>`;
   }).join('');
 }
 
 function renderStats(configs, recs, alerts) {
-  const online  = configs.filter(c => c.status === 'online').length;
-  const total   = configs.length;
-  const critical = recs.filter(r => r.action === 'IRRIGATE_NOW').length;
-  const soon     = recs.filter(r => r.action === 'IRRIGATE_SOON').length;
-  const avgSave  = recs.length ? (recs.reduce((s,r) => s + r.water_saving_pct, 0) / recs.length) : 0;
+  const online   = configs.filter(c=>c.status==='online').length;
+  const total    = configs.length;
+  const critical = recs.filter(r=>r.action==='IRRIGATE_NOW').length;
+  const soon     = recs.filter(r=>r.action==='IRRIGATE_SOON').length;
+  const avgSave  = recs.length ? recs.reduce((s,r)=>s+r.water_saving_pct,0)/recs.length : 0;
 
-  document.getElementById('st-online').textContent     = `${online}/${total}`;
-  document.getElementById('st-online-sub').textContent  = `${total - online} offline`;
-  document.getElementById('st-critical').textContent    = critical;
-  document.getElementById('st-critical-sub').textContent= `${alerts.length} jami alert`;
-  document.getElementById('st-soon').textContent        = soon;
-  document.getElementById('total-saving').textContent   = `${avgSave.toFixed(1)}%`;
-  document.getElementById('st-saving').textContent      = `${avgSave.toFixed(1)}%`;
+  document.getElementById('st-online').textContent       = `${online}/${total}`;
+  document.getElementById('st-online-sub').textContent   = `${total-online} offline, ${online} faol`;
+  document.getElementById('st-online-trend').textContent = `${online} faol`;
+  document.getElementById('st-critical').textContent     = alerts.length;
+  document.getElementById('st-alert-sub').textContent    = `${critical} kritik, ${alerts.length-critical} boshqa`;
+  document.getElementById('st-soon').textContent         = soon + critical;
+  document.getElementById('st-saving').textContent       = avgSave.toFixed(0)+'%';
+  document.getElementById('total-saving').textContent    = avgSave.toFixed(1)+'%';
 
-  // notification dot
   if (alerts.length > 0) document.getElementById('notif-dot').style.display = 'block';
   document.getElementById('nb-alerts').textContent = alerts.length || '0';
 }
 
 function renderSavingChart(recs) {
-  const labels = recs.map(r => r.sensor_id);
-  const data   = recs.map(r => r.water_saving_pct);
-  initSavingChart(labels, data);
+  initSavingChart(recs.map(r=>r.sensor_id), recs.map(r=>r.water_saving_pct));
 }
 
-// ── Quick nav ─────────────────────────────────────────────────
 function renderQuickNav(configs, readings) {
-  const nav = document.getElementById('quick-nav');
-  nav.innerHTML = configs.slice(0, 4).map(cfg => {
-    const reading = readings.find(r => r.sensor_id === cfg.sensor_id);
-    const m = reading ? reading.soil_moisture : 0;
+  const order = ['online','warning','offline'];
+  const sorted = [...configs].sort((a,b)=>order.indexOf(a.status)-order.indexOf(b.status));
+  document.getElementById('quick-nav').innerHTML = sorted.slice(0,5).map(cfg => {
+    const r = readings.find(x=>x.sensor_id===cfg.sensor_id);
+    const m = r ? r.soil_moisture : 0;
     const color = statusColor(cfg.status, m, cfg.irrigation_threshold);
     return `<a class="nav-item" href="#">
-      <div class="nav-icon" style="color:${color}">●</div>
-      <span class="nav-text">${cfg.crop_type} — ${cfg.sensor_id}</span>
+      <div class="nav-icon" style="color:${color}"><i class="ri-radio-button-line"></i></div>
+      <span class="nav-label">${cfg.sensor_id} · ${cfg.crop_type}</span>
     </a>`;
   }).join('');
 }
 
-// ── Main fetch ────────────────────────────────────────────────
+// ── Fetch all ─────────────────────────────────────────────
+let isLoading = false;
 async function fetchAll() {
-  const el = document.getElementById('refresh-status');
-  el.textContent = 'Yangilanmoqda...';
+  if (isLoading) return;
+  isLoading = true;
+  const icon = document.getElementById('refresh-icon');
+  icon.style.animation = 'spin 1s linear infinite';
+  document.getElementById('refresh-status').textContent = 'Yangilanmoqda...';
 
   try {
     const [readings, configs, recs, alertsData, farms] = await Promise.all([
-      fetch(`${API}/sensors/`).then(r => r.json()),
-      fetch(`${API}/sensors/configs`).then(r => r.json()),
-      fetch(`${API}/recommendations/`).then(r => r.json()),
-      fetch(`${API}/alerts/`).then(r => r.json()),
-      fetch(`${API}/farms/`).then(r => r.json()),
+      fetch(`${API}/sensors/`).then(r=>r.json()),
+      fetch(`${API}/sensors/configs`).then(r=>r.json()),
+      fetch(`${API}/recommendations/`).then(r=>r.json()),
+      fetch(`${API}/alerts/`).then(r=>r.json()),
+      fetch(`${API}/farms/`).then(r=>r.json()),
     ]);
-
     const alerts = alertsData.alerts || [];
 
     renderStats(configs, recs, alerts);
     renderSensors(readings, configs);
     renderRecommendations(recs);
     renderFarms(farms, readings, configs);
+    renderAlerts(alerts);
     renderSavingChart(recs);
     updateMarkers(readings, configs);
+    updateMapOverlay(configs, readings);
     renderQuickNav(configs, readings);
 
-    const now = new Date().toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    el.textContent = `Oxirgi yangilanish: ${now} · 30 soniyada avtomatik yangilanadi`;
-
-  } catch (err) {
-    el.textContent = `⚠️ API bilan ulanish xatosi. Qayta urinish...`;
-    console.error(err);
+    const now = new Date();
+    document.getElementById('refresh-status').textContent = 'Jonli · 30 soniyada avtomatik yangilanadi';
+    document.getElementById('refresh-time').textContent = `Oxirgi: ${now.toLocaleTimeString('uz-UZ',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}`;
+  } catch(e) {
+    document.getElementById('refresh-status').textContent = '⚠️ API bilan ulanishda xatolik. Qayta urinmoqda...';
+    console.error(e);
+  } finally {
+    isLoading = false;
+    icon.style.animation = '';
   }
 }
 
-// ── Init ──────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
-  initMap();
-  fetchAll();
-  setInterval(fetchAll, 30000); // 30 soniyada auto-refresh
+// spin keyframe
+const style = document.createElement('style');
+style.textContent = '@keyframes spin{to{transform:rotate(360deg)}}';
+document.head.appendChild(style);
+
+// ── Theme toggle ──────────────────────────────────────────
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  document.getElementById('theme-icon').className = isDark ? 'ri-moon-line' : 'ri-sun-line';
+  localStorage.setItem('theme', isDark ? 'light' : 'dark');
+}
+// Load saved theme
+const savedTheme = localStorage.getItem('theme') || 'light';
+if (savedTheme === 'dark') {
+  document.documentElement.setAttribute('data-theme', 'dark');
+  document.getElementById('theme-icon').className = 'ri-sun-line';
+}
+
+// ── Language cycle ────────────────────────────────────────
+const LANGS = ['UZ','RU','EN'];
+let langIdx = 0;
+function cycleLang() {
+  langIdx = (langIdx + 1) % LANGS.length;
+  document.getElementById('lang-label').textContent = LANGS[langIdx];
+  localStorage.setItem('lang', langIdx);
+}
+langIdx = parseInt(localStorage.getItem('lang') || '0');
+document.getElementById('lang-label').textContent = LANGS[langIdx];
+
+// ── Map overlay stats update ──────────────────────────────
+function updateMapOverlay(configs, readings) {
+  const online  = configs.filter(c => c.status === 'online').length;
+  const warning = configs.filter(c => c.status === 'warning').length;
+  const offline = configs.filter(c => c.status === 'offline').length;
+  const critical = readings.filter(r => {
+    const cfg = configs.find(c => c.sensor_id === r.sensor_id);
+    return cfg && cfg.status !== 'offline' && r.soil_moisture < cfg.irrigation_threshold - 15;
+  }).length;
+
+  document.getElementById('mo-online').textContent = online;
+  document.getElementById('mo-warn').textContent   = warning;
+  document.getElementById('mo-crit').textContent   = critical;
+  document.getElementById('mo-off').textContent    = offline;
+}
+
+// responsive menu
+if (window.innerWidth <= 680) document.getElementById('menu-btn').style.display = 'flex';
+window.addEventListener('resize', () => {
+  document.getElementById('menu-btn').style.display = window.innerWidth <= 680 ? 'flex' : 'none';
 });
+
+// Init
+initMap();
+fetchAll();
+setInterval(fetchAll, 30000);
 </script>
 </body>
 </html>

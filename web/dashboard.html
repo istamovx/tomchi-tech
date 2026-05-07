@@ -3,1072 +3,1162 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Tomchi Tech — Admin Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<title>Tomchi Tech — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
 <style>
 /* ═══════════════════════════════════════════════════════════════
-   DESIGN TOKENS
+   BLUE DESIGN SYSTEM TOKENS
 ═══════════════════════════════════════════════════════════════ */
 :root {
-  /* ── ACRU-style palette ── */
-  --bg:          #F2F2F2;
-  --card:        #FFFFFF;
-  --card2:       #FAFAFA;
+  /* Backgrounds */
+  --bg-page:          #F5F5F5;
+  --bg-primary:       #FFFFFF;
+  --bg-primary-alt:   #FAFAFA;
+  --bg-secondary:     #F9FAFB;
+  --bg-brand-section: #FFFFFF;
 
-  /* Lime green (from ACRU chart bars) */
-  --primary:     #86C332;
-  --primary-d:   #6FA828;
-  --primary-lt:  #F0F9E6;
-  --primary-mid: #C8E89A;
+  /* Text */
+  --text-primary:     #181D27;
+  --text-secondary:   #414651;
+  --text-tertiary:    #535862;
+  --text-placeholder: #717680;
+  --text-quaternary:  #717680;
+  --text-disabled:    #A4A7AE;
 
-  --txt:         #111111;
-  --txt-2:       #555555;
-  --txt-3:       #999999;
-  --txt-4:       #C8C8C8;
+  /* Borders */
+  --border-primary:   #D5D7DA;
+  --border-secondary: #E9EAEB;
+  --border-tertiary:  #F5F5F5;
+  --border-brand:     #2970FF;
+  --border-brand-alt: #155EEF;
 
-  --border:      #E8E8E8;
-  --border-soft: #F2F2F2;
+  /* Brand */
+  --brand:            #155EEF;
+  --brand-hover:      #1248C7;
 
-  --green:  #86C332; --green-bg:  #F0F9E6;
-  --red:    #E04040; --red-bg:    #FDEAEA;
-  --yellow: #F5A623; --yellow-bg: #FFF4E0;
-  --blue:   #3B82F6; --blue-bg:   #EFF6FF;
-  --purple: #7C3AED; --purple-bg: #F5F0FF;
+  /* Status */
+  --success:          #17B26A;
+  --success-bg:       #ECFDF3;
+  --success-border:   #ABEFC6;
+  --warning:          #F79009;
+  --warning-bg:       #FFFAEB;
+  --warning-border:   #FEDF89;
+  --danger:           #D92D20;
+  --danger-bg:        #FEF3F2;
+  --danger-border:    #FECDCA;
+  --neutral:          #717680;
+  --neutral-bg:       #F9FAFB;
 
-  /* ACRU: cards have NO border — only soft shadow */
-  --sh:   0 1px 6px rgba(0,0,0,.06), 0 4px 16px rgba(0,0,0,.05);
-  --sh-h: 0 4px 12px rgba(0,0,0,.08), 0 12px 32px rgba(0,0,0,.08);
+  /* Utility */
+  --utility-gray-50:  #FAFAFA;
+  --utility-gray-200: #E9EAEB;
+  --utility-gray-700: #414651;
 
-  --r:   18px;
-  --r-s: 12px;
-  --r-xs: 8px;
+  /* Blue brand tints */
+  --brand-50:  #EFF4FF;
+  --brand-100: #D1E0FF;
+  --brand-200: #B2CCFF;
+  --brand-600: #155EEF;
+  --brand-700: #004EEB;
 
-  --sb: 220px;
-  --rp: 300px;
+  /* Shadows — Blue system */
+  --shadow-xs:  0px 1px 2px rgba(10,13,18,0.05);
+  --shadow-sm:  0px 1px 3px rgba(10,13,18,0.08), 0px 1px 2px rgba(10,13,18,0.04);
+  --shadow-md:  0px 4px 8px rgba(10,13,18,0.08), 0px 2px 4px rgba(10,13,18,0.04);
+  --shadow-skeu-border: inset 0px 0px 0px 1px rgba(10,13,18,0.18), inset 0px -2px 0px rgba(10,13,18,0.05);
+  --shadow-icon: 0px 1px 2px rgba(10,13,18,0.05);
 
-  /* Fonts — min 16px */
-  --f-xs:  14px;
-  --f-sm:  16px;
-  --f-md:  17px;
-  --f-lg:  21px;
-  --f-xl:  28px;
-  --f-2xl: 38px;
-  --f-3xl: 50px;
+  /* Spacing */
+  --sp-xxs: 2px;
+  --sp-xs:  4px;
+  --sp-sm:  6px;
+  --sp-md:  8px;
+  --sp-lg:  12px;
+  --sp-xl:  16px;
+  --sp-2xl: 20px;
+  --sp-3xl: 24px;
+  --sp-4xl: 32px;
+
+  /* Radius */
+  --r-xs:   4px;
+  --r-sm:   6px;
+  --r-md:   8px;
+  --r-lg:   10px;
+  --r-xl:   12px;
+  --r-2xl:  16px;
+  --r-full: 9999px;
+
+  /* Typography */
+  --text-xs-size: 12px; --text-xs-lh: 18px;
+  --text-sm-size: 14px; --text-sm-lh: 20px;
+  --text-md-size: 16px; --text-md-lh: 24px;
+  --text-lg-size: 18px; --text-lg-lh: 28px;
+  --text-xl-size: 20px; --text-xl-lh: 30px;
+  --display-xs-size: 24px; --display-xs-lh: 32px;
+  --display-sm-size: 30px; --display-sm-lh: 38px;
+
+  /* Layout */
+  --sidebar-w: 280px;
 }
 
-/* ── Reset ──────────────────────────────────────────────────── */
-*, *::before, *::after { box-sizing: border-box; margin:0; padding:0; }
+/* ── Reset ────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { font-size: 16px; }
 body {
   font-family: 'Inter', system-ui, sans-serif;
-  background: var(--bg);
-  color: var(--txt);
-  height: 100vh;
-  display: flex;
-  overflow: hidden;
+  background: var(--bg-page);
+  color: var(--text-primary);
+  height: 100vh; display: flex; overflow: hidden;
   -webkit-font-smoothing: antialiased;
-  font-size: var(--f-sm);
 }
-a { text-decoration: none; color: inherit; }
-button { font-family: inherit; cursor: pointer; }
+a  { text-decoration: none; color: inherit; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; }
 i[class^="ri-"] { line-height: 1; }
-
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+::-webkit-scrollbar-thumb { background: var(--border-secondary); border-radius: 99px; }
 
 /* ═══════════════════════════════════════════════════════════════
-   SIDEBAR
+   SIDEBAR  (Blue pattern exact)
 ═══════════════════════════════════════════════════════════════ */
 .sidebar {
-  width: var(--sb);
-  background: var(--card);
-  border-right: none;
-  box-shadow: 2px 0 12px rgba(0,0,0,.04);
-  display: flex; flex-direction: column;
-  height: 100vh; flex-shrink: 0;
-  z-index: 100;
+  width: var(--sidebar-w);
+  background: var(--bg-primary);
+  border-right: 1px solid var(--border-secondary);
+  height: 100vh; display: flex; flex-direction: column;
+  flex-shrink: 0; z-index: 100;
+  overflow: hidden;
 }
-.sb-brand {
-  display: flex; align-items: center; gap: 12px;
-  padding: 0 20px; height: 68px;
-  border-bottom: none;
-}
-.brand-logo {
-  width: 42px; height: 42px;
-  background: linear-gradient(135deg, var(--primary), var(--primary-d));
-  border-radius: 12px;
-  display: flex; align-items: center; justify-content: center;
-  color: #fff; font-size: 22px;
-  box-shadow: 0 3px 10px rgba(91,158,47,.35);
-  flex-shrink: 0;
-}
-.brand-name { font-size: var(--f-md); font-weight: 800; letter-spacing: -.3px; }
-.brand-ver {
-  font-size: 12px; font-weight: 700;
-  background: var(--primary-lt); color: var(--primary);
-  padding: 2px 8px; border-radius: 99px;
-}
-.sb-nav {
-  flex: 1; overflow-y: auto;
-  padding: 20px 14px;
-  display: flex; flex-direction: column; gap: 2px;
-}
-.nav-sec-label {
-  font-size: 12px; font-weight: 700; letter-spacing: .8px;
-  text-transform: uppercase; color: var(--txt-4);
-  padding: 0 10px 8px; margin-top: 8px;
-}
-.nav-item {
-  display: flex; align-items: center; gap: 12px;
-  padding: 10px 14px; border-radius: var(--r-s);
-  cursor: pointer; color: var(--txt-3);
-  font-size: var(--f-sm); font-weight: 500;
-  transition: all .15s; position: relative;
-}
-.nav-item:hover { background: var(--bg); color: var(--txt-2); }
-.nav-item.active { background: #F5F5F5; color: var(--txt); font-weight: 700; }
-.nav-item.active::before {
-  content: ''; position: absolute; left: 0; top: 50%;
-  transform: translateY(-50%);
-  width: 3px; height: 22px;
-  background: var(--primary); border-radius: 0 3px 3px 0;
-}
-.nav-icon { font-size: 20px; width: 24px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.nav-badge {
-  font-size: 12px; font-weight: 700;
-  padding: 2px 7px; border-radius: 99px;
-  background: var(--red-bg); color: var(--red);
-  margin-left: auto;
-}
-.nav-badge.g { background: var(--green-bg); color: var(--green); }
 
-.sb-footer {
-  border-top: 1px solid var(--border-soft);
-  padding: 14px;
+/* Brand / Logo area */
+.sb-header {
+  display: flex; flex-direction: column; gap: var(--sp-2xl);
+  padding: var(--sp-3xl) var(--sp-2xl);
 }
-.user-row {
-  display: flex; align-items: center; gap: 10px;
-  padding: 10px 12px; border-radius: var(--r-s);
-  cursor: pointer; transition: background .15s;
+.sb-logo {
+  display: flex; align-items: center; gap: var(--sp-md);
 }
-.user-row:hover { background: var(--bg); }
-.user-av {
-  width: 38px; height: 38px;
-  background: linear-gradient(135deg, #f59e0b, #d97706);
-  border-radius: 99px;
+.sb-logomark {
+  width: 32px; height: 32px; border-radius: var(--r-md);
+  background: linear-gradient(180deg,#2970FF 0%,#155EEF 100%);
   display: flex; align-items: center; justify-content: center;
-  font-size: var(--f-sm); font-weight: 800; color: #fff; flex-shrink: 0;
+  color: #fff; font-size: 16px; flex-shrink: 0;
+  border: 0.2px solid rgba(10,13,18,.12);
+  box-shadow: 0 1px 1px rgba(10,13,18,.13), 0 1px 3px rgba(10,13,18,.1);
 }
-.user-name { font-size: var(--f-sm); font-weight: 700; }
-.user-role { font-size: 13px; color: var(--txt-3); margin-top: 1px; }
+.sb-logoname {
+  font-size: var(--text-md-size); font-weight: 700;
+  line-height: var(--text-md-lh); color: var(--text-primary);
+}
+.sb-search {
+  display: flex; align-items: center; gap: var(--sp-md);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-tertiary);
+  border-radius: var(--r-md);
+  padding: var(--sp-lg) var(--sp-xl);
+  box-shadow: var(--shadow-xs);
+  cursor: text;
+}
+.sb-search i { color: var(--text-placeholder); font-size: 18px; flex-shrink: 0; }
+.sb-search span { flex: 1; font-size: var(--text-md-size); color: var(--text-placeholder); }
+.sb-shortcut {
+  border: 1px solid var(--border-secondary);
+  border-radius: var(--r-xs);
+  padding: 1px 4px;
+  font-size: var(--text-xs-size); font-weight: 500;
+  color: var(--text-quaternary); line-height: var(--text-xs-lh);
+}
+
+/* Nav items */
+.sb-nav { flex: 1; overflow-y: auto; padding: 0 var(--sp-xl); }
+.nav-item {
+  display: flex; align-items: center; gap: var(--sp-md);
+  padding: var(--sp-md) var(--sp-lg);
+  border-radius: var(--r-sm);
+  cursor: pointer; color: var(--text-secondary);
+  font-size: var(--text-md-size); font-weight: 600;
+  line-height: var(--text-md-lh);
+  transition: background .12s; width: 100%;
+  margin: 1px 0; text-align: left;
+}
+.nav-item:hover  { background: var(--bg-secondary); }
+.nav-item.active { background: var(--bg-secondary); color: var(--text-primary); }
+.nav-icon { font-size: 18px; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.nav-badge {
+  margin-left: auto;
+  font-size: var(--text-xs-size); font-weight: 500; line-height: var(--text-xs-lh);
+  padding: var(--sp-xxs) var(--sp-md);
+  border-radius: var(--r-full);
+  background: var(--utility-gray-50);
+  border: 1px solid var(--utility-gray-200);
+  color: var(--utility-gray-700);
+}
+.nav-badge.alert { background: var(--danger-bg); border-color: var(--danger-border); color: var(--danger); }
+
+/* Footer */
+.sb-footer {
+  border-top: 1px solid var(--border-secondary);
+  padding: var(--sp-xl);
+  display: flex; flex-direction: column; gap: var(--sp-xs);
+}
+.nav-item.footer-item { gap: var(--sp-md); }
+.sb-account {
+  background: var(--bg-primary-alt);
+  border: 1px solid var(--border-secondary);
+  border-radius: var(--r-xl);
+  padding: var(--sp-lg);
+  display: flex; align-items: center; gap: var(--sp-md);
+  cursor: pointer; margin-top: var(--sp-md);
+  transition: background .12s;
+}
+.sb-account:hover { background: var(--bg-secondary); }
+.av-wrap {
+  width: 40px; height: 40px; border-radius: var(--r-full);
+  background: #E0E0E0;
+  border: 1px solid rgba(0,0,0,0.08);
+  position: relative; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700; color: var(--text-secondary);
+}
+.av-online {
+  position: absolute; bottom: -1px; right: -1px;
+  width: 10px; height: 10px; border-radius: var(--r-full);
+  background: var(--success);
+  border: 1.5px solid var(--bg-primary);
+}
+.av-name { font-size: var(--text-md-size); font-weight: 600; line-height: var(--text-md-lh); color: var(--text-primary); }
+.av-role { font-size: var(--text-sm-size); line-height: var(--text-sm-lh); color: var(--text-tertiary); }
 
 /* ═══════════════════════════════════════════════════════════════
-   MAIN WRAPPER
+   MAIN LAYOUT
 ═══════════════════════════════════════════════════════════════ */
 .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
 
-/* ── Topbar ─────────────────────────────────────────────────── */
-.topbar {
-  background: var(--bg);
-  border-bottom: none;
-  padding: 0 24px;
-  display: flex; align-items: center; gap: 12px;
-  height: 68px; flex-shrink: 0;
+/* Page header */
+.page-header {
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--border-secondary);
+  padding: 0 var(--sp-4xl);
+  height: 68px;
+  display: flex; align-items: center; gap: var(--sp-lg);
+  flex-shrink: 0;
 }
-.topbar-left { display: flex; align-items: center; gap: 10px; flex: 1; }
-.topbar-title { font-size: var(--f-lg); font-weight: 800; }
-.topbar-sub   { font-size: var(--f-sm); color: var(--txt-3); margin-left: 4px; }
+.ph-title    { font-size: var(--text-xl-size); font-weight: 700; line-height: var(--text-xl-lh); flex: 1; }
+.ph-subtitle { font-size: var(--text-sm-size); color: var(--text-tertiary); margin-left: 6px; }
 
-.search-box {
-  display: flex; align-items: center; gap: 8px;
-  background: var(--card); border: none;
-  border-radius: 12px; padding: 9px 18px;
-  width: 260px; transition: all .2s;
-  box-shadow: var(--sh);
+.ph-search {
+  display: flex; align-items: center; gap: var(--sp-md);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-secondary);
+  border-radius: var(--r-md); padding: 8px 14px;
+  width: 224px; box-shadow: var(--shadow-xs);
+  transition: border-color .15s, box-shadow .15s;
 }
-.search-box:focus-within { box-shadow: var(--sh-h); }
-.search-box i  { color: var(--txt-3); font-size: 18px; }
-.search-box input { border:none; background:transparent; outline:none; font-family:inherit; font-size: var(--f-sm); color: var(--txt); width: 100%; }
-.search-box input::placeholder { color: var(--txt-4); }
+.ph-search:focus-within { border-color: var(--border-brand); box-shadow: 0 0 0 4px rgba(41,112,255,.06); }
+.ph-search i     { color: var(--text-placeholder); font-size: 16px; }
+.ph-search input { border: none; outline: none; background: transparent; font-family: inherit; font-size: var(--text-sm-size); color: var(--text-primary); width: 100%; }
+.ph-search input::placeholder { color: var(--text-placeholder); }
 
-.tb-btn {
-  width: 40px; height: 40px;
+.ph-btn {
+  width: 36px; height: 36px;
   display: flex; align-items: center; justify-content: center;
-  border-radius: 10px; cursor: pointer;
-  color: var(--txt-2); font-size: 20px;
-  transition: all .15s; position: relative;
-  background: transparent; border: none;
+  border-radius: var(--r-sm); color: var(--text-secondary);
+  font-size: 18px; transition: background .12s; position: relative;
 }
-.tb-btn:hover { background: var(--bg); color: var(--txt); }
-.tb-dot {
-  position: absolute; top: 7px; right: 7px;
-  width: 8px; height: 8px;
-  background: var(--red); border-radius: 99px;
-  border: 2px solid var(--card);
+.ph-btn:hover { background: var(--bg-secondary); }
+.ph-dot {
+  position: absolute; top: 6px; right: 6px;
+  width: 8px; height: 8px; border-radius: var(--r-full);
+  background: var(--danger); border: 2px solid var(--bg-primary);
 }
-.tb-sep { width: 1px; height: 28px; background: var(--border); margin: 0 4px; }
+.ph-divider { width: 1px; height: 24px; background: var(--border-secondary); margin: 0 4px; }
 
+/* Buttons */
 .btn {
   display: inline-flex; align-items: center; gap: 6px;
-  padding: 9px 18px; border-radius: var(--r-s);
-  font-size: var(--f-sm); font-weight: 600; border: none;
-  cursor: pointer; transition: all .15s;
+  font-family: inherit; font-size: var(--text-sm-size);
+  font-weight: 600; line-height: var(--text-sm-lh);
+  padding: 8px 14px; border-radius: var(--r-md);
+  cursor: pointer; transition: all .15s; white-space: nowrap;
 }
-.btn i { font-size: 18px; }
-.btn-ghost { background: transparent; color: var(--txt-2); border: 1.5px solid var(--border); }
-.btn-ghost:hover { background: var(--bg); color: var(--txt); border-color: var(--txt-4); }
-.btn-primary { background: var(--primary); color: #fff; box-shadow: 0 2px 8px rgba(91,158,47,.3); }
-.btn-primary:hover { background: var(--primary-d); box-shadow: 0 4px 14px rgba(91,158,47,.4); }
+.btn i { font-size: 16px; }
+.btn-secondary {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-primary);
+  color: var(--text-secondary);
+  box-shadow: var(--shadow-xs);
+}
+.btn-secondary:hover { background: var(--bg-secondary); }
+.btn-primary {
+  background: var(--brand);
+  border: 1px solid var(--border-brand-alt);
+  color: #fff;
+  box-shadow: var(--shadow-xs), inset 0 0 0 1px rgba(255,255,255,.12), inset 0 -2px 0 rgba(10,13,18,.08);
+}
+.btn-primary:hover { background: var(--brand-hover); }
 
-/* Live banner */
-.live-bar {
-  background: var(--bg);
-  border-bottom: none;
-  padding: 5px 24px 8px;
-  display: flex; align-items: center; gap: 10px;
-  flex-shrink: 0;
+/* Lang/theme toggle */
+.ph-lang {
+  display: flex; align-items: center; gap: 5px;
+  padding: 6px 10px; border-radius: var(--r-md);
+  border: 1px solid var(--border-secondary);
+  background: var(--bg-primary);
+  font-size: var(--text-sm-size); font-weight: 600;
+  color: var(--text-secondary); cursor: pointer;
+  box-shadow: var(--shadow-xs); transition: background .12s;
 }
-.live-dot {
-  width: 9px; height: 9px;
-  background: var(--primary); border-radius: 99px;
-  animation: pulse 2s infinite;
-}
-@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.8)} }
-.live-txt  { font-size: 14px; color: var(--txt-3); font-weight: 500; flex: 1; }
-.live-time { font-size: 14px; color: var(--txt-4); }
+.ph-lang:hover { background: var(--bg-secondary); }
 
-/* ─── 3-Column Layout ──────────────────────────────────────── */
-.page-body {
-  flex: 1; overflow: hidden;
-  display: flex; gap: 0;
-}
-.center-col {
+/* Content scroll area */
+.content {
   flex: 1; overflow-y: auto;
-  padding: 22px 20px;
-  display: flex; flex-direction: column; gap: 18px;
-  min-width: 0;
-}
-.right-col {
-  width: var(--rp);
-  border-left: none;
-  box-shadow: -2px 0 12px rgba(0,0,0,.04);
-  background: var(--card);
-  display: flex; flex-direction: column;
-  overflow: hidden; flex-shrink: 0;
+  padding: var(--sp-3xl) var(--sp-4xl);
+  display: flex; flex-direction: column; gap: var(--sp-3xl);
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   STAT CARDS ROW
+   METRIC CARDS  (Blue — exact)
 ═══════════════════════════════════════════════════════════════ */
-.stats-row {
+.metrics-row {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 14px;
+  gap: var(--sp-2xl);
 }
-.stat-card {
-  background: var(--card);
-  border-radius: var(--r);
-  padding: 22px;
-  box-shadow: var(--sh);
-  border: none;
-  display: flex; flex-direction: column; gap: 16px;
-  transition: box-shadow .2s, transform .2s;
-  position: relative; overflow: hidden;
+.metric-card {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-secondary);
+  border-radius: var(--r-xl);
+  padding: var(--sp-2xl);
+  display: flex; gap: var(--sp-xl); align-items: flex-start;
+  box-shadow: 0px 1px 1px rgba(10,13,18,0.05);
+  transition: border-color .15s, box-shadow .15s;
   cursor: default;
 }
-.stat-card:hover { box-shadow: var(--sh-h); transform: translateY(-2px); }
-.stat-card::after {
-  content:''; position:absolute;
-  top:0; left:0; right:0; height:4px;
-  border-radius: var(--r) var(--r) 0 0;
+.metric-card:hover { border-color: var(--border-primary); box-shadow: var(--shadow-sm); }
+.metric-card.active-card {
+  border: 2px solid var(--border-brand);
 }
-.stat-card.c-green::after  { background: linear-gradient(90deg,#86C332,#A8D856); }
-.stat-card.c-red::after    { background: linear-gradient(90deg,#E04040,#F97316); }
-.stat-card.c-yellow::after { background: linear-gradient(90deg,#F5A623,#F5C842); }
-.stat-card.c-blue::after   { background: linear-gradient(90deg,#3B82F6,#60A5FA); }
 
-.sc-top { display: flex; align-items: flex-start; justify-content: space-between; }
-.sc-icon {
-  width: 46px; height: 46px; border-radius: 12px;
+.metric-icon {
+  width: 40px; height: 40px; border-radius: var(--r-md);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-primary);
+  box-shadow: var(--shadow-icon), var(--shadow-skeu-border);
   display: flex; align-items: center; justify-content: center;
-  font-size: 24px;
-}
-.sc-icon.g { background: var(--green-bg);  color: var(--green); }
-.sc-icon.r { background: var(--red-bg);    color: var(--red); }
-.sc-icon.y { background: var(--yellow-bg); color: var(--yellow); }
-.sc-icon.b { background: var(--blue-bg);   color: var(--blue); }
-
-.sc-badge {
-  display: flex; align-items: center; gap: 3px;
-  font-size: 13px; font-weight: 700;
-  padding: 4px 9px; border-radius: 99px;
-}
-.sc-badge.up   { background: var(--green-bg);  color: var(--green); }
-.sc-badge.down { background: var(--red-bg);    color: var(--red); }
-.sc-badge.neu  { background: var(--bg);        color: var(--txt-3); }
-
-.sc-num   { font-size: var(--f-2xl); font-weight: 900; letter-spacing: -1.5px; line-height: 1; }
-.sc-label { font-size: var(--f-sm);  color: var(--txt-2); font-weight: 500; margin-top: 4px; }
-.sc-sub   { font-size: 14px; color: var(--txt-4); margin-top: 2px; }
-
-/* Inline sparkline in stat card */
-.sc-spark { height: 36px; margin-top: 4px; }
-
-/* ═══════════════════════════════════════════════════════════════
-   MAIN CHART WIDGET
-═══════════════════════════════════════════════════════════════ */
-.chart-widget {
-  background: var(--card);
-  border-radius: var(--r);
-  box-shadow: var(--sh);
-  border: none;
-  overflow: hidden;
-}
-.cw-head {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 20px 22px 0;
-}
-.cw-title-block {}
-.cw-title { font-size: var(--f-lg); font-weight: 800; }
-.cw-sub   { font-size: var(--f-sm); color: var(--txt-3); margin-top: 2px; }
-.cw-controls { display: flex; align-items: center; gap: 8px; }
-.period-btns { display: flex; gap: 4px; }
-.pbtn {
-  padding: 6px 14px; border-radius: var(--r-xs);
-  font-size: 14px; font-weight: 600;
-  border: 1px solid var(--border);
-  background: var(--card); color: var(--txt-3);
-  cursor: pointer; transition: all .15s; font-family: inherit;
-}
-.pbtn:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-lt); }
-.pbtn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
-.cw-legend { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
-.leg-item { display: flex; align-items: center; gap: 6px; font-size: var(--f-sm); color: var(--txt-2); font-weight: 500; }
-.leg-dot { width: 10px; height: 10px; border-radius: 99px; }
-
-.cw-body { padding: 16px 22px 22px; }
-.chart-wrap { position: relative; }
-
-/* ═══════════════════════════════════════════════════════════════
-   SENSOR GRID
-═══════════════════════════════════════════════════════════════ */
-.sensor-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-}
-.sensor-card {
-  background: var(--card);
-  border-radius: var(--r);
-  padding: 20px;
-  box-shadow: var(--sh);
-  border: none;
-  cursor: pointer;
-  transition: all .2s;
-  position: relative; overflow: hidden;
-}
-.sensor-card:hover { box-shadow: var(--sh-h); transform: translateY(-2px); border-color: var(--border); }
-.sensor-card::before {
-  content:''; position:absolute;
-  top:0; left:0; bottom:0; width:4px;
-  border-radius: var(--r) 0 0 var(--r);
-}
-.sensor-card.ok::before     { background: var(--green); }
-.sensor-card.warn::before   { background: var(--yellow); }
-.sensor-card.err::before    { background: var(--red); }
-.sensor-card.offline::before{ background: var(--txt-4); }
-
-.s-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-.s-id   { font-size: var(--f-sm); font-weight: 700; }
-.s-crop { font-size: 14px; color: var(--txt-3); margin-top: 1px; }
-.s-status-dot {
-  width: 10px; height: 10px; border-radius: 99px;
-  box-shadow: 0 0 0 3px currentColor;
+  font-size: 18px; color: var(--text-secondary);
   flex-shrink: 0;
 }
-.s-nums { display: flex; gap: 12px; margin-bottom: 10px; }
-.s-val-group { flex: 1; }
-.s-val-num { font-size: var(--f-lg); font-weight: 800; line-height: 1; }
-.s-val-lbl { font-size: 14px; color: var(--txt-3); margin-top: 2px; }
 
-.s-bar-wrap { margin-bottom: 8px; }
-.s-bar-bg { height: 6px; background: var(--bg); border-radius: 99px; overflow: hidden; }
-.s-bar-fill { height: 100%; border-radius: 99px; transition: width .6s ease; }
-
-.s-meta { display: flex; align-items: center; gap: 6px; }
-.s-meta-tag {
-  display: inline-flex; align-items: center; gap: 4px;
-  font-size: 13px; font-weight: 600;
-  padding: 3px 9px; border-radius: 99px;
+.metric-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--sp-md); }
+.metric-label {
+  font-size: var(--text-sm-size); font-weight: 600;
+  line-height: var(--text-sm-lh); color: var(--text-tertiary);
 }
-.s-meta-tag.ok     { background: var(--green-bg);  color: var(--green); }
-.s-meta-tag.warn   { background: var(--yellow-bg); color: var(--yellow); }
-.s-meta-tag.err    { background: var(--red-bg);    color: var(--red); }
-.s-meta-tag.offline{ background: var(--bg);        color: var(--txt-4); }
-.s-farm { font-size: 14px; color: var(--txt-4); margin-left: auto; display: flex; align-items: center; gap: 3px; }
-.s-farm i { font-size: 14px; }
+.metric-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+.metric-num {
+  font-size: var(--display-sm-size); font-weight: 600;
+  line-height: var(--display-sm-lh); color: var(--text-primary);
+  white-space: nowrap;
+}
+.metric-change {
+  display: inline-flex; align-items: center; gap: var(--sp-xs);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--r-sm);
+  padding: var(--sp-xxs) var(--sp-md) var(--sp-xxs) var(--sp-sm);
+  box-shadow: 0px 1px 1px rgba(10,13,18,0.05);
+  font-size: var(--text-sm-size); font-weight: 500;
+  line-height: var(--text-sm-lh); color: var(--text-secondary);
+  white-space: nowrap;
+}
+.metric-change i { font-size: 14px; }
+.metric-change.up   { color: var(--success); }
+.metric-change.down { color: var(--danger); }
 
 /* ═══════════════════════════════════════════════════════════════
-   BOTTOM ROW
+   CHART SECTION  (Blue card)
 ═══════════════════════════════════════════════════════════════ */
-.bottom-row {
+.chart-card {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-secondary);
+  border-radius: var(--r-xl);
+  box-shadow: 0px 1px 1px rgba(10,13,18,0.05);
+  overflow: hidden;
+}
+.chart-card-head {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  padding: var(--sp-2xl) var(--sp-3xl) 0;
+  gap: var(--sp-xl);
+}
+.cc-left {}
+.cc-title-row { display: flex; align-items: center; gap: var(--sp-md); }
+.cc-big-num {
+  font-size: var(--display-sm-size); font-weight: 600;
+  line-height: var(--display-sm-lh); color: var(--text-primary);
+}
+.cc-title  { font-size: var(--text-sm-size); font-weight: 600; color: var(--text-tertiary); }
+.cc-right  { display: flex; align-items: center; gap: var(--sp-md); flex-shrink: 0; }
+.chart-legend { display: flex; gap: var(--sp-xl); align-items: center; }
+.leg-item { display: flex; align-items: center; gap: 6px; font-size: var(--text-sm-size); font-weight: 500; color: var(--text-tertiary); }
+.leg-dot  { width: 8px; height: 8px; border-radius: var(--r-full); flex-shrink: 0; }
+
+.period-row { display: flex; gap: 4px; }
+.p-tab {
+  padding: 6px 12px; border-radius: var(--r-md);
+  font-size: var(--text-sm-size); font-weight: 600;
+  line-height: var(--text-sm-lh);
+  border: 1px solid var(--border-secondary);
+  background: var(--bg-primary); color: var(--text-tertiary);
+  cursor: pointer; transition: all .12s;
+}
+.p-tab:hover { background: var(--bg-secondary); color: var(--text-secondary); }
+.p-tab.active {
+  background: var(--bg-primary);
+  border-color: var(--border-primary);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-xs);
+}
+.chart-body { padding: var(--sp-xl) var(--sp-3xl) var(--sp-3xl); }
+.chart-wrap { height: 220px; position: relative; }
+
+/* ═══════════════════════════════════════════════════════════════
+   SENSOR TABLE  (Blue table pattern)
+═══════════════════════════════════════════════════════════════ */
+.section-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding-bottom: var(--sp-xl);
+}
+.sec-title { font-size: var(--text-xl-size); font-weight: 700; line-height: var(--text-xl-lh); }
+.sec-sub   { font-size: var(--text-sm-size); color: var(--text-tertiary); margin-top: 2px; }
+
+.table-card {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-secondary);
+  border-radius: var(--r-xl);
+  box-shadow: 0px 1px 1px rgba(10,13,18,0.05);
+  overflow: hidden;
+}
+.table-header {
+  display: flex; align-items: center;
+  padding: var(--sp-lg) var(--sp-3xl);
+  border-bottom: 1px solid var(--border-secondary);
+  background: var(--bg-primary);
+  gap: var(--sp-xl);
+}
+.table-header-cell {
+  font-size: var(--text-xs-size); font-weight: 500;
+  line-height: var(--text-xs-lh); color: var(--text-tertiary);
+  text-transform: uppercase; letter-spacing: .4px;
+}
+.table-row {
+  display: flex; align-items: center;
+  padding: var(--sp-xl) var(--sp-3xl);
+  border-bottom: 1px solid var(--border-secondary);
+  gap: var(--sp-xl); transition: background .1s; cursor: pointer;
+}
+.table-row:last-child { border-bottom: none; }
+.table-row:hover { background: var(--bg-secondary); }
+
+/* Column widths */
+.col-sensor  { flex: 0 0 220px; min-width: 0; }
+.col-farm    { flex: 0 0 130px; }
+.col-moisture{ flex: 0 0 110px; }
+.col-temp    { flex: 0 0 90px; }
+.col-battery { flex: 0 0 90px; }
+.col-status  { flex: 1; min-width: 90px; }
+.col-action  { flex: 0 0 36px; }
+
+.sensor-name { font-size: var(--text-sm-size); font-weight: 600; color: var(--text-primary); }
+.sensor-crop { font-size: var(--text-xs-size); color: var(--text-tertiary); margin-top: 2px; display: flex; align-items: center; gap: 4px; }
+
+/* Progress bar in table */
+.moisture-wrap { display: flex; align-items: center; gap: 8px; }
+.moisture-val  { font-size: var(--text-sm-size); font-weight: 600; min-width: 38px; }
+.moisture-bar  { flex: 1; height: 5px; background: var(--border-secondary); border-radius: var(--r-full); overflow: hidden; min-width: 40px; }
+.moisture-fill { height: 100%; border-radius: var(--r-full); transition: width .5s; }
+
+/* Status badge */
+.status-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: var(--text-xs-size); font-weight: 500; line-height: var(--text-xs-lh);
+  padding: var(--sp-xxs) var(--sp-md) var(--sp-xxs) var(--sp-sm);
+  border-radius: var(--r-full); white-space: nowrap;
+  border: 1px solid transparent;
+}
+.status-badge .s-dot { width: 6px; height: 6px; border-radius: var(--r-full); flex-shrink: 0; }
+.status-badge.ok     { background: var(--success-bg); border-color: var(--success-border); color: #067647; }
+.status-badge.warn   { background: var(--warning-bg); border-color: var(--warning-border); color: #B54708; }
+.status-badge.err    { background: var(--danger-bg);  border-color: var(--danger-border);  color: var(--danger); }
+.status-badge.off    { background: var(--neutral-bg); border-color: var(--border-secondary); color: var(--neutral); }
+
+.table-icon-btn {
+  width: 32px; height: 32px; border-radius: var(--r-sm);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; color: var(--text-tertiary);
+  transition: background .12s;
+}
+.table-icon-btn:hover { background: var(--bg-secondary); color: var(--text-secondary); }
+
+/* Pagination */
+.table-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: var(--sp-lg) var(--sp-3xl);
+  border-top: 1px solid var(--border-secondary);
+}
+.pag-info { font-size: var(--text-sm-size); color: var(--text-tertiary); }
+.pag-btns { display: flex; gap: var(--sp-xs); }
+.pag-btn {
+  padding: 6px 12px; border-radius: var(--r-md);
+  border: 1px solid var(--border-secondary);
+  background: var(--bg-primary);
+  font-size: var(--text-sm-size); font-weight: 600;
+  color: var(--text-secondary);
+  box-shadow: var(--shadow-xs); cursor: pointer;
+  transition: background .12s; display: flex; align-items: center; gap: 4px;
+}
+.pag-btn:hover { background: var(--bg-secondary); }
+
+/* ═══════════════════════════════════════════════════════════════
+   TWO-COLUMN BOTTOM SECTION
+═══════════════════════════════════════════════════════════════ */
+.bottom-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 14px;
+  gap: var(--sp-3xl);
 }
-.widget {
-  background: var(--card);
-  border-radius: var(--r);
-  box-shadow: var(--sh);
-  border: none;
-  overflow: hidden;
-  display: flex; flex-direction: column;
-  transition: box-shadow .2s;
+
+/* Generic "card" wrapper */
+.card {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-secondary);
+  border-radius: var(--r-xl);
+  box-shadow: 0px 1px 1px rgba(10,13,18,0.05);
+  overflow: hidden; display: flex; flex-direction: column;
 }
-.widget:hover { box-shadow: var(--sh-h); }
-.w-head {
+.card-head {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 18px 20px;
-  border-bottom: 1px solid var(--border-soft);
+  padding: var(--sp-xl) var(--sp-3xl);
+  border-bottom: 1px solid var(--border-secondary);
 }
-.w-title {
-  display: flex; align-items: center; gap: 10px;
-  font-size: var(--f-md); font-weight: 700;
+.card-title {
+  font-size: var(--text-md-size); font-weight: 700;
+  line-height: var(--text-md-lh); color: var(--text-primary);
+  display: flex; align-items: center; gap: var(--sp-md);
 }
-.w-icon {
-  width: 34px; height: 34px; border-radius: 10px;
+.card-icon {
+  width: 32px; height: 32px; border-radius: var(--r-md);
+  background: var(--bg-primary); border: 1px solid var(--border-primary);
+  box-shadow: var(--shadow-icon), var(--shadow-skeu-border);
   display: flex; align-items: center; justify-content: center;
-  font-size: 18px;
+  font-size: 16px; color: var(--text-secondary); flex-shrink: 0;
 }
-.w-action {
-  font-size: 14px; font-weight: 600; color: var(--primary);
-  cursor: pointer; display: flex; align-items: center; gap: 3px;
-  padding: 5px 10px; border-radius: var(--r-xs);
-  transition: background .15s;
-}
-.w-action:hover { background: var(--primary-lt); }
-.w-body { flex: 1; padding: 16px 20px 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+.card-body { flex: 1; padding: var(--sp-xl) var(--sp-3xl) var(--sp-3xl); overflow-y: auto; max-height: 320px; }
 
-/* ── Recommendation cards ── */
-.rec-card {
-  border-radius: 12px; padding: 14px 16px;
-  border: 1.5px solid var(--border);
-  display: flex; flex-direction: column; gap: 8px;
-  transition: box-shadow .15s; cursor: pointer;
+/* Tabs inside card */
+.card-tabs { display: flex; border-bottom: 1px solid var(--border-secondary); }
+.card-tab {
+  padding: var(--sp-lg) var(--sp-xl);
+  font-size: var(--text-sm-size); font-weight: 500; line-height: var(--text-sm-lh);
+  color: var(--text-tertiary); cursor: pointer;
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+  transition: color .12s; display: flex; align-items: center; gap: 6px;
 }
-.rec-card:hover { box-shadow: var(--sh); }
-.rec-card.critical { border-color: #FFAAAA; background: #FFF5F5; }
-.rec-card.soon     { border-color: #FFD580; background: #FFFAEE; }
-.rec-card.ok       { border-color: var(--primary-mid); background: var(--primary-lt); }
-.rec-card.neutral  { background: var(--bg); }
+.card-tab:hover { color: var(--text-primary); }
+.card-tab.active { color: var(--text-primary); border-bottom-color: var(--brand); font-weight: 600; }
+.card-tab-count {
+  font-size: var(--text-xs-size); font-weight: 700;
+  padding: 1px 6px; border-radius: var(--r-full);
+  background: var(--danger-bg); color: var(--danger);
+}
 
-.rc-head { display: flex; align-items: center; gap: 10px; }
-.rc-icon {
-  width: 34px; height: 34px; border-radius: 10px;
+/* Recommendation items */
+.rec-item {
+  display: flex; flex-direction: column; gap: var(--sp-md);
+  padding: var(--sp-xl) 0;
+  border-bottom: 1px solid var(--border-secondary);
+}
+.rec-item:last-child { border-bottom: none; padding-bottom: 0; }
+.rec-row1  { display: flex; align-items: center; gap: var(--sp-md); }
+.rec-icon  {
+  width: 32px; height: 32px; border-radius: var(--r-md);
+  border: 1px solid var(--border-primary);
+  box-shadow: var(--shadow-icon), var(--shadow-skeu-border);
   display: flex; align-items: center; justify-content: center;
-  font-size: 18px; flex-shrink: 0;
+  font-size: 15px; flex-shrink: 0; background: var(--bg-primary);
 }
-.rc-icon.critical { background: var(--red-bg);    color: var(--red); }
-.rc-icon.soon     { background: var(--yellow-bg); color: var(--yellow); }
-.rc-icon.ok       { background: var(--green-bg);  color: var(--green); }
-.rc-icon.neutral  { background: var(--bg);        color: var(--txt-3); }
-.rc-name { flex: 1; font-size: var(--f-sm); font-weight: 700; }
-.rc-badge {
-  font-size: 13px; font-weight: 700;
-  padding: 3px 9px; border-radius: 99px;
-  display: inline-flex; align-items: center; gap: 3px;
-}
-.rc-badge.err  { background: var(--red-bg);    color: var(--red); }
-.rc-badge.warn { background: var(--yellow-bg); color: var(--yellow); }
-.rc-badge.ok   { background: var(--green-bg);  color: var(--green); }
-.rc-badge.off  { background: var(--bg);        color: var(--txt-3); }
-.rc-msg  { font-size: var(--f-sm); color: var(--txt-2); line-height: 1.5; }
-.rc-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.rec-name  { flex: 1; font-size: var(--text-sm-size); font-weight: 600; color: var(--text-primary); min-width: 0; }
+.rec-msg   { font-size: var(--text-sm-size); color: var(--text-tertiary); line-height: 1.5; }
+.rec-chips { display: flex; gap: 6px; flex-wrap: wrap; }
 .chip {
-  font-size: 14px; color: var(--txt-2);
-  background: rgba(0,0,0,.05);
-  padding: 3px 10px; border-radius: 6px;
-  display: flex; align-items: center; gap: 4px;
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: var(--text-xs-size); font-weight: 500;
+  padding: 2px 8px; border-radius: var(--r-full);
+  background: var(--utility-gray-50);
+  border: 1px solid var(--utility-gray-200);
+  color: var(--utility-gray-700);
 }
-.chip i { font-size: 14px; }
+.chip i { font-size: 12px; }
 
-/* ── Farm list ── */
+/* Farm items */
 .farm-item {
-  display: flex; align-items: center; gap: 12px;
-  padding: 12px 0; border-bottom: 1px solid var(--border-soft);
-  cursor: pointer; transition: padding .15s;
+  display: flex; align-items: center; gap: var(--sp-lg);
+  padding: var(--sp-lg) 0;
+  border-bottom: 1px solid var(--border-secondary);
+  cursor: pointer; transition: padding .1s;
 }
 .farm-item:last-child { border-bottom: none; }
 .farm-item:hover { padding-left: 4px; }
 .farm-av {
-  width: 42px; height: 42px; border-radius: 12px;
+  width: 40px; height: 40px; border-radius: var(--r-lg);
+  background: var(--bg-secondary); border: 1px solid var(--border-secondary);
   display: flex; align-items: center; justify-content: center;
-  font-size: 22px; flex-shrink: 0;
-  border: 1.5px solid var(--border);
-  background: var(--bg);
+  font-size: 20px; flex-shrink: 0;
 }
-.farm-name { font-size: var(--f-sm); font-weight: 700; }
-.farm-meta { font-size: 14px; color: var(--txt-3); margin-top: 2px; display: flex; align-items: center; gap: 4px; }
-.farm-meta i { font-size: 14px; }
-.farm-pct  { font-size: var(--f-md); font-weight: 800; }
-.farm-badge {
-  font-size: 13px; font-weight: 700;
-  padding: 2px 8px; border-radius: 99px;
-  display: inline-block;
-}
-.farm-badge.ok    { background: var(--green-bg);  color: var(--green); }
-.farm-badge.warn  { background: var(--yellow-bg); color: var(--yellow); }
-.farm-badge.err   { background: var(--red-bg);    color: var(--red); }
-.farm-badge.off   { background: var(--bg);        color: var(--txt-4); }
+.farm-name { font-size: var(--text-sm-size); font-weight: 600; color: var(--text-primary); }
+.farm-meta { font-size: var(--text-xs-size); color: var(--text-tertiary); margin-top: 2px; display: flex; align-items: center; gap: 4px; }
+.farm-pct  { font-size: var(--text-md-size); font-weight: 700; }
 
-/* ── Tabs ── */
-.tabs { display: flex; border-bottom: 1px solid var(--border-soft); padding: 0 20px; }
-.tab {
-  padding: 12px 14px; font-size: var(--f-sm); font-weight: 500;
-  color: var(--txt-3); cursor: pointer;
-  border-bottom: 2.5px solid transparent; margin-bottom: -1px;
-  transition: all .15s; display: flex; align-items: center; gap: 6px;
+/* Alert items */
+.alert-item {
+  display: flex; flex-direction: column; gap: 5px;
+  padding: var(--sp-lg) 0;
+  border-bottom: 1px solid var(--border-secondary);
 }
-.tab:hover { color: var(--txt); }
-.tab.active { color: var(--txt); border-bottom-color: var(--primary); font-weight: 700; }
-.tab-count {
-  font-size: 12px; font-weight: 800;
-  padding: 2px 6px; border-radius: 99px;
-  background: var(--red-bg); color: var(--red);
+.alert-item:last-child { border-bottom: none; }
+.alert-row1 { display: flex; align-items: flex-start; gap: var(--sp-md); }
+.alert-icon {
+  width: 28px; height: 28px; border-radius: var(--r-md);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; flex-shrink: 0;
 }
+.alert-icon.crit { background: var(--danger-bg);  color: var(--danger); }
+.alert-icon.warn { background: var(--warning-bg); color: var(--warning); }
+.alert-icon.ok   { background: var(--success-bg); color: var(--success); }
+.alert-msg  { flex: 1; font-size: var(--text-sm-size); font-weight: 600; color: var(--text-primary); line-height: 1.4; }
+.alert-desc { font-size: var(--text-xs-size); color: var(--text-tertiary); padding-left: 36px; }
+.alert-foot { display: flex; align-items: center; gap: 6px; padding-left: 36px; }
+.alert-tag  { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: var(--r-full); }
+.alert-tag.err  { background: var(--danger-bg);  color: var(--danger); }
+.alert-tag.warn { background: var(--warning-bg); color: var(--warning); }
+.alert-time { font-size: 11px; color: var(--text-placeholder); margin-left: auto; display: flex; align-items: center; gap: 3px; }
 
-/* ═══════════════════════════════════════════════════════════════
-   RIGHT PANEL
-═══════════════════════════════════════════════════════════════ */
-.rp-section {
-  border-bottom: 1px solid var(--border-soft);
-  padding: 18px 18px 16px;
-  flex-shrink: 0;
-}
-.rp-section:last-child { border-bottom: none; }
-.rp-title {
-  font-size: var(--f-md); font-weight: 800;
-  margin-bottom: 14px;
-  display: flex; align-items: center; justify-content: space-between;
-}
-.rp-sub { font-size: 14px; color: var(--txt-3); font-weight: 400; }
-
-/* Map section */
-.rp-map-wrap {
-  border-radius: 12px; overflow: hidden;
-  height: 220px; position: relative;
-  border: 1.5px solid var(--border);
+/* Map card */
+.map-wrap {
+  flex: 1; min-height: 220px; position: relative;
+  margin: 0 var(--sp-3xl) var(--sp-3xl);
+  border-radius: var(--r-lg); overflow: hidden;
+  border: 1px solid var(--border-secondary);
 }
 #map { width: 100%; height: 100%; }
-
-/* Map overlays */
 .map-overlay {
   position: absolute; top: 8px; left: 8px; z-index: 1000;
-  display: flex; flex-direction: column; gap: 5px;
-  pointer-events: none;
+  display: flex; flex-direction: column; gap: 5px; pointer-events: none;
 }
 .mo-chip {
   display: flex; align-items: center; gap: 6px;
-  background: rgba(255,255,255,.92); backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,.6);
-  border-radius: 8px; padding: 5px 9px;
-  box-shadow: var(--sh); pointer-events: all;
+  background: rgba(255,255,255,.94); backdrop-filter: blur(8px);
+  border: 1px solid var(--border-secondary);
+  border-radius: var(--r-md); padding: 5px 10px;
+  box-shadow: var(--shadow-sm); pointer-events: all;
 }
-.mo-dot { width: 8px; height: 8px; border-radius: 99px; flex-shrink: 0; }
-.mo-txt { font-size: 14px; font-weight: 600; color: var(--txt); white-space: nowrap; }
-.mo-val { font-size: 14px; font-weight: 800; margin-left: 2px; }
+.mo-dot { width: 8px; height: 8px; border-radius: var(--r-full); flex-shrink: 0; }
+.mo-txt { font-size: 13px; font-weight: 600; color: var(--text-secondary); white-space: nowrap; }
+.mo-val { font-size: 13px; font-weight: 700; margin-left: 2px; }
 
-/* Water saving summary */
+/* Water saving card element */
 .saving-block {
   display: flex; align-items: center; justify-content: space-between;
-  background: var(--primary-lt);
-  border: 1.5px solid var(--primary-mid);
-  border-radius: 12px; padding: 14px 16px;
-  margin-bottom: 14px;
+  background: var(--brand-50);
+  border: 1px solid var(--brand-100);
+  border-radius: var(--r-lg); padding: 16px 20px;
+  margin-bottom: var(--sp-xl);
 }
-.saving-num   { font-size: var(--f-3xl); font-weight: 900; color: var(--primary); line-height: 1; letter-spacing: -2px; }
-.saving-label { font-size: var(--f-sm); color: var(--txt-2); font-weight: 500; margin-top: 4px; }
-.saving-icon  { font-size: 42px; opacity: .25; }
+.saving-num   { font-size: var(--display-sm-size); font-weight: 700; color: var(--brand); line-height: 1; }
+.saving-label { font-size: var(--text-sm-size); color: var(--text-tertiary); margin-top: 4px; }
+.saving-icon  { font-size: 36px; color: var(--brand); opacity: .2; }
 
-/* Alert items */
-.al-item {
-  display: flex; flex-direction: column; gap: 5px;
-  padding: 12px 0; border-bottom: 1px solid var(--border-soft);
-}
-.al-item:last-child { border-bottom: none; }
-.al-top { display: flex; align-items: flex-start; gap: 10px; }
-.al-icon {
-  width: 32px; height: 32px; border-radius: 9px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 16px; flex-shrink: 0; margin-top: 1px;
-}
-.al-icon.critical { background: var(--red-bg);    color: var(--red); }
-.al-icon.warning  { background: var(--yellow-bg); color: var(--yellow); }
-.al-icon.ok       { background: var(--green-bg);  color: var(--green); }
-.al-msg   { flex: 1; font-size: var(--f-sm); font-weight: 600; color: var(--txt); line-height: 1.4; }
-.al-desc  { font-size: 14px; color: var(--txt-3); padding-left: 42px; }
-.al-foot  { display: flex; align-items: center; gap: 6px; padding-left: 42px; }
-.al-tag   { font-size: 13px; font-weight: 700; padding: 2px 8px; border-radius: 99px; }
-.al-tag.err  { background: var(--red-bg);    color: var(--red); }
-.al-tag.warn { background: var(--yellow-bg); color: var(--yellow); }
-.al-time  { font-size: 13px; color: var(--txt-4); margin-left: auto; display: flex; align-items: center; gap: 3px; }
-.al-time i { font-size: 13px; }
-
-/* Right panel scroll */
-.rp-scroll { flex: 1; overflow-y: auto; }
-
-/* ═══════════════════════════════════════════════════════════════
-   DARK MODE
-═══════════════════════════════════════════════════════════════ */
-[data-theme="dark"] {
-  --bg:          #161618;
-  --card:        #1E1E21;
-  --card2:       #252528;
-  --txt:         #F2F2F2;
-  --txt-2:       #AAAAAA;
-  --txt-3:       #777777;
-  --txt-4:       #444444;
-  --border:      #2E2E32;
-  --border-soft: #252528;
-  --primary:     #8ECF3A;
-  --primary-d:   #78B82E;
-  --primary-lt:  #0E1E06;
-  --primary-mid: #1E3E0C;
-  --green:     #8ECF3A; --green-bg:  #0E1E06;
-  --red:       #E05555; --red-bg:    #1F0A0A;
-  --yellow:    #F5A623; --yellow-bg: #1F1308;
-  --blue:      #5B9BF8; --blue-bg:   #071228;
-  --purple:    #A87EF8; --purple-bg: #120928;
-  --sh:   0 1px 4px rgba(0,0,0,.4), 0 4px 20px rgba(0,0,0,.35);
-  --sh-h: 0 4px 8px rgba(0,0,0,.5), 0 12px 36px rgba(0,0,0,.45);
-}
-[data-theme="dark"] .rec-card.critical { background:#1F0A0A; border-color:#3A1212; }
-[data-theme="dark"] .rec-card.soon     { background:#1F1308; border-color:#3A2508; }
-[data-theme="dark"] .rec-card.ok       { background:#0E1E06; border-color:#1E3E0C; }
-[data-theme="dark"] .rec-card.neutral  { background:#252528; border:none; }
-[data-theme="dark"] .saving-block      { background: linear-gradient(135deg,#0E1E06,#141F08); border-color:#1E3E0C; }
-[data-theme="dark"] .live-bar          { background: var(--bg); border:none; }
-[data-theme="dark"] .mo-chip           { background:rgba(22,22,26,.92); border-color:rgba(255,255,255,.07); }
-[data-theme="dark"] .mo-txt            { color:#F2F2F2; }
-[data-theme="dark"] .sensor-card       { background:#1E1E21; }
-[data-theme="dark"] .sensor-card:hover { background:#252528; }
-[data-theme="dark"] .pbtn              { background:#252528; border-color:#2E2E32; color:#777; }
-[data-theme="dark"] .pbtn.active       { background:var(--primary); color:#fff; border-color:var(--primary); }
-[data-theme="dark"] .pbtn:hover        { background:#0E1E06; border-color:var(--primary); color:var(--primary); }
-[data-theme="dark"] .btn-ghost         { background:#252528; border-color:#2E2E32; color:#AAAAAA; }
-[data-theme="dark"] .chip              { background:rgba(255,255,255,.07); }
-[data-theme="dark"] .farm-av           { border-color:#2E2E32; background:#252528; }
-[data-theme="dark"] .leaflet-tile      { filter: brightness(.7) invert(1) contrast(2) hue-rotate(200deg) saturate(.3) brightness(.7); }
-[data-theme="dark"] .leaflet-container { background:#161618; }
-[data-theme="dark"] .leaflet-popup-content-wrapper { background:#1E1E21; border:1px solid #2E2E32; }
-[data-theme="dark"] .leaflet-popup-tip { background:#1E1E21; }
-[data-theme="dark"] .nav-item.active   { background:#252528; }
-[data-theme="dark"] .nav-item:hover    { background:#252528; }
-[data-theme="dark"] .search-box        { background:#1E1E21; box-shadow:none; }
-[data-theme="dark"] .search-box:focus-within { background:#252528; }
-[data-theme="dark"] .tb-dot            { border-color:#1E1E21; }
-[data-theme="dark"] .rp-map-wrap       { border-color:#2E2E32; }
-[data-theme="dark"] .map-popup         { background:#1E1E21; color:#F2F2F2; }
-[data-theme="dark"] .sidebar           { box-shadow: 2px 0 12px rgba(0,0,0,.3); }
-[data-theme="dark"] .right-col         { box-shadow: -2px 0 12px rgba(0,0,0,.3); }
-[data-theme="dark"] .w-head            { border-color:#2E2E32; }
-[data-theme="dark"] .tabs              { border-color:#2E2E32; }
-[data-theme="dark"] .rp-section        { border-color:#2E2E32; }
-
-/* ═══════════════════════════════════════════════════════════════
-   SKELETON
-═══════════════════════════════════════════════════════════════ */
+/* Skeleton */
 .skel {
-  background: linear-gradient(90deg, var(--bg) 25%, var(--border) 50%, var(--bg) 75%);
+  background: linear-gradient(90deg, var(--bg-secondary) 25%, var(--border-secondary) 50%, var(--bg-secondary) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
-  border-radius: 10px;
+  border-radius: var(--r-md);
 }
-@keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+@keyframes shimmer { 0%{background-position:200%} 100%{background-position:-200%} }
+@keyframes spin    { to { transform: rotate(360deg); } }
+
+/* ── Live banner ──────────────────────────────────────────────── */
+.live-bar {
+  background: var(--bg-page);
+  padding: 5px var(--sp-4xl) 8px;
+  display: flex; align-items: center; gap: 8px;
+  flex-shrink: 0; border-bottom: 1px solid var(--border-tertiary);
+}
+.live-dot { width: 8px; height: 8px; border-radius: var(--r-full); background: var(--success); animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.8)} }
+.live-txt  { font-size: var(--text-xs-size); color: var(--text-tertiary); font-weight: 500; flex: 1; }
+.live-time { font-size: var(--text-xs-size); color: var(--text-placeholder); }
+
+/* ═══════════════════════════════════════════════════════════════
+   DARK MODE  (Blue tokens adapted)
+═══════════════════════════════════════════════════════════════ */
+[data-theme="dark"] {
+  --bg-page:          #0C0E12;
+  --bg-primary:       #161A23;
+  --bg-primary-alt:   #1C2130;
+  --bg-secondary:     #1E2436;
+  --border-primary:   #2E3448;
+  --border-secondary: #242A3A;
+  --border-tertiary:  #1A1F2E;
+  --border-brand:     #2970FF;
+  --text-primary:     #F0F2F5;
+  --text-secondary:   #BCC2CE;
+  --text-tertiary:    #8B92A0;
+  --text-placeholder: #636B78;
+  --text-quaternary:  #636B78;
+  --text-disabled:    #454C58;
+  --success-bg:       #0A1E14; --success-border: #0D3320;
+  --warning-bg:       #1A1404; --warning-border: #2E2006;
+  --danger-bg:        #1A0A08; --danger-border:  #2E1210;
+  --neutral-bg:       #1C2130;
+  --utility-gray-50:  #1C2130;
+  --utility-gray-200: #2E3448;
+  --utility-gray-700: #BCC2CE;
+  --brand-50:         #0D1528;
+  --brand-100:        #152040;
+  --shadow-xs:  0 1px 2px rgba(0,0,0,.4);
+  --shadow-sm:  0 1px 3px rgba(0,0,0,.5), 0 1px 2px rgba(0,0,0,.3);
+  --shadow-md:  0 4px 8px rgba(0,0,0,.5);
+  --shadow-icon: 0 1px 2px rgba(0,0,0,.5);
+  --shadow-skeu-border: inset 0 0 0 1px rgba(255,255,255,0.06), inset 0 -2px 0 rgba(0,0,0,.2);
+}
+[data-theme="dark"] .sb-search           { background: #1C2130; border-color: #2E3448; }
+[data-theme="dark"] .ph-search           { background: #1C2130; border-color: #2E3448; }
+[data-theme="dark"] .btn-secondary       { background: #1C2130; border-color: #2E3448; }
+[data-theme="dark"] .p-tab               { background: #1C2130; border-color: #2E3448; color: #8B92A0; }
+[data-theme="dark"] .p-tab.active        { background: #161A23; border-color: #2E3448; }
+[data-theme="dark"] .table-row:hover     { background: #1E2436; }
+[data-theme="dark"] .farm-item:hover     { background: transparent; }
+[data-theme="dark"] .mo-chip             { background: rgba(22,26,35,.95); border-color: #2E3448; }
+[data-theme="dark"] .saving-block        { background: #0D1528; border-color: #152040; }
+[data-theme="dark"] .saving-num          { color: #6B9FFF; }
+[data-theme="dark"] .saving-icon         { color: #6B9FFF; }
+[data-theme="dark"] .metric-card:hover   { background: #1E2436; }
+[data-theme="dark"] .leaflet-tile        { filter: brightness(.6) invert(1) contrast(2) hue-rotate(200deg) saturate(.3) brightness(.7); }
+[data-theme="dark"] .leaflet-container   { background: #0C0E12; }
+[data-theme="dark"] .leaflet-popup-content-wrapper { background: #161A23; border: 1px solid #2E3448; }
+[data-theme="dark"] .leaflet-popup-tip  { background: #161A23; }
+[data-theme="dark"] .ph-dot             { border-color: #161A23; }
+[data-theme="dark"] .live-bar           { border-color: #1A1F2E; }
+[data-theme="dark"] .nav-item.active    { background: #1E2436; }
 
 /* ═══════════════════════════════════════════════════════════════
    RESPONSIVE
 ═══════════════════════════════════════════════════════════════ */
-@media (max-width: 1400px) {
-  :root { --rp: 260px; }
-  .sensor-grid { grid-template-columns: repeat(2, 1fr); }
+@media (max-width: 1280px) { .metrics-row { grid-template-columns: repeat(2,1fr); } }
+@media (max-width: 1100px) { .bottom-grid { grid-template-columns: 1fr; } }
+@media (max-width: 900px)  {
+  :root { --sidebar-w: 240px; }
+  .col-battery { display: none; }
 }
-@media (max-width: 1150px) {
-  .right-col { display: none; }
-  .sensor-grid { grid-template-columns: repeat(2, 1fr); }
-}
-@media (max-width: 860px) {
-  :root { --sb: 220px; }
-  .stats-row { grid-template-columns: repeat(2, 1fr); }
-  .bottom-row { grid-template-columns: 1fr; }
-}
-@media (max-width: 680px) {
-  .sidebar { position: fixed; left: -100%; transition: left .25s; z-index: 200; }
+@media (max-width: 720px) {
+  .sidebar { position: fixed; left: -100%; z-index: 200; transition: left .25s; }
   .sidebar.open { left: 0; }
-  .sensor-grid { grid-template-columns: 1fr; }
+  .metrics-row { grid-template-columns: 1fr 1fr; }
+  .content { padding: var(--sp-xl); }
+  .col-temp, .col-battery { display: none; }
 }
-@keyframes spin { to { transform: rotate(360deg); } }
 </style>
 </head>
 <body>
 
 <!-- ══ SIDEBAR ══════════════════════════════════════════════════ -->
 <nav class="sidebar" id="sidebar">
-  <div class="sb-brand">
-    <div class="brand-logo"><i class="ri-leaf-line"></i></div>
-    <div style="flex:1">
-      <div class="brand-name">Tomchi Tech</div>
+
+  <div class="sb-header">
+    <!-- Logo -->
+    <div class="sb-logo">
+      <div class="sb-logomark"><i class="ri-leaf-line"></i></div>
+      <span class="sb-logoname">Tomchi Tech</span>
     </div>
-    <span class="brand-ver">v0.1</span>
+
+    <!-- Search -->
+    <div class="sb-search">
+      <i class="ri-search-2-line"></i>
+      <span>Qidirish</span>
+      <span class="sb-shortcut">⌘K</span>
+    </div>
   </div>
 
+  <!-- Nav -->
   <div class="sb-nav">
-    <div class="nav-sec-label">Asosiy</div>
-    <a class="nav-item active" href="#">
+    <button class="nav-item active">
       <span class="nav-icon"><i class="ri-dashboard-3-line"></i></span>
       Dashboard
-    </a>
-    <a class="nav-item" href="#">
+    </button>
+    <button class="nav-item">
       <span class="nav-icon"><i class="ri-radar-line"></i></span>
       Sensorlar
-      <span class="nav-badge g" id="nb-sensors">6</span>
-    </a>
-    <a class="nav-item" href="#">
+      <span class="nav-badge" id="nb-sensors">6</span>
+    </button>
+    <button class="nav-item">
       <span class="nav-icon"><i class="ri-plant-line"></i></span>
       Fermalar
-    </a>
-    <a class="nav-item" href="#">
+    </button>
+    <button class="nav-item">
       <span class="nav-icon"><i class="ri-lightbulb-line"></i></span>
       Tavsiyalar
-    </a>
-    <a class="nav-item" href="#">
+    </button>
+    <button class="nav-item">
       <span class="nav-icon"><i class="ri-notification-3-line"></i></span>
       Alertlar
-      <span class="nav-badge" id="nb-alerts">—</span>
-    </a>
-    <a class="nav-item" href="#">
+      <span class="nav-badge alert" id="nb-alerts">0</span>
+    </button>
+    <button class="nav-item">
       <span class="nav-icon"><i class="ri-bar-chart-2-line"></i></span>
       Hisobotlar
-    </a>
+    </button>
 
-    <div class="nav-sec-label" style="margin-top:8px">Tez kirish</div>
-    <div id="quick-nav">
-      <div class="nav-item" style="opacity:.4">
-        <span class="nav-icon"><i class="ri-loader-4-line"></i></span>
-        Yuklanmoqda...
-      </div>
-    </div>
-
-    <div style="flex:1"></div>
-    <a class="nav-item" href="#">
-      <span class="nav-icon"><i class="ri-settings-3-line"></i></span>
-      Sozlamalar
-    </a>
-    <a class="nav-item" href="#">
-      <span class="nav-icon"><i class="ri-question-line"></i></span>
-      Yordam
-    </a>
+    <div style="height:12px"></div>
+    <div id="quick-nav"></div>
   </div>
 
+  <!-- Footer -->
   <div class="sb-footer">
-    <div class="user-row">
-      <div class="user-av">X</div>
-      <div style="flex:1;min-width:0">
-        <div class="user-name">Xurshid Istamov</div>
-        <div class="user-role">Agrotexnik · Admin</div>
+    <button class="nav-item footer-item">
+      <span class="nav-icon"><i class="ri-settings-3-line"></i></span>
+      Sozlamalar
+    </button>
+    <button class="nav-item footer-item">
+      <span class="nav-icon"><i class="ri-question-line"></i></span>
+      Yordam
+    </button>
+    <div class="sb-account">
+      <div class="av-wrap">
+        X
+        <div class="av-online"></div>
       </div>
-      <i class="ri-more-2-fill" style="color:var(--txt-3);font-size:18px"></i>
+      <div style="flex:1;min-width:0">
+        <div class="av-name">Xurshid Istamov</div>
+        <div class="av-role">Agrotexnik · Admin</div>
+      </div>
+      <i class="ri-more-2-fill" style="color:var(--text-tertiary);font-size:16px;flex-shrink:0"></i>
     </div>
   </div>
 </nav>
 
-<!-- ══ MAIN ═════════════════════════════════════════════════════ -->
+<!-- ══ MAIN ════════════════════════════════════════════════════ -->
 <div class="main">
 
-  <!-- Topbar -->
-  <div class="topbar">
-    <button class="tb-btn" id="menu-btn" onclick="document.getElementById('sidebar').classList.toggle('open')" style="display:none">
+  <!-- Page header -->
+  <header class="page-header">
+    <button id="menu-btn" class="ph-btn" onclick="document.getElementById('sidebar').classList.toggle('open')" style="display:none">
       <i class="ri-menu-line"></i>
     </button>
-    <div class="topbar-left">
-      <div class="topbar-title">Dashboard</div>
-      <span class="topbar-sub">— barcha sensorlar monitoringi</span>
+    <div style="flex:1">
+      <span class="ph-title">Dashboard</span>
+      <span class="ph-subtitle">— barcha sensorlar monitoringi</span>
     </div>
 
-    <div class="search-box">
+    <div class="ph-search">
       <i class="ri-search-2-line"></i>
-      <input type="text" placeholder="Sensor, ferma qidirish..."/>
+      <input type="text" placeholder="Sensor, ferma..."/>
     </div>
 
-    <button class="tb-btn" onclick="fetchAll()" title="Yangilash">
+    <button class="ph-btn" onclick="fetchAll()" title="Yangilash">
       <i class="ri-refresh-line" id="refresh-icon"></i>
     </button>
-    <button class="tb-btn" title="Ogohlantirishlar" style="position:relative">
+    <button class="ph-btn" style="position:relative" title="Alertlar">
       <i class="ri-notification-3-line"></i>
-      <div class="tb-dot" id="notif-dot" style="display:none"></div>
+      <div class="ph-dot" id="notif-dot" style="display:none"></div>
     </button>
-    <button class="tb-btn" title="Sozlamalar">
-      <i class="ri-settings-3-line"></i>
-    </button>
-
-    <div class="tb-sep"></div>
-
-    <!-- Lang -->
-    <button class="tb-btn" id="lang-btn" onclick="cycleLang()" title="Til" style="width:auto;padding:0 12px;gap:6px;font-size:var(--f-sm);font-weight:700;color:var(--txt-2)">
-      <i class="ri-global-line" style="font-size:18px"></i>
+    <div class="ph-divider"></div>
+    <button class="ph-lang" id="lang-btn" onclick="cycleLang()">
+      <i class="ri-global-line" style="font-size:16px"></i>
       <span id="lang-label">UZ</span>
     </button>
-
-    <!-- Theme -->
-    <button class="tb-btn" id="theme-btn" onclick="toggleTheme()" title="Mavzu">
-      <i class="ri-moon-line" id="theme-icon" style="font-size:18px"></i>
+    <button class="ph-btn" id="theme-btn" onclick="toggleTheme()" title="Mavzu">
+      <i class="ri-moon-line" id="theme-icon" style="font-size:17px"></i>
     </button>
-
-    <div class="tb-sep"></div>
-    <button class="btn btn-ghost"><i class="ri-calendar-check-line"></i> Jadval</button>
+    <div class="ph-divider"></div>
+    <button class="btn btn-secondary"><i class="ri-calendar-check-line"></i> Jadval</button>
     <button class="btn btn-primary"><i class="ri-add-line"></i> Sensor qo'shish</button>
-  </div>
+  </header>
 
   <!-- Live banner -->
   <div class="live-bar">
-    <div class="live-dot" id="live-dot"></div>
+    <div class="live-dot"></div>
     <span class="live-txt" id="refresh-status">Ma'lumotlar yuklanmoqda...</span>
     <span class="live-time" id="refresh-time"></span>
   </div>
 
-  <!-- Page body: center + right -->
-  <div class="page-body">
+  <!-- Content -->
+  <main class="content">
 
-    <!-- ── CENTER COLUMN ──────────────────────────────────────── -->
-    <div class="center-col">
-
-      <!-- Stat Cards -->
-      <div class="stats-row">
-        <div class="stat-card c-green">
-          <div class="sc-top">
-            <div class="sc-icon g"><i class="ri-radar-line"></i></div>
-            <span class="sc-badge up" id="st-online-trend"><i class="ri-arrow-up-s-line"></i> Faol</span>
+    <!-- ── Metric cards ──────────────────────────────────── -->
+    <div class="metrics-row">
+      <div class="metric-card active-card">
+        <div class="metric-icon"><i class="ri-radar-line"></i></div>
+        <div class="metric-body">
+          <div class="metric-label">Online sensorlar</div>
+          <div class="metric-row">
+            <span class="metric-num" id="st-online">—</span>
+            <span class="metric-change up" id="st-online-change">
+              <i class="ri-arrow-up-right-line"></i> Faol
+            </span>
           </div>
-          <div>
-            <div class="sc-num" id="st-online">—</div>
-            <div class="sc-label">Online sensorlar</div>
-            <div class="sc-sub" id="st-online-sub">Yuklanmoqda...</div>
-          </div>
-        </div>
-
-        <div class="stat-card c-red">
-          <div class="sc-top">
-            <div class="sc-icon r"><i class="ri-alarm-warning-line"></i></div>
-            <span class="sc-badge down" id="st-alert-trend"><i class="ri-arrow-up-s-line"></i> Kritik</span>
-          </div>
-          <div>
-            <div class="sc-num" id="st-critical" style="color:var(--red)">—</div>
-            <div class="sc-label">Faol alertlar</div>
-            <div class="sc-sub" id="st-alert-sub">Yuklanmoqda...</div>
-          </div>
-        </div>
-
-        <div class="stat-card c-yellow">
-          <div class="sc-top">
-            <div class="sc-icon y"><i class="ri-drop-line"></i></div>
-            <span class="sc-badge neu" id="st-irr-trend">Tavsiya</span>
-          </div>
-          <div>
-            <div class="sc-num" id="st-soon" style="color:var(--yellow)">—</div>
-            <div class="sc-label">Sug'orish kerak</div>
-            <div class="sc-sub">Sensor bo'yicha</div>
-          </div>
-        </div>
-
-        <div class="stat-card c-blue">
-          <div class="sc-top">
-            <div class="sc-icon b"><i class="ri-recycle-line"></i></div>
-            <span class="sc-badge up" id="st-save-trend"><i class="ri-arrow-up-s-line"></i> Yaxshi</span>
-          </div>
-          <div>
-            <div class="sc-num" id="st-saving" style="color:var(--blue)">—</div>
-            <div class="sc-label">O'rtacha suv tejash</div>
-            <div class="sc-sub">An'anaviy vs smart</div>
-          </div>
+          <div style="font-size:12px;color:var(--text-placeholder)" id="st-online-sub">Yuklanmoqda</div>
         </div>
       </div>
 
-      <!-- Trend Line Chart -->
-      <div class="chart-widget">
-        <div class="cw-head">
-          <div class="cw-title-block">
-            <div class="cw-title">Namlik trendi</div>
-            <div class="cw-sub">Sensorlar bo'yicha tuproq namligi dinamikasi</div>
+      <div class="metric-card">
+        <div class="metric-icon"><i class="ri-alarm-warning-line"></i></div>
+        <div class="metric-body">
+          <div class="metric-label">Faol alertlar</div>
+          <div class="metric-row">
+            <span class="metric-num" id="st-critical" style="color:var(--danger)">—</span>
+            <span class="metric-change down" id="st-alert-change">
+              <i class="ri-arrow-up-right-line"></i> Kritik
+            </span>
           </div>
-          <div class="cw-controls">
-            <div class="cw-legend" id="trend-legend"></div>
-            <div class="period-btns">
-              <button class="pbtn active" onclick="setPeriod(7,this)">7 kun</button>
-              <button class="pbtn" onclick="setPeriod(14,this)">14 kun</button>
-              <button class="pbtn" onclick="setPeriod(30,this)">30 kun</button>
-            </div>
-          </div>
-        </div>
-        <div class="cw-body">
-          <div class="chart-wrap" style="height:220px">
-            <canvas id="trendChart"></canvas>
-          </div>
+          <div style="font-size:12px;color:var(--text-placeholder)" id="st-alert-sub">Yuklanmoqda</div>
         </div>
       </div>
 
-      <!-- Sensor Grid -->
-      <div>
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-          <div style="font-size:var(--f-lg);font-weight:800">Barcha sensorlar</div>
-          <button class="btn btn-ghost" style="font-size:var(--f-sm)"><i class="ri-external-link-line"></i> Barchasi</button>
-        </div>
-        <div class="sensor-grid" id="sensor-grid">
-          <div class="skel" style="height:140px"></div>
-          <div class="skel" style="height:140px"></div>
-          <div class="skel" style="height:140px"></div>
-          <div class="skel" style="height:140px"></div>
-          <div class="skel" style="height:140px"></div>
-          <div class="skel" style="height:140px"></div>
+      <div class="metric-card">
+        <div class="metric-icon"><i class="ri-drop-line"></i></div>
+        <div class="metric-body">
+          <div class="metric-label">Sug'orish kerak</div>
+          <div class="metric-row">
+            <span class="metric-num" id="st-soon" style="color:var(--warning)">—</span>
+            <span class="metric-change" id="st-soon-change">
+              <i class="ri-time-line"></i> Tavsiya
+            </span>
+          </div>
+          <div style="font-size:12px;color:var(--text-placeholder)">sensor bo'yicha</div>
         </div>
       </div>
 
-      <!-- Bottom row: Recommendations + Farms/Alerts -->
-      <div class="bottom-row">
-
-        <!-- Recommendations -->
-        <div class="widget">
-          <div class="w-head">
-            <div class="w-title">
-              <div class="w-icon" style="background:var(--yellow-bg);color:var(--yellow)"><i class="ri-lightbulb-flash-line"></i></div>
-              Sug'orish tavsiyalari
-            </div>
-            <span class="w-action"><i class="ri-external-link-line"></i> Barchasi</span>
+      <div class="metric-card">
+        <div class="metric-icon"><i class="ri-recycle-line"></i></div>
+        <div class="metric-body">
+          <div class="metric-label">O'rtacha suv tejash</div>
+          <div class="metric-row">
+            <span class="metric-num" id="st-saving" style="color:var(--brand)">—</span>
+            <span class="metric-change up" id="st-save-change">
+              <i class="ri-arrow-up-right-line"></i> Yaxshi
+            </span>
           </div>
-          <div class="w-body" id="rec-list" style="max-height:340px;overflow-y:auto">
-            <div class="skel" style="height:90px"></div>
-            <div class="skel" style="height:90px;margin-top:4px"></div>
+          <div style="font-size:12px;color:var(--text-placeholder)">an'anaviy vs smart</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Trend chart ───────────────────────────────────── -->
+    <div class="chart-card">
+      <div class="chart-card-head">
+        <div class="cc-left">
+          <div class="cc-title-row">
+            <span class="cc-big-num" id="cc-main-num">—</span>
+            <span class="metric-change up" id="cc-change" style="margin-top:6px">
+              <i class="ri-arrow-up-right-line"></i> Tejash
+            </span>
+          </div>
+          <div class="cc-title">Namlik trendi · sensorlar bo'yicha</div>
+        </div>
+        <div class="cc-right">
+          <div class="chart-legend" id="trend-legend"></div>
+          <div class="period-row">
+            <button class="p-tab active" onclick="setPeriod(7,this)">7 kun</button>
+            <button class="p-tab" onclick="setPeriod(14,this)">14 kun</button>
+            <button class="p-tab" onclick="setPeriod(30,this)">30 kun</button>
+          </div>
+        </div>
+      </div>
+      <div class="chart-body">
+        <div class="chart-wrap"><canvas id="trendChart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- ── Sensor Table ──────────────────────────────────── -->
+    <div>
+      <div class="section-header">
+        <div>
+          <div class="sec-title">Barcha sensorlar</div>
+          <div class="sec-sub" id="sensor-count">Yuklanmoqda...</div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-secondary"><i class="ri-filter-line"></i> Filter</button>
+          <button class="btn btn-secondary"><i class="ri-download-2-line"></i> Eksport</button>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <!-- Table header -->
+        <div class="table-header">
+          <div class="table-header-cell col-sensor">Sensor / Ekin</div>
+          <div class="table-header-cell col-farm">Ferma</div>
+          <div class="table-header-cell col-moisture">Namlik</div>
+          <div class="table-header-cell col-temp">Harorat</div>
+          <div class="table-header-cell col-battery">Batareya</div>
+          <div class="table-header-cell col-status">Holat</div>
+          <div class="table-header-cell col-action"></div>
+        </div>
+
+        <!-- Table body -->
+        <div id="sensor-table-body">
+          <div style="padding:40px;text-align:center">
+            <div class="skel" style="height:44px;margin-bottom:8px"></div>
+            <div class="skel" style="height:44px;margin-bottom:8px"></div>
+            <div class="skel" style="height:44px;margin-bottom:8px"></div>
+            <div class="skel" style="height:44px"></div>
           </div>
         </div>
 
-        <!-- Farms + Alerts tabs -->
-        <div class="widget">
-          <div class="w-head" style="padding-bottom:0;border-bottom:none">
-            <div class="w-title">
-              <div class="w-icon" style="background:var(--purple-bg);color:var(--purple)"><i class="ri-community-line"></i></div>
-              Fermalar va alertlar
-            </div>
-          </div>
-          <div class="tabs">
-            <div class="tab active" onclick="switchTab(this,'farms-tab')">
-              <i class="ri-plant-line"></i> Fermalar
-            </div>
-            <div class="tab" onclick="switchTab(this,'alerts-tab')">
-              <i class="ri-alarm-warning-line"></i> Alertlar
-              <span class="tab-count" id="tab-alert-count">0</span>
-            </div>
-          </div>
-          <div class="w-body" id="farms-tab" style="max-height:280px;overflow-y:auto">
-            <div class="skel" style="height:48px"></div>
-            <div class="skel" style="height:48px;margin-top:4px"></div>
-          </div>
-          <div class="w-body" id="alerts-tab" style="display:none;max-height:280px;overflow-y:auto">
-            <div class="skel" style="height:70px"></div>
+        <!-- Pagination -->
+        <div class="table-footer">
+          <span class="pag-info" id="pag-info">— sensor</span>
+          <div class="pag-btns">
+            <button class="pag-btn"><i class="ri-arrow-left-s-line"></i> Oldingi</button>
+            <button class="pag-btn">Keyingi <i class="ri-arrow-right-s-line"></i></button>
           </div>
         </div>
+      </div>
+    </div>
 
-      </div><!-- /bottom-row -->
-    </div><!-- /center-col -->
+    <!-- ── Bottom 2-col grid ─────────────────────────────── -->
+    <div class="bottom-grid">
 
-    <!-- ── RIGHT PANEL ────────────────────────────────────────── -->
-    <div class="right-col">
-      <div class="rp-scroll">
-
-        <!-- Map -->
-        <div class="rp-section">
-          <div class="rp-title">
-            Sensorlar xaritasi
-            <span class="rp-sub" id="map-count">6 sensor</span>
+      <!-- Recommendations -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">
+            <div class="card-icon"><i class="ri-lightbulb-flash-line"></i></div>
+            Sug'orish tavsiyalari
           </div>
-          <div class="rp-map-wrap">
-            <div class="map-overlay" id="map-overlay">
+          <button class="btn btn-secondary" style="font-size:12px;padding:5px 10px">
+            <i class="ri-external-link-line"></i> Barchasi
+          </button>
+        </div>
+        <div class="card-body" id="rec-list">
+          <div class="skel" style="height:80px;margin-bottom:8px"></div>
+          <div class="skel" style="height:80px"></div>
+        </div>
+      </div>
+
+      <!-- Map + Farms/Alerts -->
+      <div style="display:flex;flex-direction:column;gap:var(--sp-3xl)">
+
+        <!-- Map card -->
+        <div class="card" style="min-height:280px">
+          <div class="card-head">
+            <div class="card-title">
+              <div class="card-icon"><i class="ri-map-2-line"></i></div>
+              Sensorlar xaritasi
+            </div>
+            <span style="font-size:13px;color:var(--text-tertiary)" id="map-count">6 sensor</span>
+          </div>
+          <div class="map-wrap">
+            <div class="map-overlay">
               <div class="mo-chip">
-                <div class="mo-dot" style="background:#5B9E2F"></div>
+                <div class="mo-dot" style="background:#17B26A"></div>
                 <span class="mo-txt">Online</span>
-                <span class="mo-val" id="mo-online" style="color:#5B9E2F">—</span>
+                <span class="mo-val" id="mo-online" style="color:#067647">—</span>
               </div>
               <div class="mo-chip">
-                <div class="mo-dot" style="background:#D4900A"></div>
+                <div class="mo-dot" style="background:#F79009"></div>
                 <span class="mo-txt">Diqqat</span>
-                <span class="mo-val" id="mo-warn" style="color:#D4900A">—</span>
+                <span class="mo-val" id="mo-warn" style="color:#B54708">—</span>
               </div>
               <div class="mo-chip">
-                <div class="mo-dot" style="background:#E04040"></div>
+                <div class="mo-dot" style="background:#D92D20"></div>
                 <span class="mo-txt">Kritik</span>
-                <span class="mo-val" id="mo-crit" style="color:#E04040">—</span>
+                <span class="mo-val" id="mo-crit" style="color:var(--danger)">—</span>
               </div>
             </div>
             <div id="map"></div>
           </div>
         </div>
 
-        <!-- Water saving -->
-        <div class="rp-section">
-          <div class="rp-title">Suv tejash</div>
-          <div class="saving-block">
-            <div>
-              <div class="saving-num" id="total-saving">—</div>
-              <div class="saving-label">O'rtacha suv tejash<br>an'anaviy usulga nisbatan</div>
+        <!-- Farms + Alerts tabbed card -->
+        <div class="card">
+          <div style="padding: var(--sp-xl) var(--sp-3xl) 0">
+            <div class="card-title" style="font-size:var(--text-md-size)">
+              <div class="card-icon"><i class="ri-community-line"></i></div>
+              Fermalar va alertlar
             </div>
-            <i class="ri-water-percent-line saving-icon" style="color:var(--primary)"></i>
           </div>
-          <div class="chart-wrap" style="height:130px">
-            <canvas id="savingChart"></canvas>
+          <div class="card-tabs">
+            <button class="card-tab active" onclick="switchTab(this,'farms-tab')">
+              <i class="ri-plant-line"></i> Fermalar
+            </button>
+            <button class="card-tab" onclick="switchTab(this,'alerts-tab')">
+              <i class="ri-alarm-warning-line"></i> Alertlar
+              <span class="card-tab-count" id="tab-alert-count">0</span>
+            </button>
           </div>
-        </div>
-
-        <!-- Recent alerts in right panel -->
-        <div class="rp-section">
-          <div class="rp-title">
-            So'nggi alertlar
-            <span class="rp-sub" id="rp-alert-count"></span>
+          <div class="card-body" id="farms-tab">
+            <div class="skel" style="height:48px;margin-bottom:8px"></div>
+            <div class="skel" style="height:48px"></div>
           </div>
-          <div id="rp-alerts">
+          <div class="card-body" id="alerts-tab" style="display:none">
             <div class="skel" style="height:60px"></div>
-            <div class="skel" style="height:60px;margin-top:8px"></div>
           </div>
         </div>
 
-      </div><!-- /rp-scroll -->
-    </div><!-- /right-col -->
+        <!-- Water saving summary -->
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title">
+              <div class="card-icon"><i class="ri-water-percent-line"></i></div>
+              Suv tejash tahlili
+            </div>
+            <button class="btn btn-secondary" style="font-size:12px;padding:5px 10px">
+              <i class="ri-download-2-line"></i> Hisobot
+            </button>
+          </div>
+          <div class="card-body">
+            <div class="saving-block">
+              <div>
+                <div class="saving-num" id="total-saving">—</div>
+                <div class="saving-label">O'rtacha suv tejash · an'anaviy usulga nisbatan</div>
+              </div>
+              <i class="ri-water-percent-line saving-icon"></i>
+            </div>
+            <div style="height:130px;position:relative">
+              <canvas id="savingChart"></canvas>
+            </div>
+          </div>
+        </div>
 
-  </div><!-- /page-body -->
+      </div>
+    </div>
+
+  </main>
 </div><!-- /main -->
 
 <script>
 const API = 'https://tomchi-tech-api.onrender.com/api/v1';
 const CROP_EMOJI = { pomidor:'🍅', kartoshka:'🥔', paxta:'🌿', uzum:'🍇', bugdoy:'🌾', "makkajo'xori":'🌽', piyoz:'🧅' };
+const LINE_COLORS = ['#155EEF','#17B26A','#F79009','#7839EE','#D92D20','#0BA5EC'];
 
 let trendChart = null, savingChart = null, map = null, markers = {};
 let trendDays = 7, _lastConfigs = [], _lastReadings = [];
 
-const LINE_PALETTE = ['#5B9E2F','#2D7DD2','#D4900A','#7C3AED','#E04040','#06B6D4'];
-
 // ── Helpers ───────────────────────────────────────────────────
-function statusInfo(status, m, thr) {
-  if (status === 'offline') return { cls:'offline', color:'#AAAAAA', label:'Offline' };
-  if (m < thr - 15)         return { cls:'err',     color:'#E04040', label:'Darhol!' };
-  if (m < thr)              return { cls:'warn',    color:'#D4900A', label:'Tez sug\'or' };
-  return                           { cls:'ok',      color:'#5B9E2F', label:'Yaxshi' };
+function sInfo(status, m, thr) {
+  if (status === 'offline') return { cls:'off',  color:'#717680', label:'Offline' };
+  if (m < thr - 15)         return { cls:'err',  color:'#D92D20', label:'Darhol!' };
+  if (m < thr)              return { cls:'warn', color:'#F79009', label:"Tez sug'or" };
+  return                           { cls:'ok',   color:'#17B26A', label:'Yaxshi' };
 }
 
-// ── Tab switch ────────────────────────────────────────────────
 function switchTab(el, id) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.card-tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
   ['farms-tab','alerts-tab'].forEach(t => {
     document.getElementById(t).style.display = t === id ? 'flex' : 'none';
@@ -1079,133 +1169,112 @@ function switchTab(el, id) {
 function initMap() {
   map = L.map('map', { scrollWheelZoom: false, zoomControl: false }).setView([40.8,64.0],5);
   L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-    attribution: '© CartoDB', maxZoom: 18,
+    attribution:'© CartoDB', maxZoom:18
   }).addTo(map);
-  L.control.zoom({ position: 'bottomright' }).addTo(map);
+  L.control.zoom({ position:'bottomright' }).addTo(map);
 }
 
 function updateMarkers(readings, configs) {
   configs.forEach(cfg => {
     const r = readings.find(x => x.sensor_id === cfg.sensor_id);
     const m = r ? r.soil_moisture : 0;
-    const { cls, color, label } = statusInfo(cfg.status, m, cfg.irrigation_threshold);
-    const clsBgs = { ok:'#EBF5E1', warn:'#FEF3DC', err:'#FDEAEA', offline:'#F5F5F5' };
-
+    const { cls, color } = sInfo(cfg.status, m, cfg.irrigation_threshold);
+    const bgMap = { ok:'#ECFDF3', warn:'#FFFAEB', err:'#FEF3F2', off:'#F9FAFB' };
     const icon = L.divIcon({
       className: '',
-      html: `<div style="width:36px;height:36px;background:${clsBgs[cls]};border:2.5px solid ${color};border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 2px 8px ${color}44;cursor:pointer">${CROP_EMOJI[cfg.crop_type]||'🌱'}</div>`,
-      iconSize: [36,36], iconAnchor: [18,18],
+      html: `<div style="width:34px;height:34px;background:${bgMap[cls]};border:2px solid ${color};border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;box-shadow:0 2px 6px ${color}44;cursor:pointer">${CROP_EMOJI[cfg.crop_type]||'🌱'}</div>`,
+      iconSize:[34,34], iconAnchor:[17,17],
     });
-    const popup = `<div class="map-popup" style="padding:12px;min-width:160px;font-family:'Inter',sans-serif">
-      <div style="font-size:16px;font-weight:700;margin-bottom:8px">${cfg.sensor_id} · ${cfg.crop_type}</div>
-      <div style="font-size:14px;color:#666;margin-bottom:3px"><i class="ri-drop-line"></i> Namlik: <b style="color:${color}">${cfg.status==='offline'?'—':m.toFixed(1)+'%'}</b></div>
-      <div style="font-size:14px;color:#666;margin-bottom:3px"><i class="ri-temp-hot-line"></i> Harorat: ${r?r.temperature.toFixed(1)+'°C':'—'}</div>
-      <div style="font-size:14px;color:#666"><i class="ri-map-pin-line"></i> ${cfg.farm_id} · ${cfg.field_area_ha} ga</div>
+    const popup = `<div style="padding:12px;min-width:160px;font-family:'Inter',sans-serif">
+      <div style="font-size:14px;font-weight:700;margin-bottom:8px;color:#181D27">${cfg.sensor_id} · ${cfg.crop_type}</div>
+      <div style="font-size:13px;color:#535862;margin-bottom:3px"><i class="ri-drop-line"></i> Namlik: <b style="color:${color}">${cfg.status==='offline'?'—':m.toFixed(1)+'%'}</b></div>
+      <div style="font-size:13px;color:#535862;margin-bottom:3px"><i class="ri-temp-hot-line"></i> Harorat: ${r?r.temperature.toFixed(1)+'°C':'—'}</div>
+      <div style="font-size:13px;color:#535862"><i class="ri-map-pin-line"></i> ${cfg.farm_id} · ${cfg.field_area_ha} ga</div>
     </div>`;
-
     if (markers[cfg.sensor_id]) map.removeLayer(markers[cfg.sensor_id]);
     markers[cfg.sensor_id] = L.marker([cfg.location_lat, cfg.location_lon], { icon })
-      .addTo(map).bindPopup(popup, { maxWidth: 200 });
+      .addTo(map).bindPopup(popup, { maxWidth:200 });
   });
 }
 
 function updateMapOverlay(configs, readings) {
-  const online  = configs.filter(c => c.status === 'online').length;
-  const warning = configs.filter(c => c.status === 'warning').length;
-  const critical = readings.filter(r => {
-    const cfg = configs.find(c => c.sensor_id === r.sensor_id);
-    return cfg && cfg.status !== 'offline' && r.soil_moisture < cfg.irrigation_threshold - 15;
+  const online  = configs.filter(c=>c.status==='online').length;
+  const warning = configs.filter(c=>c.status==='warning').length;
+  const crit    = readings.filter(r=>{
+    const cfg = configs.find(c=>c.sensor_id===r.sensor_id);
+    return cfg && cfg.status!=='offline' && r.soil_moisture < cfg.irrigation_threshold-15;
   }).length;
   document.getElementById('mo-online').textContent = online;
   document.getElementById('mo-warn').textContent   = warning;
-  document.getElementById('mo-crit').textContent   = critical;
+  document.getElementById('mo-crit').textContent   = crit;
   document.getElementById('map-count').textContent = configs.length + ' sensor';
 }
 
-// ── Trend Chart ───────────────────────────────────────────────
-function genTrendData(sensorId, currentMoisture, days) {
-  const seed = sensorId.charCodeAt(sensorId.length - 1);
-  let val = Math.min(88, currentMoisture + 12 + (seed % 12));
-  const data = [];
-  for (let i = days; i >= 0; i--) {
-    const drop = 1.3 + Math.sin(i * 0.9 + seed) * 0.7;
-    val = Math.max(15, Math.min(90, val - drop + (i % 5 === 0 ? 20 : 0)));
-    data.push(Math.round(val * 10) / 10);
-  }
-  return data;
+// ── Trend chart ───────────────────────────────────────────────
+function genTrend(sensorId, cur, days) {
+  const seed = sensorId.charCodeAt(sensorId.length-1);
+  let v = Math.min(88, cur + 12 + seed % 12);
+  return Array.from({length:days+1}, (_,i)=>{
+    const drop = 1.3 + Math.sin((days-i)*.9+seed)*.7;
+    v = Math.max(15, Math.min(90, v - drop + ((days-i)%5===0 ? 20 : 0)));
+    return Math.round(v*10)/10;
+  });
 }
-function buildDateLabels(days) {
+function dateLabels(days) {
   const now = new Date();
-  return Array.from({length: days+1}, (_, i) => {
-    const d = new Date(now); d.setDate(d.getDate() - (days - i));
-    return d.toLocaleDateString('uz-UZ', { month: 'short', day: 'numeric' });
+  return Array.from({length:days+1}, (_,i)=>{
+    const d = new Date(now); d.setDate(d.getDate()-(days-i));
+    return d.toLocaleDateString('uz-UZ',{month:'short',day:'numeric'});
   });
 }
 
 function initTrendChart(configs, readings) {
   const ctx = document.getElementById('trendChart').getContext('2d');
   if (trendChart) trendChart.destroy();
+  const dark = isDark();
+  const gc = dark ? '#242A3A' : '#F2F4F7';
+  const tc = dark ? '#636B78' : '#98A2B3';
+  const labels = dateLabels(trendDays);
 
-  const dark = isDarkMode();
-  const gridC = dark ? '#27272a' : '#EEEEEE';
-  const tickC = dark ? '#71717a' : '#AAAAAA';
-  const tooltipBg = dark ? '#18181b' : '#fff';
-  const labels = buildDateLabels(trendDays);
-
-  // Update legend
-  const legendEl = document.getElementById('trend-legend');
-  legendEl.innerHTML = configs.slice(0,6).map((cfg, i) =>
-    `<div class="leg-item"><div class="leg-dot" style="background:${LINE_PALETTE[i%LINE_PALETTE.length]}"></div>${cfg.sensor_id}</div>`
+  // Legend
+  document.getElementById('trend-legend').innerHTML = configs.slice(0,6).map((cfg,i) =>
+    `<div class="leg-item"><div class="leg-dot" style="background:${LINE_COLORS[i%6]}"></div>${cfg.sensor_id}</div>`
   ).join('');
 
-  const datasets = configs.slice(0, 6).map((cfg, i) => {
-    const r = readings.find(x => x.sensor_id === cfg.sensor_id);
-    const cur = r ? r.soil_moisture : 45;
-    const color = LINE_PALETTE[i % LINE_PALETTE.length];
-    const grad = ctx.createLinearGradient(0, 0, 0, 240);
-    grad.addColorStop(0, color + '28');
-    grad.addColorStop(1, color + '04');
+  const datasets = configs.slice(0,6).map((cfg,i)=>{
+    const r = readings.find(x=>x.sensor_id===cfg.sensor_id);
+    const color = LINE_COLORS[i%6];
+    const grad = ctx.createLinearGradient(0,0,0,240);
+    grad.addColorStop(0, color+'22'); grad.addColorStop(1, color+'04');
     return {
       label: cfg.sensor_id,
-      data: genTrendData(cfg.sensor_id, cur, trendDays),
-      borderColor: color, backgroundColor: grad,
-      borderWidth: 2.5, tension: 0.42, fill: true,
-      pointBackgroundColor: color, pointBorderColor: '#fff', pointBorderWidth: 2,
-      pointRadius: 3, pointHoverRadius: 6,
+      data: genTrend(cfg.sensor_id, r?r.soil_moisture:45, trendDays),
+      borderColor: color, backgroundColor: grad, borderWidth: 2,
+      tension: 0.4, fill: true,
+      pointBackgroundColor: color, pointBorderColor: dark?'#161A23':'#fff',
+      pointBorderWidth: 2, pointRadius: 2.5, pointHoverRadius: 5,
     };
   });
 
   trendChart = new Chart(ctx, {
-    type: 'line',
-    data: { labels, datasets },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      interaction: { mode: 'index', intersect: false },
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          backgroundColor: tooltipBg,
-          borderColor: dark ? '#27272a' : '#E0E0E0', borderWidth: 1,
-          titleColor: dark ? '#fafafa' : '#1A1A1A',
-          bodyColor: dark ? '#a1a1aa' : '#555555',
-          padding: 12,
-          titleFont: { size: 14, weight: '700' },
-          bodyFont: { size: 14 },
-          callbacks: { label: c => ` ${c.dataset.label}: ${c.parsed.y.toFixed(1)}%` }
+    type:'line', data:{ labels, datasets },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      interaction:{ mode:'index', intersect:false },
+      plugins:{
+        legend:{ display:false },
+        tooltip:{
+          backgroundColor: dark?'#1C2130':'#fff',
+          borderColor: dark?'#2E3448':'#E9EAEB', borderWidth:1,
+          titleColor: dark?'#F0F2F5':'#181D27',
+          bodyColor:  dark?'#8B92A0':'#535862',
+          padding:12, titleFont:{size:13,weight:'600'}, bodyFont:{size:13},
+          callbacks:{ label: c=>' '+c.dataset.label+': '+c.parsed.y.toFixed(1)+'%' }
         }
       },
-      scales: {
-        y: {
-          min:0, max:100,
-          grid: { color: gridC },
-          ticks: { callback: v => v+'%', font: { size: 13 }, color: tickC, stepSize: 25 },
-          border: { display: false }
-        },
-        x: {
-          grid: { display: false },
-          ticks: { font: { size: 13 }, color: tickC, maxRotation: 0 },
-          border: { display: false }
-        }
+      scales:{
+        y:{ min:0, max:100, grid:{color:gc}, ticks:{callback:v=>v+'%',font:{size:12},color:tc,stepSize:25}, border:{display:false} },
+        x:{ grid:{display:false}, ticks:{font:{size:12},color:tc,maxRotation:0}, border:{display:false} }
       }
     }
   });
@@ -1213,106 +1282,99 @@ function initTrendChart(configs, readings) {
 
 function setPeriod(days, btn) {
   trendDays = days;
-  document.querySelectorAll('.pbtn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.p-tab').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   if (_lastConfigs.length) initTrendChart(_lastConfigs, _lastReadings);
 }
 
-// ── Saving Chart ──────────────────────────────────────────────
+// ── Saving chart ──────────────────────────────────────────────
 function initSavingChart(recs) {
   const ctx = document.getElementById('savingChart').getContext('2d');
   if (savingChart) savingChart.destroy();
-  const dark = isDarkMode();
-  const gridC = dark ? '#27272a' : '#EEEEEE';
-  const tickC = dark ? '#71717a' : '#AAAAAA';
+  const dark = isDark();
+  const gc = dark?'#242A3A':'#F2F4F7';
+  const tc = dark?'#636B78':'#98A2B3';
   savingChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: recs.map(r => r.sensor_id),
-      datasets: [{
-        data: recs.map(r => r.water_saving_pct),
-        borderRadius: 6, borderSkipped: false,
-        backgroundColor: recs.map(r => r.water_saving_pct >= 60 ? '#5B9E2F30' : r.water_saving_pct >= 35 ? '#D4900A30' : '#E0404030'),
-        borderColor:     recs.map(r => r.water_saving_pct >= 60 ? '#5B9E2F'   : r.water_saving_pct >= 35 ? '#D4900A'   : '#E04040'),
-        borderWidth: 2,
+    type:'bar',
+    data:{
+      labels: recs.map(r=>r.sensor_id),
+      datasets:[{
+        data: recs.map(r=>r.water_saving_pct),
+        borderRadius:5, borderSkipped:false,
+        backgroundColor: recs.map(r=>r.water_saving_pct>=60?'#17B26A22':r.water_saving_pct>=35?'#F7900922':'#D92D2022'),
+        borderColor:     recs.map(r=>r.water_saving_pct>=60?'#17B26A'  :r.water_saving_pct>=35?'#F79009'  :'#D92D20'),
+        borderWidth:1.5,
       }]
     },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: { callbacks: { label: c => ` ${c.parsed.y.toFixed(1)}% tejash` }, titleFont: { size: 14 }, bodyFont: { size: 14 } }
-      },
-      scales: {
-        y: { min:0, max:100, grid:{color:gridC}, ticks:{callback:v=>v+'%',font:{size:13},color:tickC}, border:{display:false} },
-        x: { grid:{display:false}, ticks:{font:{size:13},color:tickC}, border:{display:false} }
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{ callbacks:{label:c=>` ${c.parsed.y.toFixed(1)}% tejash`}, bodyFont:{size:12} } },
+      scales:{
+        y:{min:0,max:100,grid:{color:gc},ticks:{callback:v=>v+'%',font:{size:11},color:tc},border:{display:false}},
+        x:{grid:{display:false},ticks:{font:{size:11},color:tc},border:{display:false}}
       }
     }
   });
 }
 
-// ── Render Sensor Grid ────────────────────────────────────────
-function renderSensorGrid(readings, configs) {
-  document.getElementById('sensor-grid').innerHTML = configs.map(cfg => {
-    const r = readings.find(x => x.sensor_id === cfg.sensor_id);
-    const m = r ? r.soil_moisture : 0;
-    const t = r ? r.temperature : null;
+// ── Render sensor table ───────────────────────────────────────
+function renderSensorTable(readings, configs) {
+  document.getElementById('sensor-count').textContent = configs.length + ' ta sensor · ' + configs.filter(c=>c.status==='online').length + ' online';
+  document.getElementById('pag-info').textContent = configs.length + ' ta sensor';
+  document.getElementById('sensor-table-body').innerHTML = configs.map(cfg=>{
+    const r   = readings.find(x=>x.sensor_id===cfg.sensor_id);
+    const m   = r ? r.soil_moisture : 0;
+    const t   = r ? r.temperature : null;
     const bat = r ? r.battery_level : null;
-    const { cls, color, label } = statusInfo(cfg.status, m, cfg.irrigation_threshold);
-    const pct = cfg.status === 'offline' ? 0 : m;
-    return `<div class="sensor-card ${cls}" onclick="">
-      <div class="s-head">
-        <div>
-          <div class="s-id">${cfg.sensor_id}</div>
-          <div class="s-crop">${CROP_EMOJI[cfg.crop_type]||'🌱'} ${cfg.crop_type} · ${cfg.field_area_ha} ga</div>
-        </div>
-        <div class="s-status-dot" style="background:${color};color:${color}"></div>
+    const { cls, color, label } = sInfo(cfg.status, m, cfg.irrigation_threshold);
+    const pct = cfg.status==='offline' ? 0 : m;
+    const batColor = bat!==null && bat<20 ? 'var(--danger)' : bat!==null && bat<40 ? 'var(--warning)' : 'var(--text-secondary)';
+    return `<div class="table-row">
+      <div class="col-sensor">
+        <div class="sensor-name">${cfg.sensor_id}</div>
+        <div class="sensor-crop">${CROP_EMOJI[cfg.crop_type]||'🌱'} ${cfg.crop_type} · ${cfg.field_area_ha} ga</div>
       </div>
-      <div class="s-nums">
-        <div class="s-val-group">
-          <div class="s-val-num" style="color:${color}">${cfg.status==='offline'?'—':pct.toFixed(1)+'%'}</div>
-          <div class="s-val-lbl">Namlik</div>
-        </div>
-        <div class="s-val-group">
-          <div class="s-val-num">${t!==null?t.toFixed(1)+'°':'—'}</div>
-          <div class="s-val-lbl">Harorat</div>
-        </div>
-        <div class="s-val-group">
-          <div class="s-val-num" style="color:${bat!==null&&bat<20?'#E04040':'inherit'}">${bat!==null?bat.toFixed(0)+'%':'—'}</div>
-          <div class="s-val-lbl">Batareya</div>
+      <div class="col-farm" style="font-size:var(--text-sm-size);color:var(--text-tertiary)">${cfg.farm_id}</div>
+      <div class="col-moisture">
+        <div class="moisture-wrap">
+          <span class="moisture-val" style="color:${color}">${cfg.status==='offline'?'—':pct.toFixed(1)+'%'}</span>
+          <div class="moisture-bar"><div class="moisture-fill" style="width:${pct}%;background:${color}"></div></div>
         </div>
       </div>
-      <div class="s-bar-wrap">
-        <div class="s-bar-bg"><div class="s-bar-fill" style="width:${pct}%;background:${color}"></div></div>
+      <div class="col-temp" style="font-size:var(--text-sm-size);font-weight:500;color:var(--text-secondary)">${t!==null?t.toFixed(1)+'°C':'—'}</div>
+      <div class="col-battery" style="font-size:var(--text-sm-size);font-weight:500;color:${batColor}">${bat!==null?bat.toFixed(0)+'%':'—'}</div>
+      <div class="col-status">
+        <span class="status-badge ${cls}">
+          <span class="s-dot" style="background:${color}"></span>${label}
+        </span>
       </div>
-      <div class="s-meta">
-        <span class="s-meta-tag ${cls}">${label}</span>
-        <span class="s-farm"><i class="ri-map-pin-line"></i>${cfg.farm_id}</span>
+      <div class="col-action">
+        <button class="table-icon-btn"><i class="ri-more-2-fill"></i></button>
       </div>
     </div>`;
   }).join('');
 }
 
-// ── Render Recommendations ────────────────────────────────────
-function renderRecommendations(recs) {
+// ── Render recommendations ────────────────────────────────────
+function renderRecs(recs) {
   const PRI = { IRRIGATE_NOW:0, IRRIGATE_SOON:1, STOP_IRRIGATION:2, NO_ACTION:3 };
-  const sorted = [...recs].sort((a,b)=>(PRI[a.action]||3)-(PRI[b.action]||3));
   const MAP = {
-    IRRIGATE_NOW:    { cls:'critical', icon:'ri-alarm-warning-fill', badge:'err',  lbl:"Darhol sug'or" },
-    IRRIGATE_SOON:   { cls:'soon',     icon:'ri-time-line',          badge:'warn', lbl:"Tez sug'or" },
-    STOP_IRRIGATION: { cls:'neutral',  icon:'ri-stop-circle-line',   badge:'off',  lbl:"To'xtat" },
-    NO_ACTION:       { cls:'ok',       icon:'ri-check-double-line',  badge:'ok',   lbl:"Yaxshi holat" },
+    IRRIGATE_NOW:    { icon:'ri-alarm-warning-fill', iconColor:'var(--danger)',   badge:'err',  lbl:"Darhol sug'or" },
+    IRRIGATE_SOON:   { icon:'ri-time-line',          iconColor:'var(--warning)',  badge:'warn', lbl:"Tez sug'or" },
+    STOP_IRRIGATION: { icon:'ri-stop-circle-line',   iconColor:'var(--neutral)',  badge:'off',  lbl:"To'xtat" },
+    NO_ACTION:       { icon:'ri-check-double-line',  iconColor:'var(--success)',  badge:'ok',   lbl:"Yaxshi holat" },
   };
-  document.getElementById('rec-list').innerHTML = sorted.map(r => {
-    const m = MAP[r.action] || MAP.NO_ACTION;
-    return `<div class="rec-card ${m.cls}">
-      <div class="rc-head">
-        <div class="rc-icon ${m.cls}"><i class="${m.icon}"></i></div>
-        <span class="rc-name">${r.sensor_id} · ${r.crop_type}</span>
-        <span class="rc-badge ${m.badge}">${m.lbl}</span>
+  const sorted = [...recs].sort((a,b)=>(PRI[a.action]||3)-(PRI[b.action]||3));
+  document.getElementById('rec-list').innerHTML = sorted.map(r=>{
+    const m = MAP[r.action]||MAP.NO_ACTION;
+    return `<div class="rec-item">
+      <div class="rec-row1">
+        <div class="rec-icon" style="color:${m.iconColor}"><i class="${m.icon}"></i></div>
+        <span class="rec-name">${r.sensor_id} · ${r.crop_type}</span>
+        <span class="status-badge ${m.badge}" style="margin-left:auto">${m.lbl}</span>
       </div>
-      <div class="rc-msg">${r.message}</div>
-      <div class="rc-chips">
+      <div class="rec-msg">${r.message}</div>
+      <div class="rec-chips">
         <span class="chip"><i class="ri-drop-line"></i>${r.water_needed_liters.toLocaleString()} L</span>
         <span class="chip"><i class="ri-percent-line"></i>${r.current_moisture.toFixed(1)}% namlik</span>
         <span class="chip"><i class="ri-recycle-line"></i>${r.water_saving_pct.toFixed(1)}% tejash</span>
@@ -1321,116 +1383,97 @@ function renderRecommendations(recs) {
   }).join('');
 }
 
-// ── Render Farms ──────────────────────────────────────────────
+// ── Render farms ──────────────────────────────────────────────
 function renderFarms(farms, readings, configs) {
-  const lbls = { ok:"Yaxshi", warn:"Tez sug'or", err:"Darhol!", offline:"Offline" };
-  document.getElementById('farms-tab').innerHTML = farms.map(f => {
-    const cfg = configs.find(c => c.farm_id === f.farm_id);
-    const r   = cfg ? readings.find(x => x.sensor_id === cfg.sensor_id) : null;
+  const lbls = { ok:"Yaxshi", warn:"Tez sug'or", err:"Darhol!", off:"Offline" };
+  document.getElementById('farms-tab').innerHTML = farms.map(f=>{
+    const cfg = configs.find(c=>c.farm_id===f.farm_id);
+    const r   = cfg ? readings.find(x=>x.sensor_id===cfg.sensor_id) : null;
     const m   = r ? r.soil_moisture : null;
-    const { cls, color } = statusInfo(cfg ? cfg.status : 'offline', m||0, cfg ? cfg.irrigation_threshold : 45);
+    const { cls, color } = sInfo(cfg?cfg.status:'offline', m||0, cfg?cfg.irrigation_threshold:45);
     return `<div class="farm-item">
       <div class="farm-av">${CROP_EMOJI[f.crop_type]||'🌱'}</div>
       <div style="flex:1;min-width:0">
         <div class="farm-name">${f.farmer_name}</div>
         <div class="farm-meta"><i class="ri-map-pin-line"></i>${f.district} · ${f.total_area_ha} ga · ${f.crop_type}</div>
       </div>
-      <div style="text-align:right">
+      <div style="text-align:right;flex-shrink:0">
         <div class="farm-pct" style="color:${color}">${m!==null&&cfg?.status!=='offline'?m.toFixed(1)+'%':'—'}</div>
-        <span class="farm-badge ${cls}">${lbls[cls]}</span>
+        <span class="status-badge ${cls}" style="margin-top:2px;display:inline-flex">${lbls[cls]}</span>
       </div>
     </div>`;
   }).join('');
 }
 
-// ── Render Alerts ─────────────────────────────────────────────
+// ── Render alerts ─────────────────────────────────────────────
 function renderAlerts(alerts) {
   document.getElementById('tab-alert-count').textContent = alerts.length;
-  document.getElementById('rp-alert-count').textContent = alerts.length ? alerts.length + ' ta' : '';
+  document.getElementById('nb-alerts').textContent = alerts.length || '0';
   const SEV = {
-    critical: { cls:'critical', icon:'ri-alarm-warning-fill', tag:'err', lbl:'Kritik' },
-    error:    { cls:'critical', icon:'ri-error-warning-fill', tag:'err', lbl:'Xato' },
-    warning:  { cls:'warning',  icon:'ri-alert-fill',         tag:'warn',lbl:'Diqqat' },
+    critical: { cls:'crit', icon:'ri-alarm-warning-fill', tag:'err', lbl:'Kritik' },
+    error:    { cls:'crit', icon:'ri-error-warning-fill', tag:'err', lbl:'Xato' },
+    warning:  { cls:'warn', icon:'ri-alert-fill',         tag:'warn',lbl:'Diqqat' },
   };
   const html = !alerts.length
-    ? `<div style="text-align:center;padding:24px;color:var(--txt-3)">
-         <i class="ri-checkbox-circle-line" style="font-size:32px;color:var(--green);display:block;margin-bottom:8px"></i>
-         Faol ogohlantirishlar yo'q
+    ? `<div style="text-align:center;padding:24px;color:var(--text-tertiary)">
+         <i class="ri-checkbox-circle-line" style="font-size:28px;color:var(--success);display:block;margin-bottom:6px"></i>
+         Faol alertlar yo'q
        </div>`
-    : alerts.map(a => {
-        const s = SEV[a.severity] || SEV.warning;
+    : alerts.map(a=>{
+        const s = SEV[a.severity]||SEV.warning;
         const time = new Date(a.at).toLocaleTimeString('uz-UZ',{hour:'2-digit',minute:'2-digit'});
-        return `<div class="al-item">
-          <div class="al-top">
-            <div class="al-icon ${s.cls}"><i class="${s.icon}"></i></div>
-            <div class="al-msg">${a.message}</div>
+        return `<div class="alert-item">
+          <div class="alert-row1">
+            <div class="alert-icon ${s.cls}"><i class="${s.icon}"></i></div>
+            <div class="alert-msg">${a.message}</div>
           </div>
-          <div class="al-desc">${a.sensor_id} · ${a.farm_id}${a.value!=null?' · '+a.value.toFixed(1):''}</div>
-          <div class="al-foot">
-            <span class="al-tag ${s.tag}">${a.type.replace(/_/g,' ')}</span>
-            <span class="al-time"><i class="ri-time-line"></i>${time}</span>
+          <div class="alert-desc">${a.sensor_id} · ${a.farm_id}${a.value!=null?' · '+a.value.toFixed(1):''}</div>
+          <div class="alert-foot">
+            <span class="alert-tag ${s.tag}">${s.lbl}</span>
+            <span class="alert-time"><i class="ri-time-line"></i>${time}</span>
           </div>
         </div>`;
       }).join('');
-
   document.getElementById('alerts-tab').innerHTML = html;
-  document.getElementById('rp-alerts').innerHTML = !alerts.length
-    ? `<div style="text-align:center;padding:16px;color:var(--txt-3);font-size:var(--f-sm)"><i class="ri-checkbox-circle-line" style="font-size:28px;color:var(--green);display:block;margin-bottom:6px"></i>Hamma yaxshi</div>`
-    : alerts.slice(0,4).map(a => {
-        const s = SEV[a.severity] || SEV.warning;
-        const time = new Date(a.at).toLocaleTimeString('uz-UZ',{hour:'2-digit',minute:'2-digit'});
-        return `<div class="al-item">
-          <div class="al-top">
-            <div class="al-icon ${s.cls}"><i class="${s.icon}"></i></div>
-            <div class="al-msg">${a.message}</div>
-          </div>
-          <div class="al-desc">${a.sensor_id} · ${a.farm_id}</div>
-          <div class="al-foot">
-            <span class="al-tag ${s.tag}">${s.lbl}</span>
-            <span class="al-time"><i class="ri-time-line"></i>${time}</span>
-          </div>
-        </div>`;
-      }).join('');
 }
 
-// ── Render Stats ──────────────────────────────────────────────
+// ── Render stats ──────────────────────────────────────────────
 function renderStats(configs, recs, alerts) {
-  const online  = configs.filter(c => c.status === 'online').length;
+  const online  = configs.filter(c=>c.status==='online').length;
   const total   = configs.length;
-  const critical= recs.filter(r => r.action === 'IRRIGATE_NOW').length;
-  const soon    = recs.filter(r => r.action === 'IRRIGATE_SOON').length;
-  const avgSave = recs.length ? recs.reduce((s,r) => s + r.water_saving_pct, 0) / recs.length : 0;
+  const crit    = recs.filter(r=>r.action==='IRRIGATE_NOW').length;
+  const soon    = recs.filter(r=>r.action==='IRRIGATE_SOON').length;
+  const avgSave = recs.length ? recs.reduce((s,r)=>s+r.water_saving_pct,0)/recs.length : 0;
 
-  document.getElementById('st-online').textContent     = `${online}/${total}`;
-  document.getElementById('st-online-sub').textContent = `${total-online} offline · ${online} faol`;
+  document.getElementById('st-online').textContent     = online+'/'+total;
+  document.getElementById('st-online-sub').textContent = (total-online)+' offline · '+online+' faol';
   document.getElementById('st-critical').textContent   = alerts.length;
-  document.getElementById('st-alert-sub').textContent  = `${critical} kritik · ${alerts.length-critical} boshqa`;
-  document.getElementById('st-soon').textContent       = soon + critical;
-  document.getElementById('st-saving').textContent     = avgSave.toFixed(0) + '%';
-  document.getElementById('total-saving').textContent  = avgSave.toFixed(1) + '%';
-  document.getElementById('nb-alerts').textContent     = alerts.length || '0';
-  if (alerts.length > 0) document.getElementById('notif-dot').style.display = 'block';
+  document.getElementById('st-alert-sub').textContent  = crit+' kritik · '+(alerts.length-crit)+' boshqa';
+  document.getElementById('st-soon').textContent       = crit+soon;
+  document.getElementById('st-saving').textContent     = avgSave.toFixed(0)+'%';
+  document.getElementById('total-saving').textContent  = avgSave.toFixed(1)+'%';
+  document.getElementById('cc-main-num').textContent   = avgSave.toFixed(1)+'%';
+  document.getElementById('cc-change').innerHTML       = '<i class="ri-arrow-up-right-line"></i> tejash';
+  document.getElementById('nb-sensors').textContent    = online;
+  if (alerts.length>0) document.getElementById('notif-dot').style.display = 'block';
 }
 
-// ── Quick Nav ─────────────────────────────────────────────────
 function renderQuickNav(configs, readings) {
-  const sorted = [...configs].sort((a,b) => {
-    const o = ['online','warning','offline'];
-    return o.indexOf(a.status) - o.indexOf(b.status);
+  const sorted = [...configs].sort((a,b)=>{
+    const o=['online','warning','offline']; return o.indexOf(a.status)-o.indexOf(b.status);
   });
-  document.getElementById('quick-nav').innerHTML = sorted.slice(0,5).map(cfg => {
-    const r = readings.find(x => x.sensor_id === cfg.sensor_id);
+  document.getElementById('quick-nav').innerHTML = sorted.slice(0,4).map(cfg=>{
+    const r = readings.find(x=>x.sensor_id===cfg.sensor_id);
     const m = r ? r.soil_moisture : 0;
-    const { color } = statusInfo(cfg.status, m, cfg.irrigation_threshold);
-    return `<a class="nav-item" href="#">
+    const {color} = sInfo(cfg.status, m, cfg.irrigation_threshold);
+    return `<button class="nav-item" style="font-size:13px">
       <span class="nav-icon" style="color:${color}"><i class="ri-radio-button-line"></i></span>
       ${cfg.sensor_id} · ${cfg.crop_type}
-    </a>`;
+    </button>`;
   }).join('');
-  document.getElementById('nb-sensors').textContent = configs.filter(c=>c.status==='online').length;
 }
 
-// ── Fetch All ─────────────────────────────────────────────────
+// ── Fetch all ─────────────────────────────────────────────────
 let isLoading = false;
 async function fetchAll() {
   if (isLoading) return;
@@ -1438,7 +1481,6 @@ async function fetchAll() {
   const icon = document.getElementById('refresh-icon');
   icon.style.animation = 'spin 1s linear infinite';
   document.getElementById('refresh-status').textContent = 'Yangilanmoqda...';
-
   try {
     const [readings, configs, recs, alertsData, farms] = await Promise.all([
       fetch(`${API}/sensors/`).then(r=>r.json()),
@@ -1447,12 +1489,12 @@ async function fetchAll() {
       fetch(`${API}/alerts/`).then(r=>r.json()),
       fetch(`${API}/farms/`).then(r=>r.json()),
     ]);
-    const alerts = alertsData.alerts || [];
+    const alerts = alertsData.alerts||[];
     _lastReadings = readings; _lastConfigs = configs;
 
     renderStats(configs, recs, alerts);
-    renderSensorGrid(readings, configs);
-    renderRecommendations(recs);
+    renderSensorTable(readings, configs);
+    renderRecs(recs);
     renderFarms(farms, readings, configs);
     renderAlerts(alerts);
     initSavingChart(recs);
@@ -1462,8 +1504,8 @@ async function fetchAll() {
     renderQuickNav(configs, readings);
 
     const now = new Date();
-    document.getElementById('refresh-status').textContent = 'Jonli · 30 soniyada avtomatik yangilanadi';
-    document.getElementById('refresh-time').textContent = `Oxirgi: ${now.toLocaleTimeString('uz-UZ',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}`;
+    document.getElementById('refresh-status').textContent = 'Jonli · 30 soniyada yangilanadi';
+    document.getElementById('refresh-time').textContent = 'Oxirgi: '+now.toLocaleTimeString('uz-UZ',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
   } catch(e) {
     document.getElementById('refresh-status').textContent = '⚠️ API bilan ulanishda xatolik';
     console.error(e);
@@ -1474,65 +1516,48 @@ async function fetchAll() {
 }
 
 // ── Theme ─────────────────────────────────────────────────────
-function isDarkMode() {
-  return document.documentElement.getAttribute('data-theme') === 'dark';
-}
+function isDark() { return document.documentElement.getAttribute('data-theme')==='dark'; }
 function applyChartTheme() {
-  const dark = isDarkMode();
-  const gridC = dark ? '#27272a' : '#EEEEEE';
-  const tickC = dark ? '#71717a' : '#AAAAAA';
-  Chart.defaults.color = tickC;
-  Chart.defaults.borderColor = gridC;
-  [trendChart, savingChart].forEach(ch => {
+  const dark = isDark();
+  const gc = dark?'#242A3A':'#F2F4F7';
+  const tc = dark?'#636B78':'#98A2B3';
+  [trendChart, savingChart].forEach(ch=>{
     if (!ch) return;
-    ch.options.scales.y.grid.color = gridC;
-    ch.options.scales.x.grid.color = gridC;
-    ch.options.scales.y.ticks.color = tickC;
-    ch.options.scales.x.ticks.color = tickC;
-    if (ch === trendChart) {
-      const tb = dark ? '#18181b' : '#fff';
-      ch.options.plugins.tooltip.backgroundColor = tb;
-      ch.options.plugins.tooltip.borderColor = dark ? '#27272a' : '#E0E0E0';
-      ch.options.plugins.tooltip.titleColor = dark ? '#fafafa' : '#1A1A1A';
-      ch.options.plugins.tooltip.bodyColor  = dark ? '#a1a1aa' : '#555555';
+    ch.options.scales.y.grid.color = gc;
+    ch.options.scales.x.grid.color = gc;
+    ch.options.scales.y.ticks.color = tc;
+    ch.options.scales.x.ticks.color = tc;
+    if (ch===trendChart) {
+      ch.options.plugins.tooltip.backgroundColor = dark?'#1C2130':'#fff';
+      ch.options.plugins.tooltip.borderColor = dark?'#2E3448':'#E9EAEB';
+      ch.options.plugins.tooltip.titleColor = dark?'#F0F2F5':'#181D27';
+      ch.options.plugins.tooltip.bodyColor  = dark?'#8B92A0':'#535862';
     }
     ch.update();
   });
 }
 function toggleTheme() {
-  const dark = isDarkMode();
-  document.documentElement.setAttribute('data-theme', dark ? 'light' : 'dark');
-  document.getElementById('theme-icon').className = dark ? 'ri-moon-line' : 'ri-sun-line';
-  localStorage.setItem('theme', dark ? 'light' : 'dark');
+  const d = isDark();
+  document.documentElement.setAttribute('data-theme', d?'light':'dark');
+  document.getElementById('theme-icon').className = d?'ri-moon-line':'ri-sun-line';
+  localStorage.setItem('theme', d?'light':'dark');
   applyChartTheme();
 }
-const savedTheme = localStorage.getItem('theme') || 'light';
-if (savedTheme === 'dark') {
-  document.documentElement.setAttribute('data-theme', 'dark');
-  document.getElementById('theme-icon').className = 'ri-sun-line';
-}
+const saved = localStorage.getItem('theme')||'light';
+if (saved==='dark') { document.documentElement.setAttribute('data-theme','dark'); document.getElementById('theme-icon').className='ri-sun-line'; }
 
 // ── Lang ──────────────────────────────────────────────────────
-const LANGS = ['UZ','RU','EN'];
-let langIdx = parseInt(localStorage.getItem('lang') || '0');
+const LANGS=['UZ','RU','EN']; let langIdx=parseInt(localStorage.getItem('lang')||'0');
 document.getElementById('lang-label').textContent = LANGS[langIdx];
-function cycleLang() {
-  langIdx = (langIdx + 1) % LANGS.length;
-  document.getElementById('lang-label').textContent = LANGS[langIdx];
-  localStorage.setItem('lang', langIdx);
-}
+function cycleLang() { langIdx=(langIdx+1)%3; document.getElementById('lang-label').textContent=LANGS[langIdx]; localStorage.setItem('lang',langIdx); }
 
 // ── Responsive ────────────────────────────────────────────────
-function checkResponsive() {
-  document.getElementById('menu-btn').style.display = window.innerWidth <= 680 ? 'flex' : 'none';
-}
-checkResponsive();
-window.addEventListener('resize', checkResponsive);
+const menuBtn = document.getElementById('menu-btn');
+function checkResp() { menuBtn.style.display = window.innerWidth<=720?'flex':'none'; }
+checkResp(); window.addEventListener('resize', checkResp);
 
 // ── Init ──────────────────────────────────────────────────────
-initMap();
-fetchAll();
-setInterval(fetchAll, 30000);
+initMap(); fetchAll(); setInterval(fetchAll, 30000);
 </script>
 </body>
 </html>

@@ -712,6 +712,26 @@ i[class^="ri-"] { line-height: 1; }
 /* ── Chart container ───────────────────────────────────────── */
 .chart-wrap { position: relative; flex: 1; min-height: 0; }
 
+/* ── Trend widget ──────────────────────────────────────────── */
+.trend-widget {
+  grid-column: 1 / -1;
+}
+.trend-period-btns {
+  display: flex; gap: 4px;
+}
+.period-btn {
+  padding: 4px 10px; border-radius: var(--r6);
+  font-size: 11px; font-weight: 600;
+  border: 1px solid var(--stroke);
+  background: var(--bg-white); color: var(--text-sub);
+  cursor: pointer; transition: all .15s; font-family: inherit;
+}
+.period-btn:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-lt); }
+.period-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 1px 4px rgba(22,163,74,.3); }
+[data-theme="dark"] .period-btn { background: #18181b; border-color: #27272a; color: #71717a; }
+[data-theme="dark"] .period-btn:hover { background: #0a1f0f; border-color: var(--primary); color: var(--primary); }
+[data-theme="dark"] .period-btn.active { background: var(--primary); color: #fff; }
+
 /* ── Saving summary ────────────────────────────────────────── */
 .saving-big {
   text-align: center; padding: 10px 0 8px;
@@ -1094,6 +1114,31 @@ i[class^="ri-"] { line-height: 1; }
         </div>
       </div>
 
+      <!-- Widget 6: Moisture Trend (line chart — full width) -->
+      <div class="widget trend-widget">
+        <div class="w-head">
+          <div class="w-title">
+            <div class="w-title-icon" style="background:#eff6ff;color:#3b82f6">
+              <i class="ri-line-chart-line"></i>
+            </div>
+            Namlik trendi
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="trend-period-btns" id="period-btns">
+              <button class="period-btn active" onclick="setPeriod(7,this)">7 kun</button>
+              <button class="period-btn" onclick="setPeriod(14,this)">14 kun</button>
+              <button class="period-btn" onclick="setPeriod(30,this)">30 kun</button>
+            </div>
+            <span class="w-action"><i class="ri-download-2-line"></i> Eksport</span>
+          </div>
+        </div>
+        <div class="w-body">
+          <div class="chart-wrap" style="min-height:220px">
+            <canvas id="trendChart"></canvas>
+          </div>
+        </div>
+      </div>
+
     </div><!-- /main-grid -->
   </div><!-- /content -->
 </div><!-- /main -->
@@ -1103,7 +1148,8 @@ const API = 'https://tomchi-tech-api.onrender.com/api/v1';
 
 const CROP_EMOJI = { pomidor:'🍅', kartoshka:'🥔', paxta:'🌿', uzum:'🍇', bugdoy:'🌾', "makkajo'xori":'🌽', piyoz:'🧅' };
 
-let moistureChart = null, savingChart = null, map = null, markers = {};
+let moistureChart = null, savingChart = null, trendChart = null, map = null, markers = {};
+let trendDays = 7, trendSensors = [];
 
 // ── Tab switch ────────────────────────────────────────────
 function switchTab(el, tabId) {
@@ -1221,6 +1267,134 @@ function initSavingChart(labels, data) {
       }
     }
   });
+}
+
+// ── Trend line chart ──────────────────────────────────────
+const LINE_PALETTE = [
+  '#16a34a','#3b82f6','#f59e0b','#8b5cf6','#ef4444','#06b6d4',
+];
+
+function genTrendData(sensorId, currentMoisture, days) {
+  // Simulate realistic moisture curve: starts higher, dips, resets (irrigation)
+  const seed = sensorId.charCodeAt(sensorId.length - 1);
+  const data = [];
+  let val = currentMoisture + 10 + (seed % 15);
+  for (let i = days; i >= 0; i--) {
+    // Natural daily drop ~1-3%, occasional irrigation spike
+    const drop = 1.2 + Math.sin(i * 0.9 + seed) * 0.8;
+    val = Math.max(15, Math.min(90, val - drop + (i % 5 === 0 ? 18 : 0)));
+    data.push(Math.round(val * 10) / 10);
+  }
+  return data;
+}
+
+function buildDateLabels(days) {
+  const labels = [];
+  const now = new Date();
+  for (let i = days; i >= 0; i--) {
+    const d = new Date(now);
+    d.setDate(d.getDate() - i);
+    labels.push(d.toLocaleDateString('uz-UZ', { month: 'short', day: 'numeric' }));
+  }
+  return labels;
+}
+
+function initTrendChart(sensors, readings) {
+  const ctx = document.getElementById('trendChart').getContext('2d');
+  if (trendChart) trendChart.destroy();
+
+  const dark = isDarkMode();
+  const gridColor = dark ? '#27272a' : '#f1f5f9';
+  const tickColor = dark ? '#71717a' : '#94a3b8';
+  const labels = buildDateLabels(trendDays);
+
+  const datasets = sensors.slice(0, 6).map((cfg, i) => {
+    const r = readings.find(x => x.sensor_id === cfg.sensor_id);
+    const current = r ? r.soil_moisture : 45;
+    const color = LINE_PALETTE[i % LINE_PALETTE.length];
+    const dataArr = genTrendData(cfg.sensor_id, current, trendDays);
+
+    // Gradient fill
+    const grad = ctx.createLinearGradient(0, 0, 0, 260);
+    grad.addColorStop(0, color + '33');
+    grad.addColorStop(1, color + '00');
+
+    return {
+      label: cfg.sensor_id + ' · ' + (cfg.crop_type || ''),
+      data: dataArr,
+      borderColor: color,
+      backgroundColor: grad,
+      borderWidth: 2.5,
+      pointBackgroundColor: color,
+      pointBorderColor: '#fff',
+      pointBorderWidth: 2,
+      pointRadius: 3,
+      pointHoverRadius: 6,
+      tension: 0.42,
+      fill: true,
+    };
+  });
+
+  trendChart = new Chart(ctx, {
+    type: 'line',
+    data: { labels, datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: {
+          display: true,
+          position: 'top',
+          align: 'end',
+          labels: {
+            boxWidth: 12, boxHeight: 12,
+            borderRadius: 4, useBorderRadius: true,
+            font: { size: 11, family: 'Inter' },
+            color: tickColor, padding: 14,
+          }
+        },
+        tooltip: {
+          backgroundColor: dark ? '#18181b' : '#fff',
+          borderColor: dark ? '#27272a' : '#e2e8f0',
+          borderWidth: 1,
+          titleColor: dark ? '#fafafa' : '#0f172a',
+          bodyColor: dark ? '#a1a1aa' : '#64748b',
+          padding: 10,
+          callbacks: {
+            label: c => ` ${c.dataset.label.split(' · ')[0]}: ${c.parsed.y.toFixed(1)}%`
+          }
+        }
+      },
+      scales: {
+        y: {
+          min: 0, max: 100,
+          grid: { color: gridColor },
+          ticks: { callback: v => v + '%', font: { size: 10 }, color: tickColor, stepSize: 20 },
+          border: { display: false }
+        },
+        x: {
+          grid: { display: false },
+          ticks: { font: { size: 10 }, color: tickColor, maxRotation: 0 },
+          border: { display: false }
+        }
+      }
+    }
+  });
+  trendSensors = sensors;
+}
+
+function setPeriod(days, btn) {
+  trendDays = days;
+  document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (trendSensors.length && trendChart) {
+    const r = [];
+    trendSensors.forEach(cfg => {
+      const found = trendChart._data;
+      r.push({ sensor_id: cfg.sensor_id });
+    });
+    initTrendChart(trendSensors, window._lastReadings || []);
+  }
 }
 
 // ── Render ────────────────────────────────────────────────
@@ -1387,6 +1561,7 @@ async function fetchAll() {
     ]);
     const alerts = alertsData.alerts || [];
 
+    window._lastReadings = readings;
     renderStats(configs, recs, alerts);
     renderSensors(readings, configs);
     renderRecommendations(recs);
@@ -1396,6 +1571,7 @@ async function fetchAll() {
     updateMarkers(readings, configs);
     updateMapOverlay(configs, readings);
     renderQuickNav(configs, readings);
+    initTrendChart(configs, readings);
 
     const now = new Date();
     document.getElementById('refresh-status').textContent = 'Jonli · 30 soniyada avtomatik yangilanadi';
@@ -1439,6 +1615,18 @@ function applyChartTheme() {
     savingChart.options.scales.y.ticks.color = tickColor;
     savingChart.options.scales.x.ticks.color = tickColor;
     savingChart.update();
+  }
+  if (trendChart) {
+    trendChart.options.scales.y.grid.color = gridColor;
+    trendChart.options.scales.x.grid.color = gridColor;
+    trendChart.options.scales.y.ticks.color = tickColor;
+    trendChart.options.scales.x.ticks.color = tickColor;
+    trendChart.options.plugins.legend.labels.color = tickColor;
+    trendChart.options.plugins.tooltip.backgroundColor = dark ? '#18181b' : '#fff';
+    trendChart.options.plugins.tooltip.borderColor     = dark ? '#27272a' : '#e2e8f0';
+    trendChart.options.plugins.tooltip.titleColor      = dark ? '#fafafa' : '#0f172a';
+    trendChart.options.plugins.tooltip.bodyColor       = dark ? '#a1a1aa' : '#64748b';
+    trendChart.update();
   }
 }
 

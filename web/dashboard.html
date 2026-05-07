@@ -1,1079 +1,642 @@
 <!DOCTYPE html>
 <html lang="uz">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Tomchi Tech — Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Tomchi Tech — Admin Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
 <style>
-  /* ── AlignUI Design Tokens ────────────────────────────────── */
-  :root {
-    --bg-white-0:       #ffffff;
-    --bg-weak-50:       #f7f7f7;
-    --bg-soft-100:      #f0f0f0;
-    --text-strong-950:  #171717;
-    --text-sub-600:     #5c5c5c;
-    --text-soft-400:    #a3a3a3;
-    --stroke-soft-200:  #ebebeb;
-    --primary-base:     #16a34a;   /* Tomchi Tech green */
-    --primary-light:    #dcfce7;
-    --radius-4:         4px;
-    --radius-6:         6px;
-    --radius-8:         8px;
-    --radius-10:        10px;
-    --radius-full:      999px;
-    --shadow-xs:        0 1px 2px rgba(10,13,20,0.03);
-    --shadow-sm:        0 2px 4px rgba(27,28,29,0.04);
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'Inter', sans-serif;
-    background: var(--bg-weak-50);
-    color: var(--text-strong-950);
-    height: 100vh;
-    display: flex;
-    overflow: hidden;
-    font-feature-settings: 'ss11' 1, 'calt' 0, 'liga' 0;
-  }
-
-  /* ── Sidebar ─────────────────────────────────────────────── */
-  .sidebar {
-    width: 272px;
-    height: 100vh;
-    background: var(--bg-white-0);
-    border-right: 1px solid var(--stroke-soft-200);
-    display: flex;
-    flex-direction: column;
-    flex-shrink: 0;
-  }
-
-  .sidebar-header {
-    padding: 12px;
-    border-bottom: 1px solid var(--stroke-soft-200);
-  }
-
-  .sidebar-brand {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px;
-    border-radius: var(--radius-10);
-    cursor: pointer;
-  }
-
-  .sidebar-brand:hover { background: var(--bg-weak-50); }
-
-  .brand-logo {
-    width: 40px; height: 40px;
-    background: var(--primary-base);
-    border-radius: var(--radius-full);
-    display: flex; align-items: center; justify-content: center;
-    color: white; font-size: 18px; flex-shrink: 0;
-  }
-
-  .brand-text { flex: 1; }
-  .brand-name {
-    font-size: 14px; font-weight: 500; line-height: 20px;
-    letter-spacing: -0.084px; color: var(--text-strong-950);
-  }
-  .brand-sub {
-    font-size: 12px; font-weight: 400; line-height: 16px;
-    color: var(--text-sub-600);
-  }
-
-  .brand-icon {
-    width: 28px; height: 28px;
-    border: 1px solid var(--stroke-soft-200);
-    border-radius: var(--radius-6);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 12px; color: var(--text-soft-400);
-    box-shadow: var(--shadow-xs);
-  }
-
-  .sidebar-content {
-    flex: 1;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    overflow-y: auto;
-  }
-
-  .nav-section { display: flex; flex-direction: column; gap: 8px; }
-
-  .nav-label {
-    padding: 4px;
-    font-size: 12px; font-weight: 500; line-height: 16px;
-    letter-spacing: 0.48px; text-transform: uppercase;
-    color: var(--text-soft-400);
-  }
-
-  .nav-items { display: flex; flex-direction: column; gap: 4px; }
-
-  .nav-item {
-    display: flex; align-items: center; gap: 8px;
-    padding: 8px 12px;
-    border-radius: var(--radius-8);
-    cursor: pointer;
-    position: relative;
-    text-decoration: none;
-  }
-
-  .nav-item:hover { background: var(--bg-weak-50); }
-
-  .nav-item.active {
-    background: var(--bg-weak-50);
-  }
-
-  .nav-item.active::before {
-    content: '';
-    position: absolute;
-    left: -20px; top: 8px;
-    width: 4px; height: 20px;
-    background: var(--primary-base);
-    border-radius: 0 4px 4px 0;
-  }
-
-  .nav-icon {
-    width: 20px; height: 20px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 16px; flex-shrink: 0;
-  }
-
-  .nav-text {
-    flex: 1;
-    font-size: 14px; font-weight: 500; line-height: 20px;
-    letter-spacing: -0.084px;
-    color: var(--text-sub-600);
-  }
-
-  .nav-item.active .nav-text { color: var(--text-strong-950); }
-
-  .nav-badge {
-    background: #fee2e2; color: #dc2626;
-    font-size: 11px; font-weight: 600;
-    padding: 2px 6px; border-radius: var(--radius-full);
-  }
-
-  .nav-badge.green { background: var(--primary-light); color: var(--primary-base); }
-
-  .nav-chevron {
-    font-size: 12px; color: var(--text-soft-400);
-  }
-
-  .sidebar-footer {
-    border-top: 1px solid var(--stroke-soft-200);
-    padding: 12px;
-  }
-
-  .user-card {
-    display: flex; align-items: center; gap: 12px;
-    padding: 12px; border-radius: var(--radius-10);
-    cursor: pointer;
-  }
-
-  .user-card:hover { background: var(--bg-weak-50); }
-
-  .user-avatar {
-    width: 40px; height: 40px;
-    background: #ffecc0;
-    border-radius: var(--radius-full);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px; flex-shrink: 0;
-  }
-
-  .user-info { flex: 1; }
-  .user-name {
-    font-size: 14px; font-weight: 500; line-height: 20px;
-    letter-spacing: -0.084px; color: var(--text-strong-950);
-    display: flex; align-items: center; gap: 4px;
-  }
-
-  .verified { color: var(--primary-base); font-size: 14px; }
-
-  .user-email {
-    font-size: 12px; font-weight: 400; line-height: 16px;
-    color: var(--text-sub-600);
-  }
-
-  /* ── Main ────────────────────────────────────────────────── */
-  .main {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
-
-  /* ── Header ──────────────────────────────────────────────── */
-  .header {
-    background: var(--bg-white-0);
-    border-bottom: 1px solid var(--stroke-soft-200);
-    padding: 20px 32px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-shrink: 0;
-  }
-
-  .header-left {
-    display: flex; align-items: center; gap: 14px; flex: 1;
-  }
-
-  .header-avatar {
-    width: 48px; height: 48px;
-    background: #ffecc0;
-    border-radius: var(--radius-full);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 22px; flex-shrink: 0;
-  }
-
-  .header-greeting { }
-  .header-name {
-    font-size: 18px; font-weight: 500; line-height: 24px;
-    letter-spacing: -0.27px; color: var(--text-strong-950);
-  }
-
-  .header-sub {
-    font-size: 14px; font-weight: 400; line-height: 20px;
-    letter-spacing: -0.084px; color: var(--text-sub-600);
-  }
-
-  .header-actions { display: flex; align-items: center; gap: 8px; }
-
-  .icon-btn {
-    width: 40px; height: 40px;
-    border-radius: var(--radius-10);
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer; font-size: 18px;
-    position: relative;
-  }
-
-  .icon-btn:hover { background: var(--bg-weak-50); }
-
-  .notif-dot {
-    position: absolute;
-    top: 8px; right: 8px;
-    width: 8px; height: 8px;
-    background: #ef4444;
-    border-radius: var(--radius-full);
-    border: 2px solid white;
-  }
-
-  .btn-outline {
-    display: flex; align-items: center; gap: 4px;
-    padding: 10px 14px;
-    border: 1px solid var(--stroke-soft-200);
-    border-radius: var(--radius-10);
-    background: var(--bg-white-0);
-    box-shadow: var(--shadow-xs);
-    cursor: pointer;
-    font-size: 14px; font-weight: 500;
-    color: var(--text-sub-600);
-    font-family: 'Inter', sans-serif;
-  }
-
-  .btn-outline:hover { background: var(--bg-weak-50); }
-
-  .btn-primary {
-    display: flex; align-items: center; gap: 4px;
-    padding: 10px 14px;
-    border: none;
-    border-radius: var(--radius-10);
-    background: var(--primary-base);
-    cursor: pointer;
-    font-size: 14px; font-weight: 500;
-    color: white;
-    font-family: 'Inter', sans-serif;
-  }
-
-  .btn-primary:hover { background: #15803d; }
-
-  /* ── Content Area ─────────────────────────────────────────── */
-  .content {
-    flex: 1;
-    overflow-y: auto;
-    padding: 24px;
-    display: grid;
-    grid-template-columns: 352px 352px 352px;
-    grid-template-rows: 380px 380px;
-    gap: 16px;
-    align-content: start;
-  }
-
-  /* ── Widget Card ─────────────────────────────────────────── */
-  .widget {
-    background: var(--bg-white-0);
-    border: 1px solid var(--stroke-soft-200);
-    border-radius: var(--radius-10);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .widget.tall {
-    grid-row: 1 / 3;
-  }
-
-  .widget-header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 20px 20px 0;
-  }
-
-  .widget-title {
-    display: flex; align-items: center; gap: 8px;
-    font-size: 14px; font-weight: 500; line-height: 20px;
-    letter-spacing: -0.084px; color: var(--text-strong-950);
-  }
-
-  .widget-title-icon { font-size: 16px; }
-
-  .widget-see-all {
-    font-size: 14px; font-weight: 500; color: var(--primary-base);
-    cursor: pointer; text-decoration: none;
-  }
-
-  .widget-body { flex: 1; padding: 16px 20px 20px; overflow: hidden; }
-
-  /* ── Widget 1: Sensor Holati ─────────────────────────────── */
-  .gauge-wrap {
-    display: flex; flex-direction: column; align-items: center;
-    padding: 16px 0 8px;
-  }
-
-  .gauge {
-    position: relative; width: 160px; height: 90px; overflow: hidden;
-  }
-
-  .gauge svg { position: absolute; top: 0; left: 0; }
-
-  .gauge-center {
-    position: absolute;
-    bottom: 0; left: 50%; transform: translateX(-50%);
-    text-align: center;
-  }
-
-  .gauge-num {
-    font-size: 32px; font-weight: 700; line-height: 1;
-    color: var(--text-strong-950);
-  }
-
-  .gauge-label {
-    font-size: 11px; color: var(--text-soft-400); margin-top: 2px;
-  }
-
-  .sensor-rows { display: flex; flex-direction: column; gap: 8px; }
-
-  .sensor-row {
-    display: flex; align-items: center; gap: 10px;
-    padding: 10px 12px;
-    border-radius: var(--radius-8);
-    border: 1px solid var(--stroke-soft-200);
-  }
-
-  .sensor-dot {
-    width: 8px; height: 8px; border-radius: var(--radius-full);
-    flex-shrink: 0;
-  }
-
-  .sensor-info { flex: 1; }
-
-  .sensor-name {
-    font-size: 13px; font-weight: 500; color: var(--text-strong-950);
-  }
-
-  .sensor-meta {
-    font-size: 11px; color: var(--text-soft-400);
-  }
-
-  .sensor-right { text-align: right; }
-
-  .sensor-pct {
-    font-size: 14px; font-weight: 600;
-  }
-
-  .status-badge {
-    display: inline-block;
-    font-size: 10px; font-weight: 600;
-    padding: 2px 7px; border-radius: var(--radius-full);
-    margin-top: 2px;
-  }
-
-  .badge-ok    { background: #dcfce7; color: #16a34a; }
-  .badge-warn  { background: #fef9c3; color: #ca8a04; }
-  .badge-alert { background: #fee2e2; color: #dc2626; }
-  .badge-off   { background: #f1f5f9; color: #94a3b8; }
-
-  /* ── Widget 2: Tavsiyalar ────────────────────────────────── */
-  .rec-card {
-    border: 1px solid var(--stroke-soft-200);
-    border-radius: var(--radius-8);
-    padding: 14px;
-    margin-bottom: 10px;
-  }
-
-  .rec-header {
-    display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
-  }
-
-  .rec-icon { font-size: 18px; }
-
-  .rec-name {
-    font-size: 13px; font-weight: 500; color: var(--text-strong-950);
-    flex: 1;
-  }
-
-  .rec-badge {
-    font-size: 10px; font-weight: 700;
-    padding: 3px 8px; border-radius: var(--radius-full);
-  }
-
-  .rec-meta {
-    font-size: 12px; color: var(--text-sub-600); line-height: 1.5;
-  }
-
-  .rec-row {
-    display: flex; gap: 8px; margin-top: 8px;
-  }
-
-  .rec-chip {
-    font-size: 11px; color: var(--text-soft-400);
-    background: var(--bg-weak-50);
-    padding: 2px 8px; border-radius: var(--radius-4);
-  }
-
-  /* ── Widget 3: Ogohlantirishlar (tall) ──────────────────── */
-  .alert-tabs {
-    display: flex; gap: 4px;
-    border-bottom: 1px solid var(--stroke-soft-200);
-    padding: 0 20px;
-    margin-bottom: 0;
-  }
-
-  .alert-tab {
-    padding: 10px 12px;
-    font-size: 13px; font-weight: 500;
-    color: var(--text-soft-400);
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    margin-bottom: -1px;
-  }
-
-  .alert-tab.active {
-    color: var(--text-strong-950);
-    border-bottom-color: var(--text-strong-950);
-  }
-
-  .alert-list {
-    display: flex; flex-direction: column; gap: 0;
-    padding: 8px 20px;
-    flex: 1; overflow-y: auto;
-  }
-
-  .alert-item {
-    display: flex; flex-direction: column; gap: 4px;
-    padding: 14px 0;
-    border-bottom: 1px solid var(--stroke-soft-200);
-    cursor: pointer;
-  }
-
-  .alert-item:last-child { border-bottom: none; }
-
-  .alert-item:hover .alert-title { color: var(--primary-base); }
-
-  .alert-top {
-    display: flex; align-items: flex-start; gap: 8px;
-  }
-
-  .alert-sev {
-    width: 7px; height: 7px; border-radius: var(--radius-full);
-    margin-top: 6px; flex-shrink: 0;
-  }
-
-  .alert-title {
-    flex: 1; font-size: 13px; font-weight: 500;
-    color: var(--text-strong-950); line-height: 1.4;
-  }
-
-  .alert-chevron { font-size: 12px; color: var(--text-soft-400); margin-top: 2px; }
-
-  .alert-desc {
-    font-size: 12px; color: var(--text-sub-600);
-    padding-left: 15px; line-height: 1.4;
-  }
-
-  .alert-footer {
-    display: flex; align-items: center; gap: 8px;
-    padding-left: 15px;
-  }
-
-  .alert-chip {
-    font-size: 10px; font-weight: 500;
-    padding: 2px 7px; border-radius: var(--radius-4);
-  }
-
-  .alert-time { font-size: 11px; color: var(--text-soft-400); margin-left: auto; }
-
-  /* ── Widget 4: Suv Tejash ────────────────────────────────── */
-  .saving-big {
-    text-align: center; padding: 16px 0 12px;
-  }
-
-  .saving-num {
-    font-size: 36px; font-weight: 700; color: var(--primary-base);
-    line-height: 1;
-  }
-
-  .saving-unit {
-    font-size: 14px; color: var(--text-sub-600); margin-top: 4px;
-  }
-
-  .saving-bars { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
-
-  .bar-row { display: flex; align-items: center; gap: 8px; }
-
-  .bar-label {
-    width: 32px; font-size: 11px; color: var(--text-sub-600);
-    text-align: right; flex-shrink: 0;
-  }
-
-  .bar-track {
-    flex: 1; height: 7px;
-    background: var(--bg-soft-100);
-    border-radius: var(--radius-full);
-    overflow: hidden;
-  }
-
-  .bar-fill {
-    height: 100%; background: var(--primary-base);
-    border-radius: var(--radius-full);
-  }
-
-  .bar-pct {
-    width: 30px; font-size: 11px; font-weight: 500;
-    color: var(--text-sub-600);
-  }
-
-  /* ── Widget 5: Fermalar ──────────────────────────────────── */
-  .farm-rows { display: flex; flex-direction: column; }
-
-  .farm-row {
-    display: flex; align-items: center; gap: 10px;
-    padding: 12px 0;
-    border-bottom: 1px solid var(--stroke-soft-200);
-    cursor: pointer;
-  }
-
-  .farm-row:last-child { border-bottom: none; }
-
-  .farm-avatar {
-    width: 34px; height: 34px;
-    border-radius: var(--radius-full);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 14px; flex-shrink: 0;
-    background: var(--bg-soft-100);
-  }
-
-  .farm-info { flex: 1; min-width: 0; }
-
-  .farm-name {
-    font-size: 13px; font-weight: 500; color: var(--text-strong-950);
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-
-  .farm-meta { font-size: 11px; color: var(--text-soft-400); }
-
-  .farm-right { text-align: right; }
-
-  .farm-moisture {
-    font-size: 13px; font-weight: 600;
-  }
-
-  .farm-action {
-    font-size: 10px; font-weight: 500;
-    padding: 2px 7px; border-radius: var(--radius-full);
-    margin-top: 2px; display: block;
-  }
-
-  /* scrollbar */
-  ::-webkit-scrollbar { width: 4px; height: 4px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: var(--stroke-soft-200); border-radius: 4px; }
+/* ── AlignUI Tokens ─────────────────────────── */
+:root {
+  --bg-white:     #ffffff;
+  --bg-weak:      #f7f7f7;
+  --bg-soft:      #f0f0f0;
+  --text-strong:  #171717;
+  --text-sub:     #5c5c5c;
+  --text-soft:    #a3a3a3;
+  --stroke:       #ebebeb;
+  --primary:      #16a34a;
+  --primary-lt:   #dcfce7;
+  --r4: 4px; --r6: 6px; --r8: 8px; --r10: 10px; --rfull: 999px;
+  --sh-xs: 0 1px 2px rgba(10,13,20,.03);
+  --sh-sm: 0 2px 4px rgba(27,28,29,.04);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',sans-serif;background:var(--bg-weak);color:var(--text-strong);height:100vh;display:flex;overflow:hidden;font-feature-settings:'ss11' 1,'calt' 0,'liga' 0;}
+
+/* ── Sidebar ──────────────────────────────── */
+.sidebar{width:272px;height:100vh;background:var(--bg-white);border-right:1px solid var(--stroke);display:flex;flex-direction:column;flex-shrink:0;}
+.sb-header{padding:12px;border-bottom:1px solid var(--stroke);}
+.sb-brand{display:flex;align-items:center;gap:12px;padding:12px;border-radius:var(--r10);cursor:pointer;}
+.sb-brand:hover{background:var(--bg-weak);}
+.brand-logo{width:40px;height:40px;background:var(--primary);border-radius:var(--rfull);display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;flex-shrink:0;}
+.brand-name{font-size:14px;font-weight:500;letter-spacing:-.084px;}
+.brand-sub{font-size:12px;color:var(--text-sub);margin-top:1px;}
+.sb-content{flex:1;padding:20px;display:flex;flex-direction:column;gap:20px;overflow-y:auto;}
+.nav-label{padding:4px;font-size:12px;font-weight:500;letter-spacing:.48px;text-transform:uppercase;color:var(--text-soft);}
+.nav-items{display:flex;flex-direction:column;gap:4px;}
+.nav-item{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:var(--r8);cursor:pointer;text-decoration:none;position:relative;}
+.nav-item:hover{background:var(--bg-weak);}
+.nav-item.active{background:var(--bg-weak);}
+.nav-item.active::before{content:'';position:absolute;left:-20px;top:8px;width:4px;height:20px;background:var(--primary);border-radius:0 4px 4px 0;}
+.nav-icon{width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.nav-text{flex:1;font-size:14px;font-weight:500;letter-spacing:-.084px;color:var(--text-sub);}
+.nav-item.active .nav-text{color:var(--text-strong);}
+.nav-badge{background:#fee2e2;color:#dc2626;font-size:11px;font-weight:600;padding:2px 7px;border-radius:var(--rfull);}
+.nav-badge.g{background:var(--primary-lt);color:var(--primary);}
+.sb-footer{border-top:1px solid var(--stroke);padding:12px;}
+.user-card{display:flex;align-items:center;gap:12px;padding:12px;border-radius:var(--r10);cursor:pointer;}
+.user-card:hover{background:var(--bg-weak);}
+.user-av{width:40px;height:40px;background:#ffecc0;border-radius:var(--rfull);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.user-name{font-size:14px;font-weight:500;color:var(--text-strong);}
+.user-email{font-size:12px;color:var(--text-sub);}
+
+/* ── Main ─────────────────────────────────── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+
+/* ── Header ───────────────────────────────── */
+.header{background:var(--bg-white);border-bottom:1px solid var(--stroke);padding:16px 32px;display:flex;align-items:center;gap:12px;flex-shrink:0;}
+.hdr-left{display:flex;align-items:center;gap:14px;flex:1;}
+.hdr-av{width:48px;height:48px;background:#ffecc0;border-radius:var(--rfull);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.hdr-name{font-size:18px;font-weight:500;letter-spacing:-.27px;}
+.hdr-sub{font-size:14px;color:var(--text-sub);letter-spacing:-.084px;}
+.hdr-actions{display:flex;align-items:center;gap:8px;}
+.icon-btn{width:40px;height:40px;border-radius:var(--r10);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;position:relative;}
+.icon-btn:hover{background:var(--bg-weak);}
+.notif-dot{position:absolute;top:8px;right:8px;width:8px;height:8px;background:#ef4444;border-radius:var(--rfull);border:2px solid #fff;}
+.btn-outline{display:flex;align-items:center;gap:6px;padding:9px 14px;border:1px solid var(--stroke);border-radius:var(--r10);background:var(--bg-white);box-shadow:var(--sh-xs);cursor:pointer;font-size:14px;font-weight:500;color:var(--text-sub);font-family:'Inter',sans-serif;}
+.btn-outline:hover{background:var(--bg-weak);}
+.btn-primary{display:flex;align-items:center;gap:6px;padding:9px 14px;border:none;border-radius:var(--r10);background:var(--primary);cursor:pointer;font-size:14px;font-weight:500;color:#fff;font-family:'Inter',sans-serif;}
+.btn-primary:hover{background:#15803d;}
+
+/* refresh indicator */
+.refresh-bar{background:var(--primary-lt);border-bottom:1px solid #bbf7d0;padding:6px 32px;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--primary);font-weight:500;flex-shrink:0;}
+.refresh-dot{width:7px;height:7px;background:var(--primary);border-radius:var(--rfull);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+
+/* ── Content ──────────────────────────────── */
+.content{flex:1;overflow-y:auto;padding:20px 24px;display:grid;grid-template-columns:352px 352px 1fr;grid-template-rows:auto auto;gap:16px;align-content:start;}
+
+/* ── Widget ───────────────────────────────── */
+.widget{background:var(--bg-white);border:1px solid var(--stroke);border-radius:var(--r10);overflow:hidden;display:flex;flex-direction:column;}
+.widget.tall{grid-row:1/3;}
+.widget.wide{grid-column:1/3;}
+.w-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 0;}
+.w-title{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:500;color:var(--text-strong);}
+.w-see-all{font-size:13px;font-weight:500;color:var(--primary);cursor:pointer;}
+.w-body{flex:1;padding:14px 20px 20px;overflow:hidden;display:flex;flex-direction:column;gap:10px;}
+
+/* badges */
+.badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:var(--rfull);}
+.ok   {background:#dcfce7;color:#16a34a;}
+.warn {background:#fef9c3;color:#ca8a04;}
+.err  {background:#fee2e2;color:#dc2626;}
+.off  {background:#f1f5f9;color:#94a3b8;}
+
+/* stat cards */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:4px;}
+.stat-card{background:var(--bg-white);border:1px solid var(--stroke);border-radius:var(--r10);padding:12px;border-left-width:3px;box-shadow:var(--sh-xs);}
+.stat-num{font-size:22px;font-weight:700;color:var(--text-strong);}
+.stat-lbl{font-size:11px;color:var(--text-soft);margin-top:2px;}
+.stat-sub{font-size:11px;font-weight:500;margin-top:2px;}
+
+/* sensor list */
+.sensor-row{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--r8);border:1px solid var(--stroke);}
+.s-dot{width:8px;height:8px;border-radius:var(--rfull);flex-shrink:0;}
+.s-info{flex:1;}
+.s-name{font-size:13px;font-weight:500;}
+.s-meta{font-size:11px;color:var(--text-soft);}
+.s-right{text-align:right;}
+.s-pct{font-size:14px;font-weight:600;}
+
+/* recommendation card */
+.rec-card{border:1px solid var(--stroke);border-radius:var(--r8);padding:12px;display:flex;flex-direction:column;gap:6px;}
+.rec-head{display:flex;align-items:center;gap:8px;}
+.rec-name{font-size:13px;font-weight:500;flex:1;}
+.rec-msg{font-size:12px;color:var(--text-sub);line-height:1.5;}
+.rec-chips{display:flex;gap:6px;flex-wrap:wrap;}
+.chip{font-size:11px;color:var(--text-soft);background:var(--bg-weak);padding:2px 8px;border-radius:var(--r4);}
+
+/* map */
+#map{flex:1;min-height:300px;border-radius:0 0 var(--r10) var(--r10);}
+
+/* alert list */
+.alert-item{display:flex;flex-direction:column;gap:3px;padding:12px 0;border-bottom:1px solid var(--stroke);cursor:pointer;}
+.alert-item:last-child{border-bottom:none;}
+.alert-top{display:flex;align-items:flex-start;gap:8px;}
+.alert-sev{width:7px;height:7px;border-radius:var(--rfull);margin-top:6px;flex-shrink:0;}
+.alert-title{flex:1;font-size:13px;font-weight:500;}
+.alert-desc{font-size:12px;color:var(--text-sub);padding-left:15px;}
+.alert-foot{display:flex;align-items:center;justify-content:space-between;padding-left:15px;margin-top:2px;}
+.alert-type{font-size:10px;font-weight:600;padding:2px 7px;border-radius:var(--r4);}
+.alert-time{font-size:11px;color:var(--text-soft);}
+
+/* chart containers */
+.chart-wrap{position:relative;flex:1;min-height:120px;}
+
+/* farm row */
+.farm-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--stroke);}
+.farm-row:last-child{border-bottom:none;}
+.farm-av{width:34px;height:34px;border-radius:var(--rfull);display:flex;align-items:center;justify-content:center;font-size:14px;background:var(--bg-soft);flex-shrink:0;}
+.farm-info{flex:1;min-width:0;}
+.farm-name{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.farm-meta{font-size:11px;color:var(--text-soft);}
+.farm-r{text-align:right;}
+.farm-pct{font-size:13px;font-weight:600;}
+
+/* loading skeleton */
+.skeleton{background:linear-gradient(90deg,var(--bg-soft) 25%,var(--stroke) 50%,var(--bg-soft) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:var(--r8);height:16px;}
+@keyframes shimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
+
+/* scrollbar */
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-thumb{background:var(--stroke);border-radius:4px;}
+
+/* tabs */
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--stroke);padding:0 20px;}
+.tab{padding:10px 12px;font-size:13px;font-weight:500;color:var(--text-soft);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;}
+.tab.active{color:var(--text-strong);border-bottom-color:var(--text-strong);}
 </style>
 </head>
 <body>
 
-<!-- ── SIDEBAR ─────────────────────────────────────────────── -->
+<!-- SIDEBAR -->
 <nav class="sidebar">
-  <div class="sidebar-header">
-    <div class="sidebar-brand">
+  <div class="sb-header">
+    <div class="sb-brand">
       <div class="brand-logo">🌱</div>
-      <div class="brand-text">
+      <div>
         <div class="brand-name">Tomchi Tech</div>
         <div class="brand-sub">Agrotexnik Panel</div>
       </div>
-      <div class="brand-icon">⇅</div>
     </div>
   </div>
-
-  <div class="sidebar-content">
-    <div class="nav-section">
+  <div class="sb-content">
+    <div>
       <div class="nav-label">Asosiy</div>
-      <div class="nav-items">
-        <a class="nav-item active" href="#">
-          <div class="nav-icon">⊞</div>
-          <span class="nav-text">Dashboard</span>
-          <span class="nav-chevron">›</span>
-        </a>
-        <a class="nav-item" href="#">
-          <div class="nav-icon">📡</div>
-          <span class="nav-text">Sensorlar</span>
-          <span class="nav-badge green">6</span>
-        </a>
-        <a class="nav-item" href="#">
-          <div class="nav-icon">🌾</div>
-          <span class="nav-text">Fermalar</span>
-        </a>
-        <a class="nav-item" href="#">
-          <div class="nav-icon">💡</div>
-          <span class="nav-text">Tavsiyalar</span>
-        </a>
-        <a class="nav-item" href="#">
-          <div class="nav-icon">🔔</div>
-          <span class="nav-text">Alertlar</span>
-          <span class="nav-badge">3</span>
-        </a>
-        <a class="nav-item" href="#">
-          <div class="nav-icon">📊</div>
-          <span class="nav-text">Hisobot</span>
-        </a>
+      <div class="nav-items" style="margin-top:8px">
+        <a class="nav-item active" href="#"><div class="nav-icon">⊞</div><span class="nav-text">Dashboard</span></a>
+        <a class="nav-item" href="#"><div class="nav-icon">📡</div><span class="nav-text">Sensorlar</span><span class="nav-badge g" id="nb-sensors">6</span></a>
+        <a class="nav-item" href="#"><div class="nav-icon">🌾</div><span class="nav-text">Fermalar</span></a>
+        <a class="nav-item" href="#"><div class="nav-icon">💡</div><span class="nav-text">Tavsiyalar</span></a>
+        <a class="nav-item" href="#"><div class="nav-icon">🔔</div><span class="nav-text">Alertlar</span><span class="nav-badge" id="nb-alerts">—</span></a>
+        <a class="nav-item" href="#"><div class="nav-icon">📊</div><span class="nav-text">Hisobot</span></a>
       </div>
     </div>
-
-    <div class="nav-section">
+    <div>
       <div class="nav-label">Tez kirish</div>
-      <div class="nav-items">
-        <a class="nav-item" href="#">
-          <div class="nav-icon" style="color:#22c55e">●</div>
-          <span class="nav-text">Pomidor — S001</span>
-        </a>
-        <a class="nav-item" href="#">
-          <div class="nav-icon" style="color:#ef4444">●</div>
-          <span class="nav-text">Bug'doy — S005</span>
-        </a>
-        <a class="nav-item" href="#">
-          <div class="nav-icon" style="color:#eab308">●</div>
-          <span class="nav-text">Paxta — S003</span>
-        </a>
+      <div class="nav-items" id="quick-nav" style="margin-top:8px">
+        <div class="nav-item"><div class="nav-icon">🌱</div><span class="nav-text">Yuklanmoqda...</span></div>
       </div>
     </div>
-
     <div style="flex:1"></div>
-
     <div class="nav-items">
-      <a class="nav-item" href="#">
-        <div class="nav-icon">⚙️</div>
-        <span class="nav-text">Sozlamalar</span>
-      </a>
-      <a class="nav-item" href="#">
-        <div class="nav-icon">🎧</div>
-        <span class="nav-text">Yordam</span>
-      </a>
+      <a class="nav-item" href="#"><div class="nav-icon">⚙️</div><span class="nav-text">Sozlamalar</span></a>
     </div>
   </div>
-
-  <div class="sidebar-footer">
+  <div class="sb-footer">
     <div class="user-card">
-      <div class="user-avatar">👨‍💼</div>
-      <div class="user-info">
-        <div class="user-name">
-          Xurshid Istamov
-          <span class="verified">✓</span>
-        </div>
+      <div class="user-av">👨‍💼</div>
+      <div>
+        <div class="user-name">Xurshid Istamov ✓</div>
         <div class="user-email">designerwebapk@gmail.com</div>
       </div>
-      <div style="font-size:12px;color:var(--text-soft-400)">›</div>
     </div>
   </div>
 </nav>
 
-<!-- ── MAIN ────────────────────────────────────────────────── -->
+<!-- MAIN -->
 <div class="main">
-
-  <!-- Header -->
   <header class="header">
-    <div class="header-left">
-      <div class="header-avatar">👨‍💼</div>
-      <div class="header-greeting">
-        <div class="header-name">Xurshid Istamov</div>
-        <div class="header-sub">Tomchi Tech'ga xush kelibsiz 👋</div>
+    <div class="hdr-left">
+      <div class="hdr-av">👨‍💼</div>
+      <div>
+        <div class="hdr-name">Xurshid Istamov</div>
+        <div class="hdr-sub">Tomchi Tech'ga xush kelibsiz 👋</div>
       </div>
     </div>
-    <div class="header-actions">
-      <div class="icon-btn" title="Qidirish">🔍</div>
-      <div class="icon-btn" title="Ogohlantirishlar">
-        🔔
-        <div class="notif-dot"></div>
-      </div>
-      <button class="btn-outline">📊 Hisobot</button>
+    <div class="hdr-actions">
+      <div class="icon-btn">🔍</div>
+      <div class="icon-btn">🔔<div class="notif-dot" id="notif-dot" style="display:none"></div></div>
+      <button class="btn-outline" onclick="fetchAll()">🔄 Yangilash</button>
       <button class="btn-primary">＋ Sensor qo'shish</button>
     </div>
   </header>
 
-  <!-- Content Grid -->
+  <div class="refresh-bar">
+    <div class="refresh-dot"></div>
+    <span id="refresh-status">Ma'lumotlar yuklanmoqda...</span>
+  </div>
+
   <div class="content">
 
-    <!-- Widget 1: Sensor Holati -->
-    <div class="widget">
-      <div class="widget-header">
-        <div class="widget-title">
-          <span class="widget-title-icon">📡</span>
-          Sensor holati
-        </div>
-        <a class="widget-see-all">Barchasini ko'r</a>
+    <!-- STAT CARDS (wide) -->
+    <div class="widget wide" style="padding:16px 20px;flex-direction:row;align-items:stretch;gap:12px;grid-column:1/3;">
+      <div class="stat-card" style="border-left-color:#16a34a;flex:1">
+        <div class="stat-num" id="st-online">—</div>
+        <div class="stat-lbl">Online sensorlar</div>
+        <div class="stat-sub" style="color:#16a34a" id="st-online-sub">—</div>
       </div>
-      <div class="widget-body" style="display:flex;flex-direction:column;gap:12px">
-        <div class="gauge-wrap">
-          <div class="gauge">
-            <svg width="160" height="90" viewBox="0 0 160 90">
-              <!-- Track -->
-              <path d="M 15 85 A 65 65 0 0 1 145 85" fill="none" stroke="#f0f0f0" stroke-width="10" stroke-linecap="round"/>
-              <!-- Fill (4/6 = 67%) -->
-              <path d="M 15 85 A 65 65 0 0 1 145 85" fill="none" stroke="#16a34a" stroke-width="10" stroke-linecap="round"
-                stroke-dasharray="204" stroke-dashoffset="67"/>
-            </svg>
-            <div class="gauge-center">
-              <div class="gauge-num">4/6</div>
-              <div class="gauge-label">Online</div>
-            </div>
-          </div>
+      <div class="stat-card" style="border-left-color:#ef4444;flex:1">
+        <div class="stat-num" id="st-critical" style="color:#ef4444">—</div>
+        <div class="stat-lbl">Kritik alertlar</div>
+        <div class="stat-sub" style="color:#ef4444" id="st-critical-sub">—</div>
+      </div>
+      <div class="stat-card" style="border-left-color:#eab308;flex:1">
+        <div class="stat-num" id="st-soon" style="color:#eab308">—</div>
+        <div class="stat-lbl">Tez sug'or</div>
+        <div class="stat-sub" style="color:#eab308">Tavsiyalar</div>
+      </div>
+      <div class="stat-card" style="border-left-color:#16a34a;flex:1">
+        <div class="stat-num" id="st-saving" style="color:#16a34a">—</div>
+        <div class="stat-lbl">O'rtacha tejash</div>
+        <div class="stat-sub" style="color:#16a34a">vs an'anaviy</div>
+      </div>
+    </div>
+
+    <!-- WIDGET 1: Sensorlar holati + Chart -->
+    <div class="widget">
+      <div class="w-header">
+        <div class="w-title">📡 Sensor holati</div>
+        <span class="w-see-all">Barchasi</span>
+      </div>
+      <div class="w-body">
+        <div class="chart-wrap" style="min-height:160px">
+          <canvas id="moistureChart"></canvas>
         </div>
-        <div class="sensor-rows">
-          <div class="sensor-row">
-            <div class="sensor-dot" style="background:#22c55e"></div>
-            <div class="sensor-info">
-              <div class="sensor-name">S001 · Pomidor</div>
-              <div class="sensor-meta">Qibray · 3.5 ga</div>
-            </div>
-            <div class="sensor-right">
-              <div class="sensor-pct" style="color:#16a34a">67%</div>
-              <span class="status-badge badge-ok">Yaxshi</span>
-            </div>
-          </div>
-          <div class="sensor-row">
-            <div class="sensor-dot" style="background:#22c55e"></div>
-            <div class="sensor-info">
-              <div class="sensor-name">S002 · Kartoshka</div>
-              <div class="sensor-meta">Bo'stonliq · 2 ga</div>
-            </div>
-            <div class="sensor-right">
-              <div class="sensor-pct" style="color:#16a34a">71%</div>
-              <span class="status-badge badge-ok">Yaxshi</span>
-            </div>
-          </div>
-          <div class="sensor-row">
-            <div class="sensor-dot" style="background:#eab308"></div>
-            <div class="sensor-info">
-              <div class="sensor-name">S003 · Paxta</div>
-              <div class="sensor-meta">Guliston · 8 ga</div>
-            </div>
-            <div class="sensor-right">
-              <div class="sensor-pct" style="color:#ca8a04">38%</div>
-              <span class="status-badge badge-warn">Diqqat</span>
-            </div>
-          </div>
-          <div class="sensor-row">
-            <div class="sensor-dot" style="background:#ef4444"></div>
-            <div class="sensor-info">
-              <div class="sensor-name">S005 · Bug'doy</div>
-              <div class="sensor-meta">Urgut · 5 ga</div>
-            </div>
-            <div class="sensor-right">
-              <div class="sensor-pct" style="color:#ef4444">29%</div>
-              <span class="status-badge badge-alert">Darhol!</span>
-            </div>
-          </div>
+        <div id="sensor-list"></div>
+      </div>
+    </div>
+
+    <!-- WIDGET 2: Tavsiyalar -->
+    <div class="widget">
+      <div class="w-header">
+        <div class="w-title">💡 Sug'orish tavsiyalari</div>
+        <span class="w-see-all">Barchasi</span>
+      </div>
+      <div class="w-body" id="rec-list" style="overflow-y:auto">
+        <div class="skeleton"></div>
+        <div class="skeleton" style="height:80px;margin-top:8px"></div>
+      </div>
+    </div>
+
+    <!-- WIDGET 3: Xarita (tall) -->
+    <div class="widget tall">
+      <div class="w-header" style="padding-bottom:12px">
+        <div class="w-title">🗺️ Sensorlar xaritasi</div>
+        <span class="w-see-all" id="map-count">6 sensor</span>
+      </div>
+      <div id="map"></div>
+    </div>
+
+    <!-- WIDGET 4: Suv tejash Chart -->
+    <div class="widget">
+      <div class="w-header">
+        <div class="w-title">💧 Suv tejash</div>
+        <span class="w-see-all">Hisobot</span>
+      </div>
+      <div class="w-body">
+        <div style="text-align:center;padding:8px 0">
+          <div style="font-size:32px;font-weight:700;color:var(--primary)" id="total-saving">— %</div>
+          <div style="font-size:12px;color:var(--text-soft);margin-top:2px">O'rtacha tejash · an'anaviy usulga nisbatan</div>
+        </div>
+        <div class="chart-wrap" style="min-height:130px">
+          <canvas id="savingChart"></canvas>
         </div>
       </div>
     </div>
 
-    <!-- Widget 2: Sug'orish Tavsiyalari -->
+    <!-- WIDGET 5: Fermalar -->
     <div class="widget">
-      <div class="widget-header">
-        <div class="widget-title">
-          <span class="widget-title-icon">💡</span>
-          Sug'orish tavsiyalari
-        </div>
-        <a class="widget-see-all">Barchasini ko'r</a>
+      <div class="w-header">
+        <div class="w-title">🌾 Fermalar</div>
+        <span class="w-see-all">Barchasi</span>
       </div>
-      <div class="widget-body" style="display:flex;flex-direction:column;gap:0">
-        <div class="rec-card" style="border-color:#fca5a5;background:#fff5f5">
-          <div class="rec-header">
-            <div class="rec-icon">🚨</div>
-            <div class="rec-name">S005 · Bug'doy — Urgut</div>
-            <div class="rec-badge badge-alert">Darhol</div>
-          </div>
-          <div class="rec-meta">Tuproq namligi juda past (29%). Darhol sug'orish zarur.</div>
-          <div class="rec-row">
-            <span class="rec-chip">💧 7,500 L kerak</span>
-            <span class="rec-chip">🕐 Hoziroq</span>
-          </div>
-        </div>
-        <div class="rec-card" style="border-color:#fde68a;background:#fffdf0">
-          <div class="rec-header">
-            <div class="rec-icon">⚠️</div>
-            <div class="rec-name">S003 · Paxta — Guliston</div>
-            <div class="rec-badge badge-warn">Tez orada</div>
-          </div>
-          <div class="rec-meta">Namlik pasaymoqda (38%). 4–6 soat ichida sug'orish tavsiya etiladi.</div>
-          <div class="rec-row">
-            <span class="rec-chip">💧 9,600 L kerak</span>
-            <span class="rec-chip">🕐 4–6 soatda</span>
-          </div>
-        </div>
-        <div class="rec-card">
-          <div class="rec-header">
-            <div class="rec-icon">✅</div>
-            <div class="rec-name">S001 · Pomidor — Qibray</div>
-            <div class="rec-badge badge-ok">Yaxshi</div>
-          </div>
-          <div class="rec-meta">Namlik maqbul darajada (67%). Hech qanday harakat shart emas.</div>
-          <div class="rec-row">
-            <span class="rec-chip">💧 0 L</span>
-            <span class="rec-chip">Tejash: 100%</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Widget 3: Ogohlantirishlar (tall) -->
-    <div class="widget tall" style="grid-column:3">
-      <div class="widget-header">
-        <div class="widget-title">
-          <span class="widget-title-icon">🔔</span>
-          Ogohlantirishlar
-        </div>
-        <a class="widget-see-all">Barchasini ko'r</a>
-      </div>
-      <div class="alert-tabs">
-        <div class="alert-tab active">Kritik</div>
-        <div class="alert-tab">Diqqat</div>
-        <div class="alert-tab">Barcha</div>
-      </div>
-      <div class="alert-list">
-        <div class="alert-item">
-          <div class="alert-top">
-            <div class="alert-sev" style="background:#ef4444"></div>
-            <div class="alert-title">S005 — Bug'doy namligi kritik past</div>
-            <div class="alert-chevron">›</div>
-          </div>
-          <div class="alert-desc">Tuproq namligi 29% — sug'orish chegarasidan 26% past</div>
-          <div class="alert-footer">
-            <span class="alert-chip badge-alert">CRITICAL_DRY</span>
-            <span class="alert-time">Hozir</span>
-          </div>
-        </div>
-        <div class="alert-item">
-          <div class="alert-top">
-            <div class="alert-sev" style="background:#94a3b8"></div>
-            <div class="alert-title">S006 — Sensor aloqasi uzilgan</div>
-            <div class="alert-chevron">›</div>
-          </div>
-          <div class="alert-desc">Chortoq, Namangan — Ma'lumot kelmayapti</div>
-          <div class="alert-footer">
-            <span class="alert-chip badge-off">OFFLINE</span>
-            <span class="alert-time">15 daq</span>
-          </div>
-        </div>
-        <div class="alert-item">
-          <div class="alert-top">
-            <div class="alert-sev" style="background:#eab308"></div>
-            <div class="alert-title">S003 — Batareya past (16%)</div>
-            <div class="alert-chevron">›</div>
-          </div>
-          <div class="alert-desc">Guliston, Sirdaryo — Zaryad qilish kerak</div>
-          <div class="alert-footer">
-            <span class="alert-chip badge-warn">LOW_BATTERY</span>
-            <span class="alert-time">1 soat</span>
-          </div>
-        </div>
-        <div class="alert-item">
-          <div class="alert-top">
-            <div class="alert-sev" style="background:#eab308"></div>
-            <div class="alert-title">S003 — Namlik pasaymoqda</div>
-            <div class="alert-chevron">›</div>
-          </div>
-          <div class="alert-desc">Paxta dalasi namligi 38% — tavsiya chegarasida</div>
-          <div class="alert-footer">
-            <span class="alert-chip badge-warn">IRRIGATE_SOON</span>
-            <span class="alert-time">2 soat</span>
-          </div>
-        </div>
-        <div class="alert-item">
-          <div class="alert-top">
-            <div class="alert-sev" style="background:#22c55e"></div>
-            <div class="alert-title">S002 — Sug'orish muvaffaqiyatli</div>
-            <div class="alert-chevron">›</div>
-          </div>
-          <div class="alert-desc">Kartoshka dalasi namligi 71% ga ko'tarildi</div>
-          <div class="alert-footer">
-            <span class="alert-chip badge-ok">RESOLVED</span>
-            <span class="alert-time">3 soat</span>
-          </div>
-        </div>
-        <div class="alert-item">
-          <div class="alert-top">
-            <div class="alert-sev" style="background:#22c55e"></div>
-            <div class="alert-title">S004 — Uzum namligi optimal</div>
-            <div class="alert-chevron">›</div>
-          </div>
-          <div class="alert-desc">Marg'ilon, Farg'ona — 52%, diapazon ichida</div>
-          <div class="alert-footer">
-            <span class="alert-chip badge-ok">NO_ACTION</span>
-            <span class="alert-time">5 soat</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Widget 4: Suv Tejash -->
-    <div class="widget">
-      <div class="widget-header">
-        <div class="widget-title">
-          <span class="widget-title-icon">💧</span>
-          Suv tejash
-        </div>
-        <a class="widget-see-all">Hisobot</a>
-      </div>
-      <div class="widget-body">
-        <div class="saving-big">
-          <div class="saving-num">84,000 L</div>
-          <div class="saving-unit">Bugun tejaldi · An'anaviy usulga nisbatan</div>
-        </div>
-        <div class="saving-bars">
-          <div class="bar-row">
-            <div class="bar-label">Dush</div>
-            <div class="bar-track"><div class="bar-fill" style="width:70%"></div></div>
-            <div class="bar-pct">70%</div>
-          </div>
-          <div class="bar-row">
-            <div class="bar-label">Sesh</div>
-            <div class="bar-track"><div class="bar-fill" style="width:82%"></div></div>
-            <div class="bar-pct">82%</div>
-          </div>
-          <div class="bar-row">
-            <div class="bar-label">Chor</div>
-            <div class="bar-track"><div class="bar-fill" style="width:65%"></div></div>
-            <div class="bar-pct">65%</div>
-          </div>
-          <div class="bar-row">
-            <div class="bar-label">Pay</div>
-            <div class="bar-track"><div class="bar-fill" style="width:78%"></div></div>
-            <div class="bar-pct">78%</div>
-          </div>
-          <div class="bar-row">
-            <div class="bar-label">Jum</div>
-            <div class="bar-track"><div class="bar-fill" style="width:88%"></div></div>
-            <div class="bar-pct">88%</div>
-          </div>
-          <div class="bar-row">
-            <div class="bar-label">Shan</div>
-            <div class="bar-track"><div class="bar-fill" style="width:74%"></div></div>
-            <div class="bar-pct">74%</div>
-          </div>
-          <div class="bar-row">
-            <div class="bar-label">Yak</div>
-            <div class="bar-track"><div class="bar-fill" style="width:80%"></div></div>
-            <div class="bar-pct">80%</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Widget 5: Fermalar -->
-    <div class="widget">
-      <div class="widget-header">
-        <div class="widget-title">
-          <span class="widget-title-icon">🌾</span>
-          Fermalar
-        </div>
-        <a class="widget-see-all">Barchasini ko'r</a>
-      </div>
-      <div class="widget-body">
-        <div class="farm-rows">
-          <div class="farm-row">
-            <div class="farm-avatar">🍅</div>
-            <div class="farm-info">
-              <div class="farm-name">Akbar Toshmatov</div>
-              <div class="farm-meta">Pomidor · Qibray · 3.5 ga</div>
-            </div>
-            <div class="farm-right">
-              <div class="farm-moisture" style="color:#16a34a">67%</div>
-              <span class="farm-action badge-ok">Yaxshi</span>
-            </div>
-          </div>
-          <div class="farm-row">
-            <div class="farm-avatar">🥔</div>
-            <div class="farm-info">
-              <div class="farm-name">Muhabbat Yusupova</div>
-              <div class="farm-meta">Kartoshka · Bo'stonliq · 2 ga</div>
-            </div>
-            <div class="farm-right">
-              <div class="farm-moisture" style="color:#16a34a">71%</div>
-              <span class="farm-action badge-ok">Yaxshi</span>
-            </div>
-          </div>
-          <div class="farm-row">
-            <div class="farm-avatar">🌿</div>
-            <div class="farm-info">
-              <div class="farm-name">Sherzod Raximov</div>
-              <div class="farm-meta">Paxta · Guliston · 8 ga</div>
-            </div>
-            <div class="farm-right">
-              <div class="farm-moisture" style="color:#ca8a04">38%</div>
-              <span class="farm-action badge-warn">Tez sug'or</span>
-            </div>
-          </div>
-          <div class="farm-row">
-            <div class="farm-avatar">🍇</div>
-            <div class="farm-info">
-              <div class="farm-name">Nodira Xasanova</div>
-              <div class="farm-meta">Uzum · Marg'ilon · 1.5 ga</div>
-            </div>
-            <div class="farm-right">
-              <div class="farm-moisture" style="color:#16a34a">52%</div>
-              <span class="farm-action badge-ok">Yaxshi</span>
-            </div>
-          </div>
-          <div class="farm-row">
-            <div class="farm-avatar">🌾</div>
-            <div class="farm-info">
-              <div class="farm-name">Behruz Mirzayev</div>
-              <div class="farm-meta">Bug'doy · Urgut · 5 ga</div>
-            </div>
-            <div class="farm-right">
-              <div class="farm-moisture" style="color:#ef4444">29%</div>
-              <span class="farm-action badge-alert">Darhol!</span>
-            </div>
-          </div>
-          <div class="farm-row">
-            <div class="farm-avatar">🌽</div>
-            <div class="farm-info">
-              <div class="farm-name">Zulfiya Qodirov</div>
-              <div class="farm-meta">Makkajo'xori · Chortoq · 4 ga</div>
-            </div>
-            <div class="farm-right">
-              <div class="farm-moisture" style="color:#94a3b8">—</div>
-              <span class="farm-action badge-off">Offline</span>
-            </div>
-          </div>
-        </div>
+      <div class="w-body" id="farm-list" style="overflow-y:auto">
+        <div class="skeleton"></div>
+        <div class="skeleton" style="margin-top:8px"></div>
       </div>
     </div>
 
   </div><!-- /content -->
 </div><!-- /main -->
 
+<script>
+const API = 'https://tomchi-tech-api.onrender.com/api/v1';
+
+const CROP_EMOJI = {
+  pomidor:"🍅", kartoshka:"🥔", paxta:"🌿",
+  uzum:"🍇", bugdoy:"🌾", "makkajo'xori":"🌽", piyoz:"🧅"
+};
+
+let moistureChart = null;
+let savingChart   = null;
+let leafletMap    = null;
+let markers       = {};
+
+// ── Leaflet Map init ──────────────────────────────────────────
+function initMap() {
+  leafletMap = L.map('map', { zoomControl: true, scrollWheelZoom: true })
+    .setView([40.5, 69.0], 6);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap',
+    maxZoom: 18,
+  }).addTo(leafletMap);
+}
+
+function getMarkerColor(status, moisture, threshold) {
+  if (status === 'offline') return '#94a3b8';
+  if (status === 'warning') return '#eab308';
+  if (moisture < threshold - 15) return '#ef4444';
+  if (moisture < threshold)      return '#eab308';
+  return '#16a34a';
+}
+
+function updateMarkers(readings, configs) {
+  configs.forEach(cfg => {
+    const reading = readings.find(r => r.sensor_id === cfg.sensor_id);
+    const moisture = reading ? reading.soil_moisture : 0;
+    const color = getMarkerColor(cfg.status, moisture, cfg.irrigation_threshold);
+
+    const icon = L.divIcon({
+      className: '',
+      html: `<div style="
+        width:32px;height:32px;background:${color};border:3px solid white;
+        border-radius:50%;display:flex;align-items:center;justify-content:center;
+        font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,0.3);cursor:pointer;
+      ">${CROP_EMOJI[cfg.crop_type] || '🌱'}</div>`,
+      iconSize: [32, 32],
+      iconAnchor: [16, 16],
+    });
+
+    const popup = `
+      <div style="font-family:Inter,sans-serif;min-width:160px">
+        <div style="font-weight:600;margin-bottom:4px">${cfg.sensor_id} · ${cfg.crop_type}</div>
+        <div style="color:#555;font-size:12px">📍 ${cfg.field_area_ha} ga</div>
+        <div style="margin-top:8px;font-size:13px">
+          💧 Namlik: <b style="color:${color}">${moisture > 0 ? moisture.toFixed(1)+'%' : '—'}</b>
+        </div>
+        <div style="font-size:12px;margin-top:2px">
+          🌡 Harorat: ${reading ? reading.temperature.toFixed(1)+'°C' : '—'}
+        </div>
+        <div style="font-size:12px;margin-top:2px">
+          🔋 Batareya: ${reading ? reading.battery_level.toFixed(0)+'%' : '—'}
+        </div>
+        <div style="margin-top:6px">
+          <span style="background:${color};color:white;border-radius:4px;padding:2px 8px;font-size:11px;font-weight:600">${cfg.status.toUpperCase()}</span>
+        </div>
+      </div>`;
+
+    if (markers[cfg.sensor_id]) {
+      leafletMap.removeLayer(markers[cfg.sensor_id]);
+    }
+    markers[cfg.sensor_id] = L.marker([cfg.location_lat, cfg.location_lon], { icon })
+      .addTo(leafletMap)
+      .bindPopup(popup);
+  });
+}
+
+// ── Charts ────────────────────────────────────────────────────
+function initMoistureChart(labels, data, colors) {
+  const ctx = document.getElementById('moistureChart').getContext('2d');
+  if (moistureChart) moistureChart.destroy();
+  moistureChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        data,
+        backgroundColor: colors.map(c => c + '99'),
+        borderColor: colors,
+        borderWidth: 2,
+        borderRadius: 6,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: {
+        callbacks: { label: ctx => ` ${ctx.parsed.y.toFixed(1)}% namlik` }
+      }},
+      scales: {
+        y: { min: 0, max: 100, ticks: { callback: v => v+'%', font: { size: 10 } }, grid: { color: '#f0f0f0' } },
+        x: { ticks: { font: { size: 10 } }, grid: { display: false } }
+      }
+    }
+  });
+}
+
+function initSavingChart(labels, data) {
+  const ctx = document.getElementById('savingChart').getContext('2d');
+  if (savingChart) savingChart.destroy();
+  savingChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Tejash %',
+        data,
+        backgroundColor: data.map(v => v > 50 ? '#16a34a99' : '#eab30899'),
+        borderColor:     data.map(v => v > 50 ? '#16a34a'   : '#eab308'),
+        borderWidth: 2,
+        borderRadius: 6,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: {
+        callbacks: { label: ctx => ` ${ctx.parsed.y.toFixed(1)}% tejash` }
+      }},
+      scales: {
+        y: { min: 0, max: 100, ticks: { callback: v => v+'%', font: { size: 10 } }, grid: { color: '#f0f0f0' } },
+        x: { ticks: { font: { size: 10 } }, grid: { display: false } }
+      }
+    }
+  });
+}
+
+// ── Render helpers ────────────────────────────────────────────
+function statusColor(status, moisture, threshold) {
+  if (status === 'offline') return '#94a3b8';
+  if (moisture < threshold - 15) return '#ef4444';
+  if (moisture < threshold)      return '#eab308';
+  return '#16a34a';
+}
+
+function statusBadge(status, moisture, threshold) {
+  if (status === 'offline') return `<span class="badge off">Offline</span>`;
+  if (moisture < threshold - 15) return `<span class="badge err">Darhol!</span>`;
+  if (moisture < threshold)      return `<span class="badge warn">Tez sug'or</span>`;
+  return `<span class="badge ok">Yaxshi</span>`;
+}
+
+function renderSensors(readings, configs) {
+  const list = document.getElementById('sensor-list');
+  const labels = [], data = [], colors = [];
+
+  list.innerHTML = readings.map(r => {
+    const cfg = configs.find(c => c.sensor_id === r.sensor_id) || {};
+    const color = statusColor(cfg.status, r.soil_moisture, cfg.irrigation_threshold || 45);
+    labels.push(r.sensor_id);
+    data.push(r.soil_moisture);
+    colors.push(color);
+    return `
+      <div class="sensor-row">
+        <div class="s-dot" style="background:${color}"></div>
+        <div class="s-info">
+          <div class="s-name">${r.sensor_id} · ${cfg.crop_type || '—'}</div>
+          <div class="s-meta">${cfg.field_area_ha || '—'} ga · ${cfg.farm_id || '—'}</div>
+        </div>
+        <div class="s-right">
+          <div class="s-pct" style="color:${color}">${cfg.status==='offline'?'—':r.soil_moisture.toFixed(1)+'%'}</div>
+          ${statusBadge(cfg.status, r.soil_moisture, cfg.irrigation_threshold||45)}
+        </div>
+      </div>`;
+  }).join('');
+
+  initMoistureChart(labels, data, colors);
+}
+
+function renderRecommendations(recs) {
+  const el = document.getElementById('rec-list');
+  if (!recs.length) { el.innerHTML = '<div style="text-align:center;color:var(--text-soft);padding:20px">Ma\'lumot yo\'q</div>'; return; }
+
+  const priority = { IRRIGATE_NOW: 0, IRRIGATE_SOON: 1, STOP_IRRIGATION: 2, NO_ACTION: 3 };
+  const sorted = [...recs].sort((a, b) => (priority[a.action]||3) - (priority[b.action]||3));
+
+  const ACTION = {
+    IRRIGATE_NOW:    { icon:'🚨', cls:'err',  border:'#fca5a5', bg:'#fff5f5' },
+    IRRIGATE_SOON:   { icon:'⚠️', cls:'warn', border:'#fde68a', bg:'#fffdf0' },
+    STOP_IRRIGATION: { icon:'🛑', cls:'off',  border:'#e2e8f0', bg:'#f8fafc' },
+    NO_ACTION:       { icon:'✅', cls:'ok',   border:'var(--stroke)', bg:'var(--bg-white)' },
+  };
+
+  el.innerHTML = sorted.map(r => {
+    const a = ACTION[r.action] || ACTION.NO_ACTION;
+    return `
+      <div class="rec-card" style="border-color:${a.border};background:${a.bg}">
+        <div class="rec-head">
+          <span>${a.icon}</span>
+          <span class="rec-name">${r.sensor_id} · ${r.crop_type}</span>
+          <span class="badge ${a.cls}">${r.action.replace(/_/g,' ')}</span>
+        </div>
+        <div class="rec-msg">${r.message}</div>
+        <div class="rec-chips">
+          <span class="chip">💧 ${r.water_needed_liters.toLocaleString()} L</span>
+          <span class="chip">📉 ${r.current_moisture.toFixed(1)}%</span>
+          <span class="chip">♻️ ${r.water_saving_pct.toFixed(1)}% tejash</span>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function renderFarms(farms, readings, configs) {
+  const el = document.getElementById('farm-list');
+  el.innerHTML = farms.map(f => {
+    const cfg = configs.find(c => c.farm_id === f.farm_id);
+    const reading = cfg ? readings.find(r => r.sensor_id === cfg.sensor_id) : null;
+    const moisture = reading ? reading.soil_moisture : null;
+    const threshold = cfg ? cfg.irrigation_threshold : 45;
+    const status = cfg ? cfg.status : 'offline';
+    const color = moisture !== null ? statusColor(status, moisture, threshold) : '#94a3b8';
+    const emoji = CROP_EMOJI[f.crop_type] || '🌱';
+    return `
+      <div class="farm-row">
+        <div class="farm-av">${emoji}</div>
+        <div class="farm-info">
+          <div class="farm-name">${f.farmer_name}</div>
+          <div class="farm-meta">${f.crop_type} · ${f.district} · ${f.total_area_ha} ga</div>
+        </div>
+        <div class="farm-r">
+          <div class="farm-pct" style="color:${color}">${moisture!==null&&status!=='offline'?moisture.toFixed(1)+'%':'—'}</div>
+          ${statusBadge(status, moisture||0, threshold)}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function renderStats(configs, recs, alerts) {
+  const online  = configs.filter(c => c.status === 'online').length;
+  const total   = configs.length;
+  const critical = recs.filter(r => r.action === 'IRRIGATE_NOW').length;
+  const soon     = recs.filter(r => r.action === 'IRRIGATE_SOON').length;
+  const avgSave  = recs.length ? (recs.reduce((s,r) => s + r.water_saving_pct, 0) / recs.length) : 0;
+
+  document.getElementById('st-online').textContent     = `${online}/${total}`;
+  document.getElementById('st-online-sub').textContent  = `${total - online} offline`;
+  document.getElementById('st-critical').textContent    = critical;
+  document.getElementById('st-critical-sub').textContent= `${alerts.length} jami alert`;
+  document.getElementById('st-soon').textContent        = soon;
+  document.getElementById('total-saving').textContent   = `${avgSave.toFixed(1)}%`;
+  document.getElementById('st-saving').textContent      = `${avgSave.toFixed(1)}%`;
+
+  // notification dot
+  if (alerts.length > 0) document.getElementById('notif-dot').style.display = 'block';
+  document.getElementById('nb-alerts').textContent = alerts.length || '0';
+}
+
+function renderSavingChart(recs) {
+  const labels = recs.map(r => r.sensor_id);
+  const data   = recs.map(r => r.water_saving_pct);
+  initSavingChart(labels, data);
+}
+
+// ── Quick nav ─────────────────────────────────────────────────
+function renderQuickNav(configs, readings) {
+  const nav = document.getElementById('quick-nav');
+  nav.innerHTML = configs.slice(0, 4).map(cfg => {
+    const reading = readings.find(r => r.sensor_id === cfg.sensor_id);
+    const m = reading ? reading.soil_moisture : 0;
+    const color = statusColor(cfg.status, m, cfg.irrigation_threshold);
+    return `<a class="nav-item" href="#">
+      <div class="nav-icon" style="color:${color}">●</div>
+      <span class="nav-text">${cfg.crop_type} — ${cfg.sensor_id}</span>
+    </a>`;
+  }).join('');
+}
+
+// ── Main fetch ────────────────────────────────────────────────
+async function fetchAll() {
+  const el = document.getElementById('refresh-status');
+  el.textContent = 'Yangilanmoqda...';
+
+  try {
+    const [readings, configs, recs, alertsData, farms] = await Promise.all([
+      fetch(`${API}/sensors/`).then(r => r.json()),
+      fetch(`${API}/sensors/configs`).then(r => r.json()),
+      fetch(`${API}/recommendations/`).then(r => r.json()),
+      fetch(`${API}/alerts/`).then(r => r.json()),
+      fetch(`${API}/farms/`).then(r => r.json()),
+    ]);
+
+    const alerts = alertsData.alerts || [];
+
+    renderStats(configs, recs, alerts);
+    renderSensors(readings, configs);
+    renderRecommendations(recs);
+    renderFarms(farms, readings, configs);
+    renderSavingChart(recs);
+    updateMarkers(readings, configs);
+    renderQuickNav(configs, readings);
+
+    const now = new Date().toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    el.textContent = `Oxirgi yangilanish: ${now} · 30 soniyada avtomatik yangilanadi`;
+
+  } catch (err) {
+    el.textContent = `⚠️ API bilan ulanish xatosi. Qayta urinish...`;
+    console.error(err);
+  }
+}
+
+// ── Init ──────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  initMap();
+  fetchAll();
+  setInterval(fetchAll, 30000); // 30 soniyada auto-refresh
+});
+</script>
 </body>
 </html>

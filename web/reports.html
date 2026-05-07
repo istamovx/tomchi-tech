@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Tomchi Tech — Hisobotlar</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg-page:#F5F5F5;--bg-primary:#FFFFFF;--bg-primary-alt:#FAFAFA;--bg-secondary:#F9FAFB;
+  --text-primary:#181D27;--text-secondary:#414651;--text-tertiary:#535862;
+  --text-placeholder:#717680;--text-quaternary:#717680;
+  --border-primary:#D5D7DA;--border-secondary:#E9EAEB;--border-tertiary:#F5F5F5;
+  --border-brand:#2970FF;--border-brand-alt:#155EEF;
+  --brand:#155EEF;--brand-hover:#1248C7;
+  --success:#17B26A;--success-bg:#ECFDF3;--success-border:#ABEFC6;
+  --warning:#F79009;--warning-bg:#FFFAEB;--warning-border:#FEDF89;
+  --danger:#D92D20;--danger-bg:#FEF3F2;--danger-border:#FECDCA;
+  --neutral:#717680;--neutral-bg:#F9FAFB;
+  --utility-gray-50:#FAFAFA;--utility-gray-200:#E9EAEB;--utility-gray-700:#414651;
+  --brand-50:#EFF4FF;--brand-100:#D1E0FF;
+  --shadow-xs:0px 1px 2px rgba(10,13,18,0.05);
+  --shadow-sm:0px 1px 3px rgba(10,13,18,0.08),0px 1px 2px rgba(10,13,18,0.04);
+  --shadow-md:0px 4px 8px rgba(10,13,18,0.08),0px 2px 4px rgba(10,13,18,0.04);
+  --shadow-skeu-border:inset 0px 0px 0px 1px rgba(10,13,18,0.18),inset 0px -2px 0px rgba(10,13,18,0.05);
+  --shadow-icon:0px 1px 2px rgba(10,13,18,0.05);
+  --sp-xxs:2px;--sp-xs:4px;--sp-sm:6px;--sp-md:8px;--sp-lg:12px;
+  --sp-xl:16px;--sp-2xl:20px;--sp-3xl:24px;--sp-4xl:32px;
+  --r-xs:4px;--r-sm:6px;--r-md:8px;--r-lg:10px;--r-xl:12px;--r-full:9999px;
+  --text-xs-size:12px;--text-xs-lh:18px;--text-sm-size:14px;--text-sm-lh:20px;
+  --text-md-size:16px;--text-md-lh:24px;--text-lg-size:18px;--text-lg-lh:28px;
+  --text-xl-size:20px;--text-xl-lh:30px;
+  --display-xs-size:24px;--display-xs-lh:32px;--display-sm-size:30px;--display-sm-lh:38px;
+  --sidebar-w:280px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg-page);color:var(--text-primary);height:100vh;display:flex;overflow:hidden;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+i[class^="ri-"]{line-height:1}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border-secondary);border-radius:99px}
+
+.sidebar{width:var(--sidebar-w);background:var(--bg-primary);border-right:1px solid var(--border-secondary);height:100vh;display:flex;flex-direction:column;flex-shrink:0;z-index:100;overflow:hidden}
+.sb-header{display:flex;flex-direction:column;gap:var(--sp-2xl);padding:var(--sp-3xl) var(--sp-2xl)}
+.sb-logo{display:flex;align-items:center;gap:var(--sp-md)}
+.sb-logomark{width:32px;height:32px;border-radius:var(--r-md);background:linear-gradient(180deg,#2970FF 0%,#155EEF 100%);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;flex-shrink:0;box-shadow:0 1px 1px rgba(10,13,18,.13),0 1px 3px rgba(10,13,18,.1)}
+.sb-logoname{font-size:var(--text-md-size);font-weight:700;color:var(--text-primary)}
+.sb-search{display:flex;align-items:center;gap:var(--sp-md);background:var(--bg-primary);border:1px solid var(--border-tertiary);border-radius:var(--r-md);padding:var(--sp-lg) var(--sp-xl);box-shadow:var(--shadow-xs);cursor:text}
+.sb-search i{color:var(--text-placeholder);font-size:18px}
+.sb-search span{flex:1;font-size:var(--text-md-size);color:var(--text-placeholder)}
+.sb-shortcut{border:1px solid var(--border-secondary);border-radius:var(--r-xs);padding:1px 4px;font-size:var(--text-xs-size);font-weight:500;color:var(--text-quaternary)}
+.sb-nav{flex:1;overflow-y:auto;padding:0 var(--sp-xl)}
+.nav-item{display:flex;align-items:center;gap:var(--sp-md);padding:var(--sp-md) var(--sp-lg);border-radius:var(--r-sm);cursor:pointer;color:var(--text-secondary);font-size:var(--text-md-size);font-weight:500;line-height:var(--text-md-lh);transition:background .12s;width:100%;margin:1px 0;text-align:left}
+.nav-item:hover{background:var(--bg-secondary)}.nav-item.active{background:var(--bg-secondary);color:var(--text-primary)}
+.nav-icon{font-size:18px;width:20px;height:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.nav-badge{margin-left:auto;font-size:var(--text-xs-size);font-weight:500;padding:var(--sp-xxs) var(--sp-md);border-radius:var(--r-full);background:var(--utility-gray-50);border:1px solid var(--utility-gray-200);color:var(--utility-gray-700)}
+.nav-badge.alert{background:var(--danger-bg);border-color:var(--danger-border);color:var(--danger)}
+.sb-footer{border-top:1px solid var(--border-secondary);padding:var(--sp-xl);display:flex;flex-direction:column;gap:var(--sp-xs)}
+.sb-account{background:var(--bg-primary-alt);border:1px solid var(--border-secondary);border-radius:var(--r-xl);padding:var(--sp-lg);display:flex;align-items:center;gap:var(--sp-md);cursor:pointer;margin-top:var(--sp-md);transition:background .12s}
+.sb-account:hover{background:var(--bg-secondary)}
+.av-wrap{width:40px;height:40px;border-radius:var(--r-full);background:#E0E0E0;border:1px solid rgba(0,0,0,0.08);position:relative;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--text-secondary)}
+.av-online{position:absolute;bottom:-1px;right:-1px;width:10px;height:10px;border-radius:var(--r-full);background:var(--success);border:1.5px solid var(--bg-primary)}
+.av-name{font-size:var(--text-md-size);font-weight:600;color:var(--text-primary)}.av-role{font-size:var(--text-sm-size);color:var(--text-tertiary)}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.page-header{background:var(--bg-primary);border-bottom:1px solid var(--border-secondary);padding:0 var(--sp-4xl);height:68px;display:flex;align-items:center;gap:var(--sp-lg);flex-shrink:0}
+.ph-title{font-size:var(--text-xl-size);font-weight:700;flex:1}
+.ph-btn{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:var(--r-sm);color:var(--text-secondary);font-size:18px;transition:background .12s}
+.ph-btn:hover{background:var(--bg-secondary)}
+.ph-divider{width:1px;height:24px;background:var(--border-secondary);margin:0 4px}
+.btn{display:inline-flex;align-items:center;gap:6px;font-family:inherit;font-size:var(--text-sm-size);font-weight:600;padding:8px 14px;border-radius:var(--r-md);cursor:pointer;transition:all .15s;white-space:nowrap}
+.btn i{font-size:16px}
+.btn-secondary{background:var(--bg-primary);border:1px solid var(--border-primary);color:var(--text-secondary);box-shadow:var(--shadow-xs)}
+.btn-secondary:hover{background:var(--bg-secondary)}
+.btn-primary{background:var(--brand);border:1px solid var(--border-brand-alt);color:#fff;box-shadow:var(--shadow-xs),inset 0 0 0 1px rgba(255,255,255,.12),inset 0 -2px 0 rgba(10,13,18,.08)}
+.btn-primary:hover{background:var(--brand-hover)}
+.content{flex:1;overflow-y:auto;padding:var(--sp-3xl) var(--sp-4xl);display:flex;flex-direction:column;gap:var(--sp-3xl)}
+
+/* METRICS */
+.metrics-row{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--sp-2xl)}
+.metric-card{background:var(--bg-primary);border:1px solid var(--border-secondary);border-radius:var(--r-xl);padding:var(--sp-2xl);display:flex;gap:var(--sp-xl);align-items:flex-start;box-shadow:0px 1px 1px rgba(10,13,18,0.05);transition:all .15s}
+.metric-card:hover{border-color:var(--border-primary);box-shadow:var(--shadow-sm)}
+.metric-icon{width:40px;height:40px;border-radius:var(--r-md);background:var(--bg-primary);border:1px solid var(--border-primary);box-shadow:var(--shadow-icon),var(--shadow-skeu-border);display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--text-secondary);flex-shrink:0}
+.metric-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:var(--sp-md)}
+.metric-label{font-size:var(--text-sm-size);font-weight:600;color:var(--text-tertiary)}
+.metric-num{font-size:var(--display-sm-size);font-weight:600;color:var(--text-primary)}
+.metric-sub{font-size:var(--text-xs-size);color:var(--text-tertiary)}
+
+/* CHART CARDS */
+.chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-3xl)}
+.chart-card{background:var(--bg-primary);border:1px solid var(--border-secondary);border-radius:var(--r-xl);box-shadow:0px 1px 1px rgba(10,13,18,0.05);overflow:hidden}
+.chart-card.full{grid-column:1/-1}
+.cc-head{display:flex;align-items:flex-start;justify-content:space-between;padding:var(--sp-2xl) var(--sp-3xl);border-bottom:1px solid var(--border-secondary)}
+.cc-title{font-size:var(--text-lg-size);font-weight:700;color:var(--text-primary)}
+.cc-sub{font-size:var(--text-sm-size);color:var(--text-tertiary);margin-top:2px}
+.cc-body{padding:var(--sp-3xl)}
+.chart-wrap{height:240px;position:relative}
+
+/* PERIOD TABS */
+.period-tabs{display:flex;background:var(--bg-secondary);border-radius:var(--r-md);padding:3px;gap:2px}
+.p-tab{padding:5px 12px;border-radius:var(--r-sm);font-size:var(--text-xs-size);font-weight:600;color:var(--text-tertiary);cursor:pointer;transition:all .12s;border:1px solid transparent;background:transparent}
+.p-tab:hover{color:var(--text-secondary)}
+.p-tab.active{background:var(--bg-primary);color:var(--text-primary);border-color:var(--border-secondary);box-shadow:var(--shadow-xs)}
+
+/* SAVING TABLE */
+.saving-table{width:100%;border-collapse:collapse}
+.saving-table th{padding:var(--sp-lg) var(--sp-xl);font-size:var(--text-xs-size);font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text-tertiary);background:var(--bg-primary-alt);border-bottom:1px solid var(--border-secondary);text-align:left}
+.saving-table td{padding:var(--sp-xl);font-size:var(--text-sm-size);color:var(--text-primary);border-bottom:1px solid var(--border-secondary)}
+.saving-table tr:last-child td{border-bottom:none}
+.saving-table tr:hover td{background:var(--bg-secondary)}
+.bar-cell{display:flex;align-items:center;gap:8px}
+.bar-track{flex:1;height:6px;background:var(--border-secondary);border-radius:var(--r-full);overflow:hidden}
+.bar-fill{height:100%;border-radius:var(--r-full);background:var(--success)}
+
+/* SKEL */
+.skel{background:linear-gradient(90deg,var(--bg-secondary) 25%,var(--border-secondary) 50%,var(--bg-secondary) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:var(--r-md)}
+@keyframes shimmer{0%{background-position:200%}100%{background-position:-200%}}
+
+/* DARK */
+[data-theme="dark"]{
+  --bg-page:#0C0E12;--bg-primary:#161A23;--bg-primary-alt:#1C2130;--bg-secondary:#1E2436;
+  --border-primary:#2E3448;--border-secondary:#242A3A;--border-tertiary:#1A1F2E;
+  --text-primary:#F0F2F5;--text-secondary:#BCC2CE;--text-tertiary:#8B92A0;
+  --text-placeholder:#636B78;--text-quaternary:#636B78;
+  --utility-gray-50:#1C2130;--utility-gray-200:#2E3448;--utility-gray-700:#BCC2CE;
+  --brand-50:#0D1528;--brand-100:#152040;
+  --shadow-xs:0 1px 2px rgba(0,0,0,.4);--shadow-sm:0 1px 3px rgba(0,0,0,.5);
+  --shadow-icon:0 1px 2px rgba(0,0,0,.5);--shadow-skeu-border:inset 0 0 0 1px rgba(255,255,255,0.06),inset 0 -2px 0 rgba(0,0,0,.2);
+}
+[data-theme="dark"] .nav-item.active{background:#1E2436}
+[data-theme="dark"] .p-tab.active{background:#161A23;border-color:#2E3448}
+[data-theme="dark"] .p-tab{color:#8B92A0}
+[data-theme="dark"] .saving-table tr:hover td{background:#1E2436}
+@media(max-width:1280px){.metrics-row{grid-template-columns:repeat(2,1fr)}.chart-grid{grid-template-columns:1fr}}
+@media(max-width:720px){.sidebar{position:fixed;left:-100%;z-index:200;transition:left .25s}.sidebar.open{left:0}.content{padding:var(--sp-xl)}}
+</style>
+</head>
+<body>
+
+<nav class="sidebar" id="sidebar">
+  <div class="sb-header">
+    <div class="sb-logo">
+      <div class="sb-logomark"><i class="ri-leaf-line"></i></div>
+      <span class="sb-logoname">Tomchi Tech</span>
+    </div>
+    <div class="sb-search"><i class="ri-search-2-line"></i><span>Qidirish</span><span class="sb-shortcut">⌘K</span></div>
+  </div>
+  <div class="sb-nav">
+    <a class="nav-item" href="dashboard.html"><span class="nav-icon"><i class="ri-dashboard-3-line"></i></span>Dashboard</a>
+    <a class="nav-item" href="sensors.html"><span class="nav-icon"><i class="ri-radar-line"></i></span>Sensorlar<span class="nav-badge" id="nb-sensors">—</span></a>
+    <a class="nav-item" href="farms.html"><span class="nav-icon"><i class="ri-plant-line"></i></span>Fermalar</a>
+    <a class="nav-item" href="recommendations.html"><span class="nav-icon"><i class="ri-lightbulb-line"></i></span>Tavsiyalar</a>
+    <a class="nav-item" href="alerts.html"><span class="nav-icon"><i class="ri-notification-3-line"></i></span>Alertlar<span class="nav-badge alert" id="nb-alerts">0</span></a>
+    <a class="nav-item active" href="reports.html"><span class="nav-icon"><i class="ri-bar-chart-2-line"></i></span>Hisobotlar</a>
+  </div>
+  <div class="sb-footer">
+    <button class="nav-item footer-item"><span class="nav-icon"><i class="ri-settings-3-line"></i></span>Sozlamalar</button>
+    <button class="nav-item footer-item"><span class="nav-icon"><i class="ri-question-line"></i></span>Yordam</button>
+    <div class="sb-account">
+      <div class="av-wrap">X<div class="av-online"></div></div>
+      <div style="flex:1;min-width:0"><div class="av-name">Xurshid I.</div><div class="av-role">Admin</div></div>
+      <button class="ph-btn" onclick="toggleTheme()" title="Mavzu"><i class="ri-moon-line" id="theme-icon"></i></button>
+    </div>
+  </div>
+</nav>
+
+<div class="main">
+  <div class="page-header">
+    <div class="ph-title">Hisobotlar</div>
+    <div class="ph-divider"></div>
+    <button class="ph-btn" onclick="loadData()" title="Yangilash"><i class="ri-refresh-line"></i></button>
+    <button class="btn btn-secondary" onclick="exportReport()"><i class="ri-download-2-line"></i>CSV yuklab olish</button>
+    <button class="btn btn-primary" onclick="window.print()"><i class="ri-printer-line"></i>Chop etish</button>
+  </div>
+
+  <div class="content">
+    <!-- Summary metrics -->
+    <div class="metrics-row">
+      <div class="metric-card">
+        <div class="metric-icon" style="color:var(--success)"><i class="ri-drop-line"></i></div>
+        <div class="metric-body">
+          <div class="metric-label">Jami suv tejalgan</div>
+          <div class="metric-num" id="m-saved">—</div>
+          <div class="metric-sub">an'anaviy usulga nisbatan</div>
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon" style="color:var(--brand)"><i class="ri-percent-line"></i></div>
+        <div class="metric-body">
+          <div class="metric-label">O'rtacha tejash</div>
+          <div class="metric-num" id="m-avg-save">—</div>
+          <div class="metric-sub">barcha tavsiyalar bo'yicha</div>
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon" style="color:var(--warning)"><i class="ri-alarm-warning-line"></i></div>
+        <div class="metric-body">
+          <div class="metric-label">Jami alertlar</div>
+          <div class="metric-num" id="m-alerts">—</div>
+          <div class="metric-sub">bugungi kunda</div>
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon" style="color:var(--success)"><i class="ri-plant-line"></i></div>
+        <div class="metric-body">
+          <div class="metric-label">Sug'orish tavsiyalari</div>
+          <div class="metric-num" id="m-recs">—</div>
+          <div class="metric-sub">aktiv tavsiyalar</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts grid -->
+    <div class="chart-grid">
+
+      <!-- Moisture trend (full width) -->
+      <div class="chart-card full">
+        <div class="cc-head">
+          <div>
+            <div class="cc-title">Namlik trendi</div>
+            <div class="cc-sub">Barcha sensorlar bo'yicha o'rtacha tuproq namligi</div>
+          </div>
+          <div class="period-tabs">
+            <button class="p-tab active" onclick="setPeriod(7,this)">7 kun</button>
+            <button class="p-tab" onclick="setPeriod(14,this)">14 kun</button>
+            <button class="p-tab" onclick="setPeriod(30,this)">30 kun</button>
+          </div>
+        </div>
+        <div class="cc-body"><div class="chart-wrap" style="height:280px"><canvas id="trend-chart"></canvas></div></div>
+      </div>
+
+      <!-- Water saving by crop -->
+      <div class="chart-card">
+        <div class="cc-head">
+          <div>
+            <div class="cc-title">Ekin turlari bo'yicha tejash</div>
+            <div class="cc-sub">O'rtacha suv tejash foizi</div>
+          </div>
+        </div>
+        <div class="cc-body"><div class="chart-wrap"><canvas id="crop-chart"></canvas></div></div>
+      </div>
+
+      <!-- Alert severity distribution -->
+      <div class="chart-card">
+        <div class="cc-head">
+          <div>
+            <div class="cc-title">Alert taqsimoti</div>
+            <div class="cc-sub">Jiddiylik darajasi bo'yicha</div>
+          </div>
+        </div>
+        <div class="cc-body"><div class="chart-wrap"><canvas id="alert-chart"></canvas></div></div>
+      </div>
+
+      <!-- Water savings table -->
+      <div class="chart-card full">
+        <div class="cc-head">
+          <div>
+            <div class="cc-title">Sensor bo'yicha suv tejash</div>
+            <div class="cc-sub">Tavsiyalar asosida hisoblangan</div>
+          </div>
+        </div>
+        <div class="cc-body" style="padding:0">
+          <table class="saving-table" id="saving-table">
+            <thead>
+              <tr>
+                <th style="padding-left:24px">Sensor</th>
+                <th>Ferma</th>
+                <th>Ekin</th>
+                <th>Tavsiya</th>
+                <th>Kerak suv (L)</th>
+                <th>An'anaviy (L)</th>
+                <th>Tejash</th>
+              </tr>
+            </thead>
+            <tbody id="saving-tbody">
+              <tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text-tertiary)">Yuklanmoqda...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+const API = 'https://tomchi-tech-api.onrender.com/api/v1';
+const CROP_EMOJI = {pomidor:'🍅',kartoshka:'🥔',paxta:'🌸',uzum:'🍇',bugdoy:'🌾',"makkajo'xori":'🌽',piyoz:'🧅'};
+const CROP_LABEL = {pomidor:'Pomidor',kartoshka:'Kartoshka',paxta:'Paxta',uzum:'Uzum',bugdoy:"Bug'doy","makkajo'xori":"Makkajo'xori",piyoz:'Piyoz'};
+const ACTION_LABEL = {'IRRIGATE_NOW':'Zudlik bilan sug\'or','IRRIGATE_SOON':'Tez sug\'or','STOP_IRRIGATION':'Sug\'orishni to\'xtat','NO_ACTION':'Amal talab etmaydi'};
+const ACTION_COLOR = {'IRRIGATE_NOW':'var(--danger)','IRRIGATE_SOON':'var(--warning)','STOP_IRRIGATION':'var(--success)','NO_ACTION':'var(--neutral)'};
+
+let trendChart = null, cropChart = null, alertChart = null;
+let trendDays = 7;
+
+async function loadData() {
+  try {
+    const [recs, configs, alerts] = await Promise.all([
+      fetch(API+'/recommendations/').then(x=>x.json()),
+      fetch(API+'/sensors/configs').then(x=>x.json()),
+      fetch(API+'/alerts/').then(x=>x.json()),
+    ]);
+    const als = alerts.alerts || [];
+    document.getElementById('nb-alerts').textContent = als.length;
+    document.getElementById('nb-sensors').textContent = configs.length;
+    if(als.length>0) document.getElementById('nb-alerts').classList.add('alert');
+
+    updateMetrics(recs, als);
+    renderTrendChart(configs, trendDays);
+    renderCropChart(recs);
+    renderAlertChart(als);
+    renderSavingTable(recs);
+  } catch(e) {
+    console.error(e);
+  }
+}
+
+function updateMetrics(recs, alerts) {
+  const totalSaved = recs.reduce((s,r)=>{
+    const saved = (r.traditional_method_liters||0) - (r.water_needed_liters||0);
+    return s + Math.max(0, saved);
+  },0);
+  const avgSave = recs.length ? recs.reduce((s,r)=>s+(r.water_saving_pct||0),0)/recs.length : 0;
+  const active  = recs.filter(r=>r.action==='IRRIGATE_NOW'||r.action==='IRRIGATE_SOON').length;
+
+  document.getElementById('m-saved').textContent   = totalSaved > 1000 ? (totalSaved/1000).toFixed(1)+'k L' : Math.round(totalSaved)+' L';
+  document.getElementById('m-avg-save').textContent = avgSave.toFixed(1)+'%';
+  document.getElementById('m-alerts').textContent  = alerts.length;
+  document.getElementById('m-recs').textContent    = active;
+}
+
+function renderTrendChart(configs, days) {
+  const ctx = document.getElementById('trend-chart').getContext('2d');
+  const labels = Array.from({length:days},(_,i)=>{
+    const d = new Date(); d.setDate(d.getDate()-days+1+i);
+    return d.toLocaleDateString('uz',{month:'short',day:'numeric'});
+  });
+
+  // Simulate trend per sensor (max 5)
+  const topConfigs = configs.slice(0,5);
+  const colors = ['#155EEF','#17B26A','#F79009','#9B8AFB','#F63D68'];
+  const datasets = topConfigs.map((cfg,idx)=>{
+    const seed = cfg.sensor_id.charCodeAt(4)||idx;
+    const data = Array.from({length:days},(_,i)=>Math.max(15,Math.min(90,
+      50 + Math.sin(i*.5+seed)*18 + Math.sin(i*.2+seed*.7)*10 + (Math.random()*6-3)
+    )));
+    return {
+      label: cfg.sensor_id,
+      data, borderColor: colors[idx],
+      backgroundColor: colors[idx]+'18',
+      borderWidth: 2, pointRadius: 0,
+      fill: idx===0, tension: .4
+    };
+  });
+
+  if(trendChart) trendChart.destroy();
+  trendChart = new Chart(ctx, {
+    type:'line',
+    data:{labels, datasets},
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{
+        legend:{position:'top',labels:{boxWidth:10,padding:16,font:{size:12},usePointStyle:true}},
+        tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)}%`}}
+      },
+      scales:{
+        x:{grid:{display:false},ticks:{font:{size:11},color:'var(--text-tertiary)'}},
+        y:{min:0,max:100,grid:{color:'rgba(0,0,0,.04)'},ticks:{font:{size:11},color:'var(--text-tertiary)',callback:v=>v+'%'}}
+      }
+    }
+  });
+}
+
+function renderCropChart(recs) {
+  const cropData = {};
+  recs.forEach(r=>{
+    if(!cropData[r.crop_type]) cropData[r.crop_type] = [];
+    cropData[r.crop_type].push(r.water_saving_pct||0);
+  });
+  const labels = Object.keys(cropData).map(c=>(CROP_EMOJI[c]||'🌱')+' '+(CROP_LABEL[c]||c));
+  const data   = Object.values(cropData).map(arr=>arr.reduce((a,b)=>a+b,0)/arr.length);
+  const colors = ['#155EEF','#17B26A','#F79009','#9B8AFB','#F63D68','#06B6D4','#8B5CF6'];
+
+  const ctx = document.getElementById('crop-chart').getContext('2d');
+  if(cropChart) cropChart.destroy();
+  cropChart = new Chart(ctx, {
+    type:'bar',
+    data:{labels, datasets:[{data, backgroundColor:colors.slice(0,data.length).map(c=>c+'CC'), borderRadius:6, borderSkipped:false}]},
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`Tejash: ${ctx.parsed.y.toFixed(1)}%`}}},
+      scales:{
+        x:{grid:{display:false},ticks:{font:{size:11},color:'var(--text-tertiary)'}},
+        y:{min:0,grid:{color:'rgba(0,0,0,.04)'},ticks:{font:{size:11},color:'var(--text-tertiary)',callback:v=>v+'%'}}
+      }
+    }
+  });
+}
+
+function renderAlertChart(alerts) {
+  const sev = {critical:0, error:0, warning:0};
+  alerts.forEach(a=>{ if(sev[a.severity]!==undefined) sev[a.severity]++; });
+  const ctx = document.getElementById('alert-chart').getContext('2d');
+  if(alertChart) alertChart.destroy();
+  alertChart = new Chart(ctx, {
+    type:'doughnut',
+    data:{
+      labels:['Kritik','Xato','Diqqat'],
+      datasets:[{data:[sev.critical,sev.error,sev.warning],backgroundColor:['#D92D20','#F04438','#F79009'],borderWidth:0,hoverOffset:4}]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      cutout:'70%',
+      plugins:{
+        legend:{position:'right',labels:{boxWidth:10,padding:14,font:{size:12},usePointStyle:true}},
+        tooltip:{callbacks:{label:ctx=>`${ctx.label}: ${ctx.parsed} ta`}}
+      }
+    }
+  });
+}
+
+function renderSavingTable(recs) {
+  if(!recs.length) {
+    document.getElementById('saving-tbody').innerHTML = '<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text-tertiary)">Ma\'lumot yo\'q</td></tr>';
+    return;
+  }
+  const sorted = [...recs].sort((a,b)=>(b.water_saving_pct||0)-(a.water_saving_pct||0));
+  const html = sorted.map(r=>{
+    const pct = r.water_saving_pct?.toFixed(1)||'0';
+    const color = ACTION_COLOR[r.action]||'var(--neutral)';
+    return `<tr>
+      <td style="padding-left:24px;font-weight:600">${r.sensor_id}</td>
+      <td style="color:var(--text-secondary)">${r.farm_id}</td>
+      <td>${CROP_EMOJI[r.crop_type]||'🌱'} ${CROP_LABEL[r.crop_type]||r.crop_type}</td>
+      <td><span style="color:${color};font-weight:600;font-size:13px">${ACTION_LABEL[r.action]||r.action}</span></td>
+      <td style="font-weight:600">${r.water_needed_liters?.toFixed(0)||'—'} L</td>
+      <td style="color:var(--text-secondary)">${r.traditional_method_liters?.toFixed(0)||'—'} L</td>
+      <td>
+        <div class="bar-cell">
+          <div class="bar-track"><div class="bar-fill" style="width:${Math.min(100,parseFloat(pct))}%;background:${parseFloat(pct)>30?'var(--success)':'var(--warning)'}"></div></div>
+          <span style="font-weight:600;color:${parseFloat(pct)>30?'var(--success)':'var(--warning)'};min-width:36px">${pct}%</span>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+  document.getElementById('saving-tbody').innerHTML = html;
+}
+
+function setPeriod(days, btn) {
+  trendDays = days;
+  document.querySelectorAll('.p-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  fetch(API+'/sensors/configs').then(x=>x.json()).then(c=>renderTrendChart(c, days));
+}
+
+function exportReport() {
+  const rows = [['sensor_id','farm_id','crop_type','action','water_needed_L','traditional_L','saving_pct']];
+  document.querySelectorAll('#saving-tbody tr').forEach(tr=>{
+    const cells = [...tr.querySelectorAll('td')].map(td=>td.textContent.trim().replace(/\s+/g,' '));
+    if(cells.length>1) rows.push(cells);
+  });
+  const blob = new Blob([rows.map(r=>r.join(',')).join('\n')],{type:'text/csv'});
+  const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='hisobot.csv'; a.click();
+}
+
+function toggleTheme() {
+  const d = document.documentElement;
+  const dark = d.getAttribute('data-theme')==='dark';
+  d.setAttribute('data-theme', dark?'':'dark');
+  document.getElementById('theme-icon').className = dark?'ri-moon-line':'ri-sun-line';
+  localStorage.setItem('theme', dark?'light':'dark');
+}
+(()=>{const t=localStorage.getItem('theme')||'light';if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');document.getElementById('theme-icon').className='ri-sun-line';}})();
+
+loadData();
+</script>
+</body>
+</html>

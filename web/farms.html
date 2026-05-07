@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Tomchi Tech — Fermalar</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+:root{
+  --bg-page:#F5F5F5;--bg-primary:#FFFFFF;--bg-primary-alt:#FAFAFA;--bg-secondary:#F9FAFB;
+  --text-primary:#181D27;--text-secondary:#414651;--text-tertiary:#535862;
+  --text-placeholder:#717680;--text-quaternary:#717680;
+  --border-primary:#D5D7DA;--border-secondary:#E9EAEB;--border-tertiary:#F5F5F5;
+  --border-brand:#2970FF;--border-brand-alt:#155EEF;
+  --brand:#155EEF;--brand-hover:#1248C7;
+  --success:#17B26A;--success-bg:#ECFDF3;--success-border:#ABEFC6;
+  --warning:#F79009;--warning-bg:#FFFAEB;--warning-border:#FEDF89;
+  --danger:#D92D20;--danger-bg:#FEF3F2;--danger-border:#FECDCA;
+  --neutral:#717680;--neutral-bg:#F9FAFB;
+  --utility-gray-50:#FAFAFA;--utility-gray-200:#E9EAEB;--utility-gray-700:#414651;
+  --brand-50:#EFF4FF;--brand-100:#D1E0FF;
+  --shadow-xs:0px 1px 2px rgba(10,13,18,0.05);
+  --shadow-sm:0px 1px 3px rgba(10,13,18,0.08),0px 1px 2px rgba(10,13,18,0.04);
+  --shadow-md:0px 4px 8px rgba(10,13,18,0.08),0px 2px 4px rgba(10,13,18,0.04);
+  --shadow-skeu-border:inset 0px 0px 0px 1px rgba(10,13,18,0.18),inset 0px -2px 0px rgba(10,13,18,0.05);
+  --shadow-icon:0px 1px 2px rgba(10,13,18,0.05);
+  --sp-xxs:2px;--sp-xs:4px;--sp-sm:6px;--sp-md:8px;--sp-lg:12px;
+  --sp-xl:16px;--sp-2xl:20px;--sp-3xl:24px;--sp-4xl:32px;
+  --r-xs:4px;--r-sm:6px;--r-md:8px;--r-lg:10px;--r-xl:12px;--r-full:9999px;
+  --text-xs-size:12px;--text-xs-lh:18px;--text-sm-size:14px;--text-sm-lh:20px;
+  --text-md-size:16px;--text-md-lh:24px;--text-lg-size:18px;--text-lg-lh:28px;
+  --text-xl-size:20px;--text-xl-lh:30px;
+  --display-xs-size:24px;--display-xs-lh:32px;--display-sm-size:30px;--display-sm-lh:38px;
+  --sidebar-w:280px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg-page);color:var(--text-primary);height:100vh;display:flex;overflow:hidden;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+i[class^="ri-"]{line-height:1}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border-secondary);border-radius:99px}
+
+.sidebar{width:var(--sidebar-w);background:var(--bg-primary);border-right:1px solid var(--border-secondary);height:100vh;display:flex;flex-direction:column;flex-shrink:0;z-index:100;overflow:hidden}
+.sb-header{display:flex;flex-direction:column;gap:var(--sp-2xl);padding:var(--sp-3xl) var(--sp-2xl)}
+.sb-logo{display:flex;align-items:center;gap:var(--sp-md)}
+.sb-logomark{width:32px;height:32px;border-radius:var(--r-md);background:linear-gradient(180deg,#2970FF 0%,#155EEF 100%);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;flex-shrink:0;box-shadow:0 1px 1px rgba(10,13,18,.13),0 1px 3px rgba(10,13,18,.1)}
+.sb-logoname{font-size:var(--text-md-size);font-weight:700;color:var(--text-primary)}
+.sb-search{display:flex;align-items:center;gap:var(--sp-md);background:var(--bg-primary);border:1px solid var(--border-tertiary);border-radius:var(--r-md);padding:var(--sp-lg) var(--sp-xl);box-shadow:var(--shadow-xs);cursor:text}
+.sb-search i{color:var(--text-placeholder);font-size:18px}
+.sb-search span{flex:1;font-size:var(--text-md-size);color:var(--text-placeholder)}
+.sb-shortcut{border:1px solid var(--border-secondary);border-radius:var(--r-xs);padding:1px 4px;font-size:var(--text-xs-size);font-weight:500;color:var(--text-quaternary)}
+.sb-nav{flex:1;overflow-y:auto;padding:0 var(--sp-xl)}
+.nav-item{display:flex;align-items:center;gap:var(--sp-md);padding:var(--sp-md) var(--sp-lg);border-radius:var(--r-sm);cursor:pointer;color:var(--text-secondary);font-size:var(--text-md-size);font-weight:500;line-height:var(--text-md-lh);transition:background .12s;width:100%;margin:1px 0;text-align:left}
+.nav-item:hover{background:var(--bg-secondary)}.nav-item.active{background:var(--bg-secondary);color:var(--text-primary)}
+.nav-icon{font-size:18px;width:20px;height:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.nav-badge{margin-left:auto;font-size:var(--text-xs-size);font-weight:500;padding:var(--sp-xxs) var(--sp-md);border-radius:var(--r-full);background:var(--utility-gray-50);border:1px solid var(--utility-gray-200);color:var(--utility-gray-700)}
+.nav-badge.alert{background:var(--danger-bg);border-color:var(--danger-border);color:var(--danger)}
+.sb-footer{border-top:1px solid var(--border-secondary);padding:var(--sp-xl);display:flex;flex-direction:column;gap:var(--sp-xs)}
+.sb-account{background:var(--bg-primary-alt);border:1px solid var(--border-secondary);border-radius:var(--r-xl);padding:var(--sp-lg);display:flex;align-items:center;gap:var(--sp-md);cursor:pointer;margin-top:var(--sp-md);transition:background .12s}
+.sb-account:hover{background:var(--bg-secondary)}
+.av-wrap{width:40px;height:40px;border-radius:var(--r-full);background:#E0E0E0;border:1px solid rgba(0,0,0,0.08);position:relative;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--text-secondary)}
+.av-online{position:absolute;bottom:-1px;right:-1px;width:10px;height:10px;border-radius:var(--r-full);background:var(--success);border:1.5px solid var(--bg-primary)}
+.av-name{font-size:var(--text-md-size);font-weight:600;color:var(--text-primary)}.av-role{font-size:var(--text-sm-size);color:var(--text-tertiary)}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.page-header{background:var(--bg-primary);border-bottom:1px solid var(--border-secondary);padding:0 var(--sp-4xl);height:68px;display:flex;align-items:center;gap:var(--sp-lg);flex-shrink:0}
+.ph-title{font-size:var(--text-xl-size);font-weight:700;flex:1}
+.ph-subtitle{font-size:var(--text-sm-size);color:var(--text-tertiary);margin-left:6px}
+.ph-search{display:flex;align-items:center;gap:var(--sp-md);background:var(--bg-primary);border:1px solid var(--border-secondary);border-radius:var(--r-md);padding:8px 14px;width:224px;box-shadow:var(--shadow-xs)}
+.ph-search:focus-within{border-color:var(--border-brand);box-shadow:0 0 0 4px rgba(41,112,255,.06)}
+.ph-search i{color:var(--text-placeholder);font-size:16px}
+.ph-search input{border:none;outline:none;background:transparent;font-family:inherit;font-size:var(--text-sm-size);color:var(--text-primary);width:100%}
+.ph-search input::placeholder{color:var(--text-placeholder)}
+.ph-btn{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:var(--r-sm);color:var(--text-secondary);font-size:18px;transition:background .12s}
+.ph-btn:hover{background:var(--bg-secondary)}
+.ph-divider{width:1px;height:24px;background:var(--border-secondary);margin:0 4px}
+.btn{display:inline-flex;align-items:center;gap:6px;font-family:inherit;font-size:var(--text-sm-size);font-weight:600;padding:8px 14px;border-radius:var(--r-md);cursor:pointer;transition:all .15s;white-space:nowrap}
+.btn i{font-size:16px}
+.btn-secondary{background:var(--bg-primary);border:1px solid var(--border-primary);color:var(--text-secondary);box-shadow:var(--shadow-xs)}
+.btn-secondary:hover{background:var(--bg-secondary)}
+.btn-primary{background:var(--brand);border:1px solid var(--border-brand-alt);color:#fff;box-shadow:var(--shadow-xs),inset 0 0 0 1px rgba(255,255,255,.12),inset 0 -2px 0 rgba(10,13,18,.08)}
+.btn-primary:hover{background:var(--brand-hover)}
+.content{flex:1;overflow-y:auto;padding:var(--sp-3xl) var(--sp-4xl);display:flex;flex-direction:column;gap:var(--sp-3xl)}
+
+/* METRICS */
+.metrics-row{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--sp-2xl)}
+.metric-card{background:var(--bg-primary);border:1px solid var(--border-secondary);border-radius:var(--r-xl);padding:var(--sp-2xl);display:flex;gap:var(--sp-xl);align-items:flex-start;box-shadow:0px 1px 1px rgba(10,13,18,0.05);transition:all .15s}
+.metric-card:hover{border-color:var(--border-primary);box-shadow:var(--shadow-sm)}
+.metric-icon{width:40px;height:40px;border-radius:var(--r-md);background:var(--bg-primary);border:1px solid var(--border-primary);box-shadow:var(--shadow-icon),var(--shadow-skeu-border);display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--text-secondary);flex-shrink:0}
+.metric-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:var(--sp-md)}
+.metric-label{font-size:var(--text-sm-size);font-weight:600;color:var(--text-tertiary)}
+.metric-num{font-size:var(--display-sm-size);font-weight:600;color:var(--text-primary)}
+
+/* TWO-PANE LAYOUT */
+.two-pane{display:grid;grid-template-columns:1fr 400px;gap:var(--sp-3xl);flex:1;min-height:0}
+
+/* MAP */
+.map-card{background:var(--bg-primary);border:1px solid var(--border-secondary);border-radius:var(--r-xl);box-shadow:0px 1px 1px rgba(10,13,18,0.05);overflow:hidden;display:flex;flex-direction:column}
+.card-head{padding:var(--sp-2xl) var(--sp-3xl);border-bottom:1px solid var(--border-secondary);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.card-title{font-size:var(--text-lg-size);font-weight:700;color:var(--text-primary)}
+.card-sub{font-size:var(--text-sm-size);color:var(--text-tertiary);margin-top:2px}
+#map{flex:1;min-height:400px}
+
+/* FARM LIST */
+.farm-list-card{background:var(--bg-primary);border:1px solid var(--border-secondary);border-radius:var(--r-xl);box-shadow:0px 1px 1px rgba(10,13,18,0.05);display:flex;flex-direction:column;overflow:hidden}
+.farm-scroll{flex:1;overflow-y:auto}
+.farm-item{padding:var(--sp-xl) var(--sp-3xl);border-bottom:1px solid var(--border-secondary);cursor:pointer;transition:background .12s}
+.farm-item:last-child{border-bottom:none}
+.farm-item:hover{background:var(--bg-secondary)}
+.farm-item.selected{background:var(--brand-50);border-left:3px solid var(--brand)}
+.farm-top{display:flex;align-items:center;gap:var(--sp-md);margin-bottom:var(--sp-md)}
+.farm-emoji{width:36px;height:36px;border-radius:var(--r-md);background:var(--bg-secondary);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.farm-name{font-size:var(--text-md-size);font-weight:600;color:var(--text-primary);flex:1}
+.farm-id{font-size:var(--text-xs-size);color:var(--text-tertiary);margin-top:1px}
+.status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.farm-stats{display:flex;gap:var(--sp-2xl)}
+.fstat{display:flex;flex-direction:column;gap:2px}
+.fstat-label{font-size:var(--text-xs-size);color:var(--text-tertiary)}
+.fstat-val{font-size:var(--text-sm-size);font-weight:600;color:var(--text-primary)}
+.crop-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:var(--r-full);background:var(--brand-50);border:1px solid var(--brand-100);font-size:var(--text-xs-size);font-weight:600;color:var(--brand)}
+
+/* SKEL */
+.skel{background:linear-gradient(90deg,var(--bg-secondary) 25%,var(--border-secondary) 50%,var(--bg-secondary) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:var(--r-md)}
+@keyframes shimmer{0%{background-position:200%}100%{background-position:-200%}}
+
+/* DARK */
+[data-theme="dark"]{
+  --bg-page:#0C0E12;--bg-primary:#161A23;--bg-primary-alt:#1C2130;--bg-secondary:#1E2436;
+  --border-primary:#2E3448;--border-secondary:#242A3A;--border-tertiary:#1A1F2E;
+  --text-primary:#F0F2F5;--text-secondary:#BCC2CE;--text-tertiary:#8B92A0;
+  --text-placeholder:#636B78;--text-quaternary:#636B78;
+  --utility-gray-50:#1C2130;--utility-gray-200:#2E3448;--utility-gray-700:#BCC2CE;
+  --brand-50:#0D1528;--brand-100:#152040;
+  --shadow-xs:0 1px 2px rgba(0,0,0,.4);--shadow-sm:0 1px 3px rgba(0,0,0,.5);--shadow-icon:0 1px 2px rgba(0,0,0,.5);
+  --shadow-skeu-border:inset 0 0 0 1px rgba(255,255,255,0.06),inset 0 -2px 0 rgba(0,0,0,.2);
+}
+[data-theme="dark"] .nav-item.active{background:#1E2436}
+[data-theme="dark"] .farm-item.selected{background:#0D1528;border-left-color:#2970FF}
+[data-theme="dark"] .leaflet-tile{filter:brightness(.6) invert(1) contrast(2) hue-rotate(200deg) saturate(.3) brightness(.7)}
+[data-theme="dark"] .leaflet-container{background:#0C0E12}
+[data-theme="dark"] .leaflet-popup-content-wrapper{background:#161A23;border:1px solid #2E3448}
+[data-theme="dark"] .leaflet-popup-tip{background:#161A23}
+@media(max-width:1280px){.metrics-row{grid-template-columns:repeat(2,1fr)}.two-pane{grid-template-columns:1fr}}
+@media(max-width:720px){.sidebar{position:fixed;left:-100%;z-index:200;transition:left .25s}.sidebar.open{left:0}.content{padding:var(--sp-xl)}}
+</style>
+</head>
+<body>
+
+<nav class="sidebar" id="sidebar">
+  <div class="sb-header">
+    <div class="sb-logo">
+      <div class="sb-logomark"><i class="ri-leaf-line"></i></div>
+      <span class="sb-logoname">Tomchi Tech</span>
+    </div>
+    <div class="sb-search"><i class="ri-search-2-line"></i><span>Qidirish</span><span class="sb-shortcut">⌘K</span></div>
+  </div>
+  <div class="sb-nav">
+    <a class="nav-item" href="dashboard.html"><span class="nav-icon"><i class="ri-dashboard-3-line"></i></span>Dashboard</a>
+    <a class="nav-item" href="sensors.html"><span class="nav-icon"><i class="ri-radar-line"></i></span>Sensorlar<span class="nav-badge" id="nb-sensors">—</span></a>
+    <a class="nav-item active" href="farms.html"><span class="nav-icon"><i class="ri-plant-line"></i></span>Fermalar</a>
+    <a class="nav-item" href="recommendations.html"><span class="nav-icon"><i class="ri-lightbulb-line"></i></span>Tavsiyalar</a>
+    <a class="nav-item" href="alerts.html"><span class="nav-icon"><i class="ri-notification-3-line"></i></span>Alertlar<span class="nav-badge alert" id="nb-alerts">0</span></a>
+    <a class="nav-item" href="reports.html"><span class="nav-icon"><i class="ri-bar-chart-2-line"></i></span>Hisobotlar</a>
+  </div>
+  <div class="sb-footer">
+    <button class="nav-item footer-item"><span class="nav-icon"><i class="ri-settings-3-line"></i></span>Sozlamalar</button>
+    <button class="nav-item footer-item"><span class="nav-icon"><i class="ri-question-line"></i></span>Yordam</button>
+    <div class="sb-account">
+      <div class="av-wrap">X<div class="av-online"></div></div>
+      <div style="flex:1;min-width:0"><div class="av-name">Xurshid I.</div><div class="av-role">Admin</div></div>
+      <button class="ph-btn" onclick="toggleTheme()" title="Mavzu"><i class="ri-moon-line" id="theme-icon"></i></button>
+    </div>
+  </div>
+</nav>
+
+<div class="main">
+  <div class="page-header">
+    <div class="ph-title">Fermalar <span class="ph-subtitle" id="ph-count"></span></div>
+    <div class="ph-search">
+      <i class="ri-search-2-line"></i>
+      <input type="text" placeholder="Fermer ismi yoki hudud..." oninput="filterFarms(this.value)"/>
+    </div>
+    <div class="ph-divider"></div>
+    <button class="ph-btn" onclick="loadData()" title="Yangilash"><i class="ri-refresh-line"></i></button>
+    <button class="btn btn-primary"><i class="ri-add-line"></i>Yangi ferma</button>
+  </div>
+
+  <div class="content">
+    <!-- Metrics -->
+    <div class="metrics-row">
+      <div class="metric-card"><div class="metric-icon"><i class="ri-plant-line"></i></div><div class="metric-body"><div class="metric-label">Jami fermalar</div><div class="metric-num" id="m-farms">—</div></div></div>
+      <div class="metric-card"><div class="metric-icon"><i class="ri-map-2-line"></i></div><div class="metric-body"><div class="metric-label">Jami maydon</div><div class="metric-num" id="m-area">—</div></div></div>
+      <div class="metric-card"><div class="metric-icon"><i class="ri-radar-line"></i></div><div class="metric-body"><div class="metric-label">Jami sensorlar</div><div class="metric-num" id="m-sensors">—</div></div></div>
+      <div class="metric-card"><div class="metric-icon"><i class="ri-wifi-line"></i></div><div class="metric-body"><div class="metric-label">Online sensorlar</div><div class="metric-num" id="m-online" style="color:var(--success)">—</div></div></div>
+    </div>
+
+    <!-- Two-pane: Map + Farm list -->
+    <div class="two-pane">
+      <!-- Map -->
+      <div class="map-card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Fermalar xaritasi</div>
+            <div class="card-sub">Barcha fermalar joylashuvi</div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <div style="display:flex;align-items:center;gap:5px;font-size:13px;color:var(--text-tertiary)"><span style="width:10px;height:10px;border-radius:50%;background:var(--success);display:inline-block"></span>Online</div>
+            <div style="display:flex;align-items:center;gap:5px;font-size:13px;color:var(--text-tertiary)"><span style="width:10px;height:10px;border-radius:50%;background:var(--danger);display:inline-block"></span>Offline</div>
+          </div>
+        </div>
+        <div id="map"></div>
+      </div>
+
+      <!-- Farm list -->
+      <div class="farm-list-card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Fermalar ro'yxati</div>
+            <div class="card-sub" id="list-count">Yuklanmoqda...</div>
+          </div>
+        </div>
+        <div class="farm-scroll" id="farm-list">
+          <div style="padding:48px;text-align:center;color:var(--text-tertiary)">
+            <div class="skel" style="width:120px;height:16px;margin:0 auto 12px"></div>
+            <div class="skel" style="width:80px;height:16px;margin:0 auto"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = 'https://tomchi-tech-api.onrender.com/api/v1';
+const CROP_EMOJI = {pomidor:'🍅',kartoshka:'🥔',paxta:'🌸',uzum:'🍇',bugdoy:'🌾',"makkajo'xori":'🌽',piyoz:'🧅'};
+const CROP_LABEL = {pomidor:'Pomidor',kartoshka:'Kartoshka',paxta:'Paxta',uzum:'Uzum',bugdoy:"Bug'doy","makkajo'xori":"Makkajo'xori",piyoz:'Piyoz'};
+
+let allFarms = [], allConfigs = [], mapInstance = null, selectedFarm = null;
+let markers = {};
+
+async function loadData() {
+  try {
+    const [farms, configs, alerts] = await Promise.all([
+      fetch(API+'/farms/').then(x=>x.json()),
+      fetch(API+'/sensors/configs').then(x=>x.json()),
+      fetch(API+'/alerts/').then(x=>x.json()),
+    ]);
+    allFarms = farms; allConfigs = configs;
+    document.getElementById('nb-alerts').textContent = alerts.alerts?.length || 0;
+    document.getElementById('nb-sensors').textContent = configs.length;
+    updateMetrics(); renderFarmList(farms); initMap(farms, configs);
+    document.getElementById('ph-count').textContent = `— ${farms.length} ta ferma`;
+  } catch(e) {
+    document.getElementById('farm-list').innerHTML = '<div style="padding:48px;text-align:center;color:var(--danger)">Server bilan ulanishda xato</div>';
+  }
+}
+
+function updateMetrics() {
+  const totalArea = allFarms.reduce((s,f)=>s+f.total_area_ha,0);
+  const totalSens = allConfigs.length;
+  const online    = allConfigs.filter(c=>c.status==='online').length;
+  document.getElementById('m-farms').textContent   = allFarms.length;
+  document.getElementById('m-area').textContent    = totalArea.toFixed(1)+' ga';
+  document.getElementById('m-sensors').textContent = totalSens;
+  document.getElementById('m-online').textContent  = online;
+}
+
+function farmStatus(farmId) {
+  const fc = allConfigs.filter(c=>c.farm_id===farmId);
+  const on = fc.filter(c=>c.status==='online').length;
+  if(!fc.length) return {cls:'warn', color:'var(--neutral)', label:'Sensor yo\'q'};
+  if(on===fc.length) return {cls:'ok', color:'var(--success)', label:'Yaxshi'};
+  if(on===0) return {cls:'err', color:'var(--danger)', label:'Offline'};
+  return {cls:'warn', color:'var(--warning)', label:`${on}/${fc.length}`};
+}
+
+function renderFarmList(farms) {
+  document.getElementById('list-count').textContent = `${farms.length} ta ferma`;
+  if(!farms.length) {
+    document.getElementById('farm-list').innerHTML = '<div style="padding:48px;text-align:center;color:var(--text-tertiary)">Fermalar topilmadi</div>';
+    return;
+  }
+  const html = farms.map(f=>{
+    const st = farmStatus(f.farm_id);
+    const fc = allConfigs.filter(c=>c.farm_id===f.farm_id);
+    return `<div class="farm-item${selectedFarm===f.farm_id?' selected':''}" onclick="selectFarm('${f.farm_id}')">
+      <div class="farm-top">
+        <div class="farm-emoji">${CROP_EMOJI[f.crop_type]||'🌱'}</div>
+        <div style="flex:1;min-width:0">
+          <div class="farm-name">${f.farmer_name}</div>
+          <div class="farm-id">${f.farm_id} · ${f.region}</div>
+        </div>
+        <span class="status-dot" style="background:${st.color}"></span>
+      </div>
+      <div class="farm-stats">
+        <div class="fstat"><div class="fstat-label">Maydon</div><div class="fstat-val">${f.total_area_ha} ga</div></div>
+        <div class="fstat"><div class="fstat-label">Sensorlar</div><div class="fstat-val">${fc.length}</div></div>
+        <div class="fstat"><div class="fstat-label">Ekin</div><div class="fstat-val">${CROP_LABEL[f.crop_type]||f.crop_type}</div></div>
+        <div class="fstat"><div class="fstat-label">Hudud</div><div class="fstat-val">${f.district}</div></div>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('farm-list').innerHTML = html;
+}
+
+function selectFarm(farmId) {
+  selectedFarm = farmId;
+  renderFarmList(allFarms.filter(f=>allFarms.includes(f)||true));
+  // fly to farm's first sensor
+  const cfg = allConfigs.find(c=>c.farm_id===farmId);
+  if(cfg && mapInstance) {
+    mapInstance.flyTo([cfg.location_lat, cfg.location_lon], 14, {duration:1.2});
+    markers[farmId]?.openPopup();
+  }
+  // re-render list to show selection
+  const items = document.querySelectorAll('.farm-item');
+  items.forEach(el=>{
+    el.classList.toggle('selected', el.getAttribute('onclick')?.includes(farmId));
+  });
+}
+
+function filterFarms(q) {
+  const term = q.toLowerCase();
+  const filtered = allFarms.filter(f=>
+    f.farmer_name.toLowerCase().includes(term)||
+    f.farm_id.toLowerCase().includes(term)||
+    f.region.toLowerCase().includes(term)
+  );
+  renderFarmList(filtered);
+}
+
+function initMap(farms, configs) {
+  if(!mapInstance) {
+    mapInstance = L.map('map');
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OSM',maxZoom:18}).addTo(mapInstance);
+  } else {
+    Object.values(markers).forEach(g=>g.forEach?g.forEach(m=>m.remove()):g.remove());
+    markers = {};
+  }
+
+  const dark = document.documentElement.getAttribute('data-theme')==='dark';
+  if(dark) document.querySelector('.leaflet-tile-pane')?.querySelectorAll('img').forEach(img=>img.style.filter='brightness(.6) invert(1) contrast(2) hue-rotate(200deg) saturate(.3) brightness(.7)');
+
+  const bounds = [];
+  farms.forEach(farm => {
+    const fc = configs.filter(c=>c.farm_id===farm.farm_id);
+    if(!fc.length) return;
+    const st = farmStatus(farm.farm_id);
+    const color = st.color.replace('var(--','').replace(')','');
+    const dotColor = st.color==='var(--success)'?'#17B26A':st.color==='var(--danger)'?'#D92D20':'#F79009';
+
+    fc.forEach(cfg=>{
+      const icon = L.divIcon({
+        className:'',
+        html:`<div style="width:14px;height:14px;border-radius:50%;background:${dotColor};border:2.5px solid white;box-shadow:0 1px 4px rgba(0,0,0,.3)"></div>`,
+        iconSize:[14,14],iconAnchor:[7,7],popupAnchor:[0,-10]
+      });
+      const m = L.marker([cfg.location_lat,cfg.location_lon],{icon}).addTo(mapInstance);
+      m.bindPopup(`<div style="font-family:Inter,sans-serif;min-width:160px">
+        <div style="font-weight:700;font-size:14px;margin-bottom:4px">${farm.farmer_name}</div>
+        <div style="font-size:12px;color:#666;margin-bottom:6px">${cfg.sensor_id} · ${CROP_EMOJI[farm.crop_type]||''} ${CROP_LABEL[farm.crop_type]||''}</div>
+        <div style="font-size:12px"><b>${farm.total_area_ha}</b> ga · <b>${fc.length}</b> sensor</div>
+      </div>`);
+      bounds.push([cfg.location_lat,cfg.location_lon]);
+      if(!markers[farm.farm_id]) markers[farm.farm_id] = m;
+    });
+  });
+
+  if(bounds.length) mapInstance.fitBounds(bounds, {padding:[30,30]});
+}
+
+function toggleTheme() {
+  const d = document.documentElement;
+  const dark = d.getAttribute('data-theme')==='dark';
+  d.setAttribute('data-theme', dark?'':'dark');
+  document.getElementById('theme-icon').className = dark?'ri-moon-line':'ri-sun-line';
+  localStorage.setItem('theme', dark?'light':'dark');
+  if(mapInstance) {
+    const tiles = document.querySelectorAll('.leaflet-tile');
+    tiles.forEach(t=>t.style.filter=dark?'':'brightness(.6) invert(1) contrast(2) hue-rotate(200deg) saturate(.3) brightness(.7)');
+  }
+}
+(()=>{const t=localStorage.getItem('theme')||'light';if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');document.getElementById('theme-icon').className='ri-sun-line';}})();
+
+loadData();
+</script>
+</body>
+</html>

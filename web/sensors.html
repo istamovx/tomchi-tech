@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Tomchi Tech — Sensorlar</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg-page:#F5F5F5; --bg-primary:#FFFFFF; --bg-primary-alt:#FAFAFA; --bg-secondary:#F9FAFB;
+  --text-primary:#181D27; --text-secondary:#414651; --text-tertiary:#535862;
+  --text-placeholder:#717680; --text-quaternary:#717680; --text-disabled:#A4A7AE;
+  --border-primary:#D5D7DA; --border-secondary:#E9EAEB; --border-tertiary:#F5F5F5;
+  --border-brand:#2970FF; --border-brand-alt:#155EEF;
+  --brand:#155EEF; --brand-hover:#1248C7;
+  --success:#17B26A; --success-bg:#ECFDF3; --success-border:#ABEFC6;
+  --warning:#F79009; --warning-bg:#FFFAEB; --warning-border:#FEDF89;
+  --danger:#D92D20; --danger-bg:#FEF3F2; --danger-border:#FECDCA;
+  --neutral:#717680; --neutral-bg:#F9FAFB;
+  --utility-gray-50:#FAFAFA; --utility-gray-200:#E9EAEB; --utility-gray-700:#414651;
+  --brand-50:#EFF4FF; --brand-100:#D1E0FF;
+  --shadow-xs:0px 1px 2px rgba(10,13,18,0.05);
+  --shadow-sm:0px 1px 3px rgba(10,13,18,0.08),0px 1px 2px rgba(10,13,18,0.04);
+  --shadow-md:0px 4px 8px rgba(10,13,18,0.08),0px 2px 4px rgba(10,13,18,0.04);
+  --shadow-skeu-border:inset 0px 0px 0px 1px rgba(10,13,18,0.18),inset 0px -2px 0px rgba(10,13,18,0.05);
+  --shadow-icon:0px 1px 2px rgba(10,13,18,0.05);
+  --sp-xxs:2px; --sp-xs:4px; --sp-sm:6px; --sp-md:8px; --sp-lg:12px;
+  --sp-xl:16px; --sp-2xl:20px; --sp-3xl:24px; --sp-4xl:32px;
+  --r-xs:4px; --r-sm:6px; --r-md:8px; --r-lg:10px; --r-xl:12px; --r-full:9999px;
+  --text-xs-size:12px; --text-xs-lh:18px; --text-sm-size:14px; --text-sm-lh:20px;
+  --text-md-size:16px; --text-md-lh:24px; --text-lg-size:18px; --text-lg-lh:28px;
+  --text-xl-size:20px; --text-xl-lh:30px;
+  --display-xs-size:24px; --display-xs-lh:32px; --display-sm-size:30px; --display-sm-lh:38px;
+  --sidebar-w:280px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg-page);color:var(--text-primary);height:100vh;display:flex;overflow:hidden;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+i[class^="ri-"]{line-height:1}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border-secondary);border-radius:99px}
+
+/* SIDEBAR */
+.sidebar{width:var(--sidebar-w);background:var(--bg-primary);border-right:1px solid var(--border-secondary);height:100vh;display:flex;flex-direction:column;flex-shrink:0;z-index:100;overflow:hidden}
+.sb-header{display:flex;flex-direction:column;gap:var(--sp-2xl);padding:var(--sp-3xl) var(--sp-2xl)}
+.sb-logo{display:flex;align-items:center;gap:var(--sp-md)}
+.sb-logomark{width:32px;height:32px;border-radius:var(--r-md);background:linear-gradient(180deg,#2970FF 0%,#155EEF 100%);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;flex-shrink:0;border:0.2px solid rgba(10,13,18,.12);box-shadow:0 1px 1px rgba(10,13,18,.13),0 1px 3px rgba(10,13,18,.1)}
+.sb-logoname{font-size:var(--text-md-size);font-weight:700;line-height:var(--text-md-lh);color:var(--text-primary)}
+.sb-search{display:flex;align-items:center;gap:var(--sp-md);background:var(--bg-primary);border:1px solid var(--border-tertiary);border-radius:var(--r-md);padding:var(--sp-lg) var(--sp-xl);box-shadow:var(--shadow-xs);cursor:text}
+.sb-search i{color:var(--text-placeholder);font-size:18px;flex-shrink:0}
+.sb-search span{flex:1;font-size:var(--text-md-size);color:var(--text-placeholder)}
+.sb-shortcut{border:1px solid var(--border-secondary);border-radius:var(--r-xs);padding:1px 4px;font-size:var(--text-xs-size);font-weight:500;color:var(--text-quaternary);line-height:var(--text-xs-lh)}
+.sb-nav{flex:1;overflow-y:auto;padding:0 var(--sp-xl)}
+.nav-item{display:flex;align-items:center;gap:var(--sp-md);padding:var(--sp-md) var(--sp-lg);border-radius:var(--r-sm);cursor:pointer;color:var(--text-secondary);font-size:var(--text-md-size);font-weight:500;line-height:var(--text-md-lh);transition:background .12s;width:100%;margin:1px 0;text-align:left}
+.nav-item:hover{background:var(--bg-secondary)}
+.nav-item.active{background:var(--bg-secondary);color:var(--text-primary)}
+.nav-icon{font-size:18px;width:20px;height:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.nav-badge{margin-left:auto;font-size:var(--text-xs-size);font-weight:500;line-height:var(--text-xs-lh);padding:var(--sp-xxs) var(--sp-md);border-radius:var(--r-full);background:var(--utility-gray-50);border:1px solid var(--utility-gray-200);color:var(--utility-gray-700)}
+.nav-badge.alert{background:var(--danger-bg);border-color:var(--danger-border);color:var(--danger)}
+.sb-footer{border-top:1px solid var(--border-secondary);padding:var(--sp-xl);display:flex;flex-direction:column;gap:var(--sp-xs)}
+.nav-item.footer-item{gap:var(--sp-md)}
+.sb-account{background:var(--bg-primary-alt);border:1px solid var(--border-secondary);border-radius:var(--r-xl);padding:var(--sp-lg);display:flex;align-items:center;gap:var(--sp-md);cursor:pointer;margin-top:var(--sp-md);transition:background .12s}
+.sb-account:hover{background:var(--bg-secondary)}
+.av-wrap{width:40px;height:40px;border-radius:var(--r-full);background:#E0E0E0;border:1px solid rgba(0,0,0,0.08);position:relative;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--text-secondary)}
+.av-online{position:absolute;bottom:-1px;right:-1px;width:10px;height:10px;border-radius:var(--r-full);background:var(--success);border:1.5px solid var(--bg-primary)}
+.av-name{font-size:var(--text-md-size);font-weight:600;line-height:var(--text-md-lh);color:var(--text-primary)}
+.av-role{font-size:var(--text-sm-size);line-height:var(--text-sm-lh);color:var(--text-tertiary)}
+
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.page-header{background:var(--bg-primary);border-bottom:1px solid var(--border-secondary);padding:0 var(--sp-4xl);height:68px;display:flex;align-items:center;gap:var(--sp-lg);flex-shrink:0}
+.ph-title{font-size:var(--text-xl-size);font-weight:700;line-height:var(--text-xl-lh);flex:1}
+.ph-subtitle{font-size:var(--text-sm-size);color:var(--text-tertiary);margin-left:6px}
+.ph-search{display:flex;align-items:center;gap:var(--sp-md);background:var(--bg-primary);border:1px solid var(--border-secondary);border-radius:var(--r-md);padding:8px 14px;width:224px;box-shadow:var(--shadow-xs);transition:border-color .15s,box-shadow .15s}
+.ph-search:focus-within{border-color:var(--border-brand);box-shadow:0 0 0 4px rgba(41,112,255,.06)}
+.ph-search i{color:var(--text-placeholder);font-size:16px}
+.ph-search input{border:none;outline:none;background:transparent;font-family:inherit;font-size:var(--text-sm-size);color:var(--text-primary);width:100%}
+.ph-search input::placeholder{color:var(--text-placeholder)}
+.ph-btn{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:var(--r-sm);color:var(--text-secondary);font-size:18px;transition:background .12s;position:relative}
+.ph-btn:hover{background:var(--bg-secondary)}
+.ph-dot{position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:var(--r-full);background:var(--danger);border:2px solid var(--bg-primary)}
+.ph-divider{width:1px;height:24px;background:var(--border-secondary);margin:0 4px}
+.btn{display:inline-flex;align-items:center;gap:6px;font-family:inherit;font-size:var(--text-sm-size);font-weight:600;line-height:var(--text-sm-lh);padding:8px 14px;border-radius:var(--r-md);cursor:pointer;transition:all .15s;white-space:nowrap}
+.btn i{font-size:16px}
+.btn-secondary{background:var(--bg-primary);border:1px solid var(--border-primary);color:var(--text-secondary);box-shadow:var(--shadow-xs)}
+.btn-secondary:hover{background:var(--bg-secondary)}
+.btn-primary{background:var(--brand);border:1px solid var(--border-brand-alt);color:#fff;box-shadow:var(--shadow-xs),inset 0 0 0 1px rgba(255,255,255,.12),inset 0 -2px 0 rgba(10,13,18,.08)}
+.btn-primary:hover{background:var(--brand-hover)}
+.ph-lang{display:flex;align-items:center;gap:5px;padding:6px 10px;border-radius:var(--r-md);border:1px solid var(--border-secondary);background:var(--bg-primary);font-size:var(--text-sm-size);font-weight:600;color:var(--text-secondary);cursor:pointer;box-shadow:var(--shadow-xs);transition:background .12s}
+.ph-lang:hover{background:var(--bg-secondary)}
+.content{flex:1;overflow-y:auto;padding:var(--sp-3xl) var(--sp-4xl);display:flex;flex-direction:column;gap:var(--sp-3xl)}
+
+/* METRIC CARDS */
+.metrics-row{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--sp-2xl)}
+.metric-card{background:var(--bg-primary);border:1px solid var(--border-secondary);border-radius:var(--r-xl);padding:var(--sp-2xl);display:flex;gap:var(--sp-xl);align-items:flex-start;box-shadow:0px 1px 1px rgba(10,13,18,0.05);transition:border-color .15s,box-shadow .15s;cursor:default}
+.metric-card:hover{border-color:var(--border-primary);box-shadow:var(--shadow-sm)}
+.metric-icon{width:40px;height:40px;border-radius:var(--r-md);background:var(--bg-primary);border:1px solid var(--border-primary);box-shadow:var(--shadow-icon),var(--shadow-skeu-border);display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--text-secondary);flex-shrink:0}
+.metric-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:var(--sp-md)}
+.metric-label{font-size:var(--text-sm-size);font-weight:600;line-height:var(--text-sm-lh);color:var(--text-tertiary)}
+.metric-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.metric-num{font-size:var(--display-sm-size);font-weight:600;line-height:var(--display-sm-lh);color:var(--text-primary);white-space:nowrap}
+.metric-change{display:inline-flex;align-items:center;gap:var(--sp-xs);background:var(--bg-primary);border:1px solid var(--border-primary);border-radius:var(--r-sm);padding:var(--sp-xxs) var(--sp-md) var(--sp-xxs) var(--sp-sm);box-shadow:0px 1px 1px rgba(10,13,18,0.05);font-size:var(--text-sm-size);font-weight:500;line-height:var(--text-sm-lh);color:var(--text-secondary);white-space:nowrap}
+.metric-change i{font-size:14px}
+.metric-change.up{color:var(--success)}
+.metric-change.down{color:var(--danger)}
+
+/* FILTER BAR */
+.filter-bar{display:flex;align-items:center;gap:var(--sp-md);flex-wrap:wrap}
+.filter-group{display:flex;align-items:center;background:var(--bg-primary);border:1px solid var(--border-secondary);border-radius:var(--r-md);overflow:hidden;box-shadow:var(--shadow-xs)}
+.f-tab{padding:7px 14px;font-size:var(--text-sm-size);font-weight:600;color:var(--text-secondary);cursor:pointer;transition:background .12s;border:none;background:none;font-family:inherit}
+.f-tab:hover{background:var(--bg-secondary)}
+.f-tab.active{background:var(--bg-secondary);color:var(--text-primary);box-shadow:inset 0 0 0 1px var(--border-secondary)}
+.f-select{padding:7px 12px;font-size:var(--text-sm-size);font-weight:500;color:var(--text-secondary);border:1px solid var(--border-secondary);border-radius:var(--r-md);background:var(--bg-primary);cursor:pointer;outline:none;box-shadow:var(--shadow-xs);font-family:inherit}
+.f-spacer{flex:1}
+
+/* TABLE */
+.table-card{background:var(--bg-primary);border:1px solid var(--border-secondary);border-radius:var(--r-xl);box-shadow:0px 1px 1px rgba(10,13,18,0.05);overflow:hidden}
+.table-title-row{display:flex;align-items:center;justify-content:space-between;padding:var(--sp-2xl) var(--sp-3xl);border-bottom:1px solid var(--border-secondary)}
+.table-title{font-size:var(--text-lg-size);font-weight:700;color:var(--text-primary)}
+.table-sub{font-size:var(--text-sm-size);color:var(--text-tertiary);margin-top:2px}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+thead th{padding:var(--sp-lg) var(--sp-xl);font-size:var(--text-xs-size);font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text-tertiary);background:var(--bg-primary-alt);border-bottom:1px solid var(--border-secondary);white-space:nowrap;text-align:left}
+thead th:first-child{padding-left:var(--sp-3xl)}
+thead th:last-child{padding-right:var(--sp-3xl)}
+tbody tr{border-bottom:1px solid var(--border-secondary);transition:background .1s;cursor:pointer}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:var(--bg-secondary)}
+tbody td{padding:var(--sp-xl);font-size:var(--text-sm-size);color:var(--text-primary);white-space:nowrap}
+tbody td:first-child{padding-left:var(--sp-3xl)}
+tbody td:last-child{padding-right:var(--sp-3xl)}
+.sensor-name{font-weight:600;font-size:var(--text-md-size);color:var(--text-primary)}
+.sensor-sub{font-size:var(--text-xs-size);color:var(--text-tertiary);margin-top:2px}
+.moist-bar{width:80px;height:6px;background:var(--border-secondary);border-radius:var(--r-full);overflow:hidden;margin-top:4px}
+.moist-fill{height:100%;border-radius:var(--r-full);transition:width .4s}
+.status-badge{display:inline-flex;align-items:center;gap:5px;font-size:var(--text-xs-size);font-weight:600;padding:3px 10px 3px 8px;border-radius:var(--r-full);border:1px solid transparent;white-space:nowrap}
+.status-badge .s-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.status-badge.ok{background:var(--success-bg);border-color:var(--success-border);color:#067647}
+.status-badge.warn{background:var(--warning-bg);border-color:var(--warning-border);color:#B54708}
+.status-badge.err{background:var(--danger-bg);border-color:var(--danger-border);color:var(--danger)}
+.bat-bar{display:inline-flex;align-items:center;gap:6px}
+.bat-icon{font-size:16px}
+.bat-low{color:var(--danger)}
+.bat-mid{color:var(--warning)}
+.bat-ok{color:var(--success)}
+.sig-bars{display:inline-flex;align-items:flex-end;gap:2px;height:14px}
+.sig-bar{width:3px;border-radius:1px;background:var(--border-secondary)}
+.sig-bar.on{background:var(--success)}
+.action-cell{display:flex;align-items:center;gap:var(--sp-xs)}
+.icon-btn{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:var(--r-sm);color:var(--text-secondary);font-size:16px;transition:background .12s;cursor:pointer;border:1px solid transparent}
+.icon-btn:hover{background:var(--bg-secondary);border-color:var(--border-secondary)}
+
+/* MODAL */
+.modal-backdrop{position:fixed;inset:0;background:rgba(10,13,18,.5);z-index:500;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(2px);opacity:0;pointer-events:none;transition:opacity .2s}
+.modal-backdrop.open{opacity:1;pointer-events:all}
+.modal{background:var(--bg-primary);border-radius:var(--r-xl);border:1px solid var(--border-secondary);box-shadow:var(--shadow-md);width:560px;max-width:calc(100vw - 32px);max-height:90vh;overflow-y:auto;transform:translateY(12px);transition:transform .2s}
+.modal-backdrop.open .modal{transform:translateY(0)}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:var(--sp-2xl) var(--sp-3xl);border-bottom:1px solid var(--border-secondary)}
+.modal-title{font-size:var(--text-lg-size);font-weight:700;color:var(--text-primary)}
+.modal-close{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:var(--r-sm);color:var(--text-tertiary);font-size:18px;cursor:pointer;transition:background .12s}
+.modal-close:hover{background:var(--bg-secondary)}
+.modal-body{padding:var(--sp-3xl)}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-xl)}
+.detail-item{display:flex;flex-direction:column;gap:4px}
+.detail-label{font-size:var(--text-xs-size);font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text-tertiary)}
+.detail-value{font-size:var(--text-md-size);font-weight:600;color:var(--text-primary)}
+.detail-divider{grid-column:1/-1;height:1px;background:var(--border-secondary);margin:4px 0}
+.mini-chart-wrap{grid-column:1/-1;height:120px;margin-top:8px}
+
+/* SKEL */
+.skel{background:linear-gradient(90deg,var(--bg-secondary) 25%,var(--border-secondary) 50%,var(--bg-secondary) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:var(--r-md)}
+@keyframes shimmer{0%{background-position:200%}100%{background-position:-200%}}
+
+/* DARK MODE */
+[data-theme="dark"]{
+  --bg-page:#0C0E12; --bg-primary:#161A23; --bg-primary-alt:#1C2130; --bg-secondary:#1E2436;
+  --border-primary:#2E3448; --border-secondary:#242A3A; --border-tertiary:#1A1F2E;
+  --border-brand:#2970FF; --text-primary:#F0F2F5; --text-secondary:#BCC2CE; --text-tertiary:#8B92A0;
+  --text-placeholder:#636B78; --text-quaternary:#636B78; --text-disabled:#454C58;
+  --success-bg:#0A1E14; --success-border:#0D3320; --warning-bg:#1A1404; --warning-border:#2E2006;
+  --danger-bg:#1A0A08; --danger-border:#2E1210; --neutral-bg:#1C2130;
+  --utility-gray-50:#1C2130; --utility-gray-200:#2E3448; --utility-gray-700:#BCC2CE;
+  --brand-50:#0D1528; --brand-100:#152040;
+  --shadow-xs:0 1px 2px rgba(0,0,0,.4); --shadow-sm:0 1px 3px rgba(0,0,0,.5),0 1px 2px rgba(0,0,0,.3);
+  --shadow-md:0 4px 8px rgba(0,0,0,.5); --shadow-icon:0 1px 2px rgba(0,0,0,.5);
+  --shadow-skeu-border:inset 0 0 0 1px rgba(255,255,255,0.06),inset 0 -2px 0 rgba(0,0,0,.2);
+}
+[data-theme="dark"] .sb-search{background:#1C2130;border-color:#2E3448}
+[data-theme="dark"] .ph-search{background:#1C2130;border-color:#2E3448}
+[data-theme="dark"] .btn-secondary{background:#1C2130;border-color:#2E3448}
+[data-theme="dark"] .f-tab{color:#BCC2CE}
+[data-theme="dark"] .f-tab.active{background:#242A3A;color:#F0F2F5}
+[data-theme="dark"] .f-select{background:#1C2130;border-color:#2E3448;color:#BCC2CE}
+[data-theme="dark"] tbody tr:hover{background:#1E2436}
+[data-theme="dark"] .nav-item.active{background:#1E2436}
+[data-theme="dark"] .modal{background:#161A23;border-color:#242A3A}
+[data-theme="dark"] .filter-group{background:#161A23;border-color:#242A3A}
+@media(max-width:1280px){.metrics-row{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:720px){.sidebar{position:fixed;left:-100%;z-index:200;transition:left .25s}.sidebar.open{left:0}.content{padding:var(--sp-xl)}}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar" id="sidebar">
+  <div class="sb-header">
+    <div class="sb-logo">
+      <div class="sb-logomark"><i class="ri-leaf-line"></i></div>
+      <span class="sb-logoname">Tomchi Tech</span>
+    </div>
+    <div class="sb-search">
+      <i class="ri-search-2-line"></i>
+      <span>Qidirish</span>
+      <span class="sb-shortcut">⌘K</span>
+    </div>
+  </div>
+  <div class="sb-nav">
+    <a class="nav-item" href="dashboard.html"><span class="nav-icon"><i class="ri-dashboard-3-line"></i></span>Dashboard</a>
+    <a class="nav-item active" href="sensors.html"><span class="nav-icon"><i class="ri-radar-line"></i></span>Sensorlar<span class="nav-badge" id="nb-sensors">—</span></a>
+    <a class="nav-item" href="farms.html"><span class="nav-icon"><i class="ri-plant-line"></i></span>Fermalar</a>
+    <a class="nav-item" href="recommendations.html"><span class="nav-icon"><i class="ri-lightbulb-line"></i></span>Tavsiyalar</a>
+    <a class="nav-item" href="alerts.html"><span class="nav-icon"><i class="ri-notification-3-line"></i></span>Alertlar<span class="nav-badge alert" id="nb-alerts">0</span></a>
+    <a class="nav-item" href="reports.html"><span class="nav-icon"><i class="ri-bar-chart-2-line"></i></span>Hisobotlar</a>
+  </div>
+  <div class="sb-footer">
+    <button class="nav-item footer-item"><span class="nav-icon"><i class="ri-settings-3-line"></i></span>Sozlamalar</button>
+    <button class="nav-item footer-item"><span class="nav-icon"><i class="ri-question-line"></i></span>Yordam</button>
+    <div class="sb-account">
+      <div class="av-wrap">X<div class="av-online"></div></div>
+      <div style="flex:1;min-width:0">
+        <div class="av-name">Xurshid I.</div>
+        <div class="av-role">Admin</div>
+      </div>
+      <button class="icon-btn" onclick="toggleTheme()" title="Mavzu"><i class="ri-moon-line" id="theme-icon"></i></button>
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="page-header">
+    <button class="ph-btn" id="menu-btn" onclick="document.getElementById('sidebar').classList.toggle('open')" style="display:none"><i class="ri-menu-line"></i></button>
+    <div class="ph-title">Sensorlar <span class="ph-subtitle" id="ph-count"></span></div>
+    <div class="ph-search">
+      <i class="ri-search-2-line"></i>
+      <input type="text" id="search-inp" placeholder="Sensor ID yoki ferma..." oninput="applyFilter()"/>
+    </div>
+    <div class="ph-divider"></div>
+    <button class="ph-btn" title="Yangilash" onclick="loadData()"><i class="ri-refresh-line"></i></button>
+    <button class="btn btn-secondary" onclick="exportCSV()"><i class="ri-download-2-line"></i>CSV</button>
+    <button class="btn btn-primary"><i class="ri-add-line"></i>Yangi sensor</button>
+  </div>
+
+  <div class="content">
+    <!-- Metric cards -->
+    <div class="metrics-row" id="metrics-row">
+      <div class="metric-card"><div class="metric-icon"><i class="ri-wifi-line"></i></div><div class="metric-body"><div class="metric-label">Online</div><div class="metric-row"><div class="metric-num skel" style="width:50px;height:36px" id="m-online">—</div></div></div></div>
+      <div class="metric-card"><div class="metric-icon"><i class="ri-wifi-off-line"></i></div><div class="metric-body"><div class="metric-label">Offline</div><div class="metric-row"><div class="metric-num skel" style="width:50px;height:36px" id="m-offline">—</div></div></div></div>
+      <div class="metric-card"><div class="metric-icon"><i class="ri-alert-line"></i></div><div class="metric-body"><div class="metric-label">Ogohlantirish</div><div class="metric-row"><div class="metric-num skel" style="width:50px;height:36px" id="m-warn">—</div></div></div></div>
+      <div class="metric-card"><div class="metric-icon"><i class="ri-drop-line"></i></div><div class="metric-body"><div class="metric-label">O'rt. namlik</div><div class="metric-row"><div class="metric-num skel" style="width:60px;height:36px" id="m-moist">—</div></div></div></div>
+    </div>
+
+    <!-- Filter bar -->
+    <div class="filter-bar">
+      <div class="filter-group">
+        <button class="f-tab active" onclick="setStatus('all',this)">Barchasi</button>
+        <button class="f-tab" onclick="setStatus('online',this)"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--success);margin-right:5px;vertical-align:middle"></span>Online</button>
+        <button class="f-tab" onclick="setStatus('offline',this)"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--neutral);margin-right:5px;vertical-align:middle"></span>Offline</button>
+        <button class="f-tab" onclick="setStatus('warning',this)"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--warning);margin-right:5px;vertical-align:middle"></span>Ogohlantirish</button>
+      </div>
+      <select class="f-select" id="crop-filter" onchange="applyFilter()">
+        <option value="">Barcha ekinlar</option>
+        <option value="pomidor">🍅 Pomidor</option>
+        <option value="kartoshka">🥔 Kartoshka</option>
+        <option value="paxta">🌸 Paxta</option>
+        <option value="uzum">🍇 Uzum</option>
+        <option value="bugdoy">🌾 Bug'doy</option>
+        <option value="makkajo'xori">🌽 Makkajo'xori</option>
+        <option value="piyoz">🧅 Piyoz</option>
+      </select>
+      <select class="f-select" id="sort-by" onchange="applyFilter()">
+        <option value="id">Saralash: ID</option>
+        <option value="moisture">Saralash: Namlik</option>
+        <option value="battery">Saralash: Batareya</option>
+        <option value="temp">Saralash: Harorat</option>
+      </select>
+      <div class="f-spacer"></div>
+      <span id="result-count" style="font-size:var(--text-sm-size);color:var(--text-tertiary);font-weight:500"></span>
+    </div>
+
+    <!-- Table -->
+    <div class="table-card">
+      <div class="table-title-row">
+        <div>
+          <div class="table-title">Sensor ma'lumotlari</div>
+          <div class="table-sub">Real vaqt rejimida yangilanadi</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-tertiary)">
+            <span style="width:8px;height:8px;border-radius:50%;background:var(--success);display:inline-block;animation:pulse 2s infinite"></span>
+            Jonli
+          </div>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Sensor / Ferma</th>
+              <th>Ekin turi</th>
+              <th>Namlik</th>
+              <th>Harorat</th>
+              <th>Namlik havoda</th>
+              <th>Batareya</th>
+              <th>Signal</th>
+              <th>Holat</th>
+              <th>Amal</th>
+            </tr>
+          </thead>
+          <tbody id="sensor-tbody">
+            <tr><td colspan="9" style="text-align:center;padding:48px;color:var(--text-tertiary)"><div style="display:flex;align-items:center;justify-content:center;gap:8px"><div class="skel" style="width:16px;height:16px;border-radius:50%"></div>Yuklanmoqda...</div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="modal-backdrop" id="modal">
+  <div class="modal" id="modal-box">
+    <div class="modal-head">
+      <div class="modal-title" id="modal-title">Sensor tafsilotlari</div>
+      <button class="modal-close" onclick="closeModal()"><i class="ri-close-line"></i></button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<style>
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
+</style>
+
+<script>
+const API = 'https://tomchi-tech-api.onrender.com/api/v1';
+const CROP_EMOJI = {pomidor:'🍅',kartoshka:'🥔',paxta:'🌸',uzum:'🍇',bugdoy:'🌾',"makkajo'xori":'🌽',piyoz:'🧅'};
+const CROP_LABEL = {pomidor:'Pomidor',kartoshka:'Kartoshka',paxta:'Paxta',uzum:'Uzum',bugdoy:"Bug'doy","makkajo'xori":"Makkajo'xori",piyoz:'Piyoz'};
+
+let allReadings = [], allConfigs = [], allAlerts = [];
+let statusFilter = 'all', miniChart = null;
+
+async function loadData() {
+  try {
+    const [r, c, al] = await Promise.all([
+      fetch(API+'/sensors/').then(x=>x.json()),
+      fetch(API+'/sensors/configs').then(x=>x.json()),
+      fetch(API+'/alerts/').then(x=>x.json()),
+    ]);
+    allReadings = r; allConfigs = c; allAlerts = al.alerts || [];
+    updateMetrics(); applyFilter();
+    document.getElementById('nb-sensors').textContent = c.length;
+    document.getElementById('nb-alerts').textContent = allAlerts.length;
+    if(allAlerts.length > 0) document.getElementById('nb-alerts').classList.add('alert');
+  } catch(e) {
+    document.getElementById('sensor-tbody').innerHTML =
+      '<tr><td colspan="9" style="text-align:center;padding:48px;color:var(--danger)"><i class="ri-error-warning-line"></i> Server bilan ulanishda xato</td></tr>';
+  }
+}
+
+function updateMetrics() {
+  const online  = allConfigs.filter(c=>c.status==='online').length;
+  const offline = allConfigs.filter(c=>c.status==='offline').length;
+  const warn    = allConfigs.filter(c=>c.status==='warning').length;
+  const moistVals = allReadings.map(r=>r.soil_moisture).filter(Boolean);
+  const avgMoist = moistVals.length ? (moistVals.reduce((a,b)=>a+b,0)/moistVals.length).toFixed(1) : '—';
+
+  function setNum(id, val, cls='') {
+    const el = document.getElementById(id);
+    el.classList.remove('skel'); el.style.width=''; el.style.height='';
+    el.textContent = val;
+    if(cls) el.style.color = cls;
+  }
+  setNum('m-online',  online,  'var(--success)');
+  setNum('m-offline', offline, offline>0?'var(--neutral)':'');
+  setNum('m-warn',    warn,    warn>0?'var(--warning)':'');
+  setNum('m-moist',   avgMoist+'%');
+  document.getElementById('ph-count').textContent = `— ${allConfigs.length} ta sensor`;
+}
+
+function setStatus(val, btn) {
+  statusFilter = val;
+  document.querySelectorAll('.f-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  applyFilter();
+}
+
+function applyFilter() {
+  const search = document.getElementById('search-inp').value.toLowerCase();
+  const crop   = document.getElementById('crop-filter').value;
+  const sortBy = document.getElementById('sort-by').value;
+
+  let rows = allConfigs.map(cfg => {
+    const r = allReadings.find(x=>x.sensor_id===cfg.sensor_id) || {};
+    return { cfg, r };
+  });
+
+  if(statusFilter !== 'all') rows = rows.filter(({cfg})=>cfg.status===statusFilter);
+  if(crop) rows = rows.filter(({cfg})=>cfg.crop_type===crop);
+  if(search) rows = rows.filter(({cfg,r})=>
+    cfg.sensor_id.toLowerCase().includes(search) ||
+    cfg.farm_id.toLowerCase().includes(search)
+  );
+
+  rows.sort((a,b)=>{
+    if(sortBy==='moisture') return (b.r.soil_moisture||0)-(a.r.soil_moisture||0);
+    if(sortBy==='battery')  return (a.r.battery_level||0)-(b.r.battery_level||0);
+    if(sortBy==='temp')     return (b.r.temperature||0)-(a.r.temperature||0);
+    return a.cfg.sensor_id.localeCompare(b.cfg.sensor_id);
+  });
+
+  document.getElementById('result-count').textContent = `${rows.length} natija`;
+  renderTable(rows);
+}
+
+function renderTable(rows) {
+  if(!rows.length) {
+    document.getElementById('sensor-tbody').innerHTML =
+      '<tr><td colspan="9" style="text-align:center;padding:48px;color:var(--text-tertiary)"><i class="ri-search-line" style="font-size:24px;display:block;margin-bottom:8px"></i>Sensor topilmadi</td></tr>';
+    return;
+  }
+
+  const html = rows.map(({cfg,r})=>{
+    const m    = r.soil_moisture ?? 0;
+    const mColor = m < 30 ? 'var(--danger)' : m < 50 ? 'var(--warning)' : 'var(--success)';
+    const bat  = r.battery_level ?? 0;
+    const batClass = bat < 20 ? 'bat-low' : bat < 50 ? 'bat-mid' : 'bat-ok';
+    const sig  = r.signal_strength ?? 0;
+    const sigLevels = [25,50,75,100];
+
+    const statusMap = {online:{cls:'ok',dot:'var(--success)',label:'Online'},offline:{cls:'err',dot:'var(--neutral)',label:'Offline'},warning:{cls:'warn',dot:'var(--warning)',label:'Ogohlantirish'}};
+    const st = statusMap[cfg.status] || statusMap.offline;
+
+    const tempColor = r.temperature > 35 ? 'color:var(--danger)' : r.temperature > 28 ? 'color:var(--warning)' : '';
+
+    return `<tr onclick="openModal('${cfg.sensor_id}')">
+      <td>
+        <div class="sensor-name">${cfg.sensor_id}</div>
+        <div class="sensor-sub"><i class="ri-plant-line"></i> ${cfg.farm_id}</div>
+      </td>
+      <td>${CROP_EMOJI[cfg.crop_type]||'🌱'} ${CROP_LABEL[cfg.crop_type]||cfg.crop_type}</td>
+      <td>
+        <div style="font-weight:600;color:${mColor}">${m.toFixed(1)}%</div>
+        <div class="moist-bar"><div class="moist-fill" style="width:${m}%;background:${mColor}"></div></div>
+        <div style="font-size:11px;color:var(--text-tertiary);margin-top:2px">Maqbul: ${cfg.irrigation_threshold}%</div>
+      </td>
+      <td><span style="font-weight:600;${tempColor}">${r.temperature?.toFixed(1)||'—'}°C</span></td>
+      <td>${r.humidity?.toFixed(1)||'—'}%</td>
+      <td>
+        <div class="bat-bar">
+          <i class="ri-battery-${bat>80?'fill':bat>50?'2':'low-line'} ${batClass}" style="font-size:18px"></i>
+          <span style="font-weight:500">${bat}%</span>
+        </div>
+      </td>
+      <td>
+        <div class="sig-bars">
+          ${sigLevels.map(lvl=>`<div class="sig-bar ${sig>=lvl?'on':''}" style="height:${lvl/7}px"></div>`).join('')}
+        </div>
+        <div style="font-size:11px;color:var(--text-tertiary)">${sig}%</div>
+      </td>
+      <td><span class="status-badge ${st.cls}"><span class="s-dot" style="background:${st.dot}"></span>${st.label}</span></td>
+      <td>
+        <div class="action-cell" onclick="event.stopPropagation()">
+          <button class="icon-btn" title="Tafsilot" onclick="openModal('${cfg.sensor_id}')"><i class="ri-eye-line"></i></button>
+          <button class="icon-btn" title="Tarix"><i class="ri-history-line"></i></button>
+          <button class="icon-btn" title="Joylashuv" onclick="openMap('${cfg.sensor_id}')"><i class="ri-map-pin-line"></i></button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('sensor-tbody').innerHTML = html;
+}
+
+async function openModal(sensorId) {
+  const cfg = allConfigs.find(c=>c.sensor_id===sensorId);
+  const r   = allReadings.find(x=>x.sensor_id===sensorId) || {};
+  if(!cfg) return;
+
+  document.getElementById('modal-title').textContent = sensorId;
+  document.getElementById('modal').classList.add('open');
+
+  const m = r.soil_moisture??0;
+  const mColor = m<30?'var(--danger)':m<50?'var(--warning)':'var(--success)';
+
+  document.getElementById('modal-body').innerHTML = `
+    <div class="detail-grid">
+      <div class="detail-item"><div class="detail-label">Farm ID</div><div class="detail-value">${cfg.farm_id}</div></div>
+      <div class="detail-item"><div class="detail-label">Ekin turi</div><div class="detail-value">${CROP_EMOJI[cfg.crop_type]||''} ${CROP_LABEL[cfg.crop_type]||cfg.crop_type}</div></div>
+      <div class="detail-item"><div class="detail-label">Namlik (tuproq)</div><div class="detail-value" style="color:${mColor}">${m.toFixed(1)}%</div></div>
+      <div class="detail-item"><div class="detail-label">Sug'orish chegarasi</div><div class="detail-value">${cfg.irrigation_threshold}%</div></div>
+      <div class="detail-item"><div class="detail-label">Harorat</div><div class="detail-value">${r.temperature?.toFixed(1)||'—'}°C</div></div>
+      <div class="detail-item"><div class="detail-label">Namlik (havo)</div><div class="detail-value">${r.humidity?.toFixed(1)||'—'}%</div></div>
+      <div class="detail-item"><div class="detail-label">Suv oqimi</div><div class="detail-value">${r.water_flow?.toFixed(2)||'—'} L/min</div></div>
+      <div class="detail-item"><div class="detail-label">Batareya</div><div class="detail-value">${r.battery_level??'—'}%</div></div>
+      <div class="detail-item"><div class="detail-label">Signal</div><div class="detail-value">${r.signal_strength??'—'}%</div></div>
+      <div class="detail-item"><div class="detail-label">Maydon</div><div class="detail-value">${cfg.field_area_ha} ga</div></div>
+      <div class="detail-divider"></div>
+      <div class="detail-item"><div class="detail-label">Kenglik</div><div class="detail-value">${cfg.location_lat?.toFixed(5)}</div></div>
+      <div class="detail-item"><div class="detail-label">Uzunlik</div><div class="detail-value">${cfg.location_lon?.toFixed(5)}</div></div>
+      <div class="detail-item"><div class="detail-label">O'rnatilgan</div><div class="detail-value">${cfg.installed_at?.slice(0,10)||'—'}</div></div>
+      <div class="detail-item"><div class="detail-label">Oxirgi yangilanish</div><div class="detail-value">${r.timestamp?.slice(11,16)||'—'}</div></div>
+      <div class="detail-divider"></div>
+      <div style="grid-column:1/-1">
+        <div class="detail-label" style="margin-bottom:8px">Namlik trendi (simulyatsiya)</div>
+        <div class="mini-chart-wrap"><canvas id="mini-chart"></canvas></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:20px">
+      <button class="btn btn-secondary" style="flex:1" onclick="closeModal()"><i class="ri-close-line"></i>Yopish</button>
+      <button class="btn btn-primary" style="flex:1"><i class="ri-line-chart-line"></i>Batafsil tarix</button>
+    </div>
+  `;
+
+  // Mini chart
+  if(miniChart) { miniChart.destroy(); miniChart=null; }
+  const ctx = document.getElementById('mini-chart');
+  if(ctx) {
+    const pts = Array.from({length:24},(_,i)=>Math.max(10,Math.min(95,m+Math.sin(i*.7+sensorId.charCodeAt(4)||0)*12+Math.random()*6-3)));
+    miniChart = new Chart(ctx, {
+      type:'line',
+      data:{labels:Array.from({length:24},(_,i)=>`${23-i}s`),datasets:[{data:pts,borderColor:'#155EEF',borderWidth:2,pointRadius:0,fill:true,backgroundColor:'rgba(21,94,239,.08)',tension:.4}]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{display:false},y:{min:0,max:100,grid:{color:'rgba(0,0,0,.04)'},ticks:{font:{size:10},callback:v=>v+'%'}}}}
+    });
+  }
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+}
+document.getElementById('modal').addEventListener('click', e=>{
+  if(e.target===document.getElementById('modal')) closeModal();
+});
+
+function openMap(sensorId) {
+  const cfg = allConfigs.find(c=>c.sensor_id===sensorId);
+  if(!cfg) return;
+  const url = `https://www.openstreetmap.org/?mlat=${cfg.location_lat}&mlon=${cfg.location_lon}#map=15/${cfg.location_lat}/${cfg.location_lon}`;
+  window.open(url,'_blank');
+}
+
+function exportCSV() {
+  const headers = ['sensor_id','farm_id','crop_type','soil_moisture','temperature','humidity','battery_level','signal_strength','status'];
+  const rows = allConfigs.map(cfg=>{
+    const r = allReadings.find(x=>x.sensor_id===cfg.sensor_id)||{};
+    return [cfg.sensor_id,cfg.farm_id,cfg.crop_type,r.soil_moisture?.toFixed(1)||'',r.temperature?.toFixed(1)||'',r.humidity?.toFixed(1)||'',r.battery_level||'',r.signal_strength||'',cfg.status].join(',');
+  });
+  const blob = new Blob([[headers.join(','),...rows].join('\n')],{type:'text/csv'});
+  const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='sensorlar.csv'; a.click();
+}
+
+function toggleTheme() {
+  const d = document.documentElement;
+  const dark = d.getAttribute('data-theme')==='dark';
+  d.setAttribute('data-theme', dark?'':'dark');
+  document.getElementById('theme-icon').className = dark?'ri-moon-line':'ri-sun-line';
+  localStorage.setItem('theme', dark?'light':'dark');
+}
+(()=>{
+  const t = localStorage.getItem('theme')||'light';
+  if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');document.getElementById('theme-icon').className='ri-sun-line';}
+})();
+
+loadData();
+setInterval(loadData, 30000);
+</script>
+</body>
+</html>

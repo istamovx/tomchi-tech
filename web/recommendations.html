@@ -40,29 +40,32 @@ i[class^="ri-"]{line-height:1;}
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:var(--border-secondary);border-radius:99px;}
 
+/* ── Sidebar backdrop (mobile) ── */
+.sidebar-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.48);z-index:150;backdrop-filter:blur(2px);}
+.sidebar-backdrop.show{display:block;}
+
 /* ── Sidebar ── */
-.sidebar{width:var(--sidebar-w);background:var(--bg-primary);border-right:1px solid var(--border-secondary);height:100vh;display:flex;flex-direction:column;flex-shrink:0;z-index:100;overflow:hidden}
-.sb-header{display:flex;flex-direction:column;gap:var(--sp-lg);padding:var(--sp-3xl) var(--sp-2xl) var(--sp-3xl);border-bottom:1px solid var(--border-secondary)}
-.sb-logo{display:flex;align-items:center;gap:var(--sp-md)}
-.sb-logomark{width:32px;height:32px;border-radius:var(--r-md);background:linear-gradient(180deg,#2970FF 0%,#155EEF 100%);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;flex-shrink:0;border:0.2px solid rgba(10,13,18,.12);box-shadow:0 1px 1px rgba(10,13,18,.13),0 1px 3px rgba(10,13,18,.1)}
-.sb-logoname{font-size:var(--text-md-size);font-weight:700;line-height:var(--text-md-lh);color:var(--text-primary)}
-.sb-group-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);padding:var(--sp-lg) var(--sp-lg) var(--sp-xs);margin-top:var(--sp-md)}
-.sb-drop-list{padding-left:var(--sp-lg);border-left:2px solid var(--border-secondary);margin:2px 0 2px var(--sp-xl)}
-.sb-arr{margin-left:auto;font-size:17px;transition:transform .2s;flex-shrink:0}
-.sb-nav{flex:1;overflow-y:auto;padding:var(--sp-xl) var(--sp-xl) 0}
-.nav-item{display:flex;align-items:center;gap:var(--sp-md);padding:var(--sp-md) var(--sp-lg);border-radius:var(--r-sm);cursor:pointer;color:var(--text-secondary);font-size:var(--text-md-size);font-weight:500;line-height:var(--text-md-lh);transition:background .12s;width:100%;margin:1px 0;text-align:left}
-.nav-item:hover{background:var(--bg-secondary)}.nav-item.active{background:var(--bg-secondary);color:var(--text-primary)}
-.nav-icon{font-size:18px;width:20px;height:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.nav-badge{margin-left:auto;font-size:var(--text-xs-size);font-weight:500;line-height:var(--text-xs-lh);padding:var(--sp-xxs) var(--sp-md);border-radius:var(--r-full);background:var(--utility-gray-50);border:1px solid var(--utility-gray-200);color:var(--utility-gray-700)}
-.nav-badge.alert{background:var(--danger-bg);border-color:var(--danger-border);color:var(--danger)}
-.sb-footer{border-top:1px solid var(--border-secondary);padding:var(--sp-xl);display:flex;flex-direction:column;gap:var(--sp-xs)}
-.nav-item.footer-item{gap:var(--sp-md)}
-.sb-account{background:var(--bg-primary-alt);border:1px solid var(--border-secondary);border-radius:var(--r-xl);padding:var(--sp-lg);display:flex;align-items:center;gap:var(--sp-md);cursor:pointer;margin-top:var(--sp-md);transition:background .12s}
-.sb-account:hover{background:var(--bg-secondary)}
-.av-wrap{width:40px;height:40px;border-radius:var(--r-full);background:#E0E0E0;border:1px solid rgba(0,0,0,0.08);position:relative;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--text-secondary)}
-.av-online{position:absolute;bottom:-1px;right:-1px;width:10px;height:10px;border-radius:var(--r-full);background:var(--success);border:1.5px solid var(--bg-primary)}
-.av-name{font-size:var(--text-md-size);font-weight:600;line-height:var(--text-md-lh);color:var(--text-primary)}
-.av-role{font-size:var(--text-sm-size);line-height:var(--text-sm-lh);color:var(--text-tertiary)}
+.sidebar{width:var(--sidebar-w);background:var(--bg-primary);border-right:1px solid var(--border-secondary);height:100vh;display:flex;flex-direction:column;flex-shrink:0;z-index:200;overflow:hidden;}
+.sb-header{display:flex;flex-direction:column;gap:var(--sp-lg);padding:var(--sp-3xl) var(--sp-2xl) var(--sp-3xl);border-bottom:1px solid var(--border-secondary);}
+.sb-logo{display:flex;align-items:center;gap:var(--sp-md);}
+.sb-logomark{width:32px;height:32px;border-radius:var(--r-md);background:linear-gradient(180deg,#2970FF 0%,#155EEF 100%);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;flex-shrink:0;border:0.2px solid rgba(10,13,18,.12);box-shadow:0 1px 1px rgba(10,13,18,.13),0 1px 3px rgba(10,13,18,.1);}
+.sb-logoname{font-size:var(--text-md-size);font-weight:700;line-height:var(--text-md-lh);color:var(--text-primary);}
+.sb-group-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);padding:var(--sp-lg) var(--sp-lg) var(--sp-xs);margin-top:var(--sp-md);}
+.sb-drop-list{padding-left:var(--sp-lg);border-left:2px solid var(--border-secondary);margin:2px 0 2px var(--sp-xl);}
+.sb-arr{margin-left:auto;font-size:17px;transition:transform .2s;flex-shrink:0;}
+.sb-nav{flex:1;overflow-y:auto;padding:var(--sp-xl) var(--sp-xl) 0;}
+.nav-item{display:flex;align-items:center;gap:var(--sp-md);padding:var(--sp-md) var(--sp-lg);border-radius:var(--r-sm);cursor:pointer;color:var(--text-secondary);font-size:var(--text-md-size);font-weight:500;line-height:var(--text-md-lh);transition:background .12s;width:100%;margin:1px 0;text-align:left;}
+.nav-item:hover{background:var(--bg-secondary);}.nav-item.active{background:var(--bg-secondary);color:var(--text-primary);}
+.nav-icon{font-size:18px;width:20px;height:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.nav-badge{margin-left:auto;font-size:var(--text-xs-size);font-weight:500;line-height:var(--text-xs-lh);padding:var(--sp-xxs) var(--sp-md);border-radius:var(--r-full);background:var(--utility-gray-50);border:1px solid var(--utility-gray-200);color:var(--utility-gray-700);}
+.nav-badge.alert{background:var(--danger-bg);border-color:var(--danger-border);color:var(--danger);}
+.sb-footer{border-top:1px solid var(--border-secondary);padding:var(--sp-xl);display:flex;flex-direction:column;gap:var(--sp-xs);}
+.sb-account{background:var(--bg-primary-alt);border:1px solid var(--border-secondary);border-radius:var(--r-xl);padding:var(--sp-lg);display:flex;align-items:center;gap:var(--sp-md);cursor:pointer;margin-top:var(--sp-md);transition:background .12s;}
+.sb-account:hover{background:var(--bg-secondary);}
+.av-wrap{width:40px;height:40px;border-radius:var(--r-full);background:#E0E0E0;border:1px solid rgba(0,0,0,0.08);position:relative;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--text-secondary);}
+.av-online{position:absolute;bottom:-1px;right:-1px;width:10px;height:10px;border-radius:var(--r-full);background:var(--success);border:1.5px solid var(--bg-primary);}
+.av-name{font-size:var(--text-md-size);font-weight:600;line-height:var(--text-md-lh);color:var(--text-primary);}
+.av-role{font-size:var(--text-sm-size);line-height:var(--text-sm-lh);color:var(--text-tertiary);}
 
 /* ── Layout ── */
 .app-layout{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;}
@@ -93,7 +96,7 @@ i[class^="ri-"]{line-height:1;}
 .filter-spacer{flex:1;}
 .sort-select{padding:var(--sp-sm) var(--sp-lg);border:1px solid var(--border-secondary);border-radius:var(--r-md);font-family:inherit;font-size:var(--text-sm-size);color:var(--text-secondary);background:var(--bg-primary);cursor:pointer;}
 
-/* ── Recommendation cards grid ── */
+/* ── Recommendation cards ── */
 .rec-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:var(--sp-xl);}
 .rec-card{background:var(--bg-primary);border:1px solid var(--border-secondary);border-radius:var(--r-xl);padding:var(--sp-2xl);box-shadow:var(--shadow-xs);display:flex;flex-direction:column;gap:var(--sp-lg);transition:box-shadow .15s;}
 .rec-card:hover{box-shadow:var(--shadow-md);}
@@ -118,7 +121,7 @@ i[class^="ri-"]{line-height:1;}
 .chip{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:var(--r-full);background:var(--bg-secondary);border:1px solid var(--border-secondary);font-size:var(--text-xs-size);color:var(--text-secondary);font-weight:500;}
 .rec-moisture-bar{width:100%;height:6px;background:var(--border-secondary);border-radius:var(--r-full);overflow:hidden;margin-top:4px;}
 .rec-moisture-fill{height:100%;border-radius:var(--r-full);}
-.rec-action-row{display:flex;gap:var(--sp-md);margin-top:var(--sp-xs);}
+.rec-action-row{display:flex;gap:var(--sp-md);margin-top:var(--sp-xs);flex-wrap:wrap;}
 .btn-sm{padding:6px 14px;border-radius:var(--r-md);font-size:var(--text-sm-size);font-weight:600;display:flex;align-items:center;gap:6px;}
 .btn-primary{background:var(--brand);color:#fff;border:1px solid var(--brand);}
 .btn-primary:hover{background:var(--brand-hover);}
@@ -127,40 +130,51 @@ i[class^="ri-"]{line-height:1;}
 .empty-state{text-align:center;padding:64px 24px;color:var(--text-tertiary);}
 .empty-state i{font-size:48px;color:var(--success);display:block;margin-bottom:12px;}
 .empty-state h3{font-size:var(--text-lg-size);font-weight:600;margin-bottom:8px;color:var(--text-secondary);}
-
-/* ── Section header ── */
 .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--sp-xl);}
 .section-title{font-size:var(--text-lg-size);font-weight:700;color:var(--text-primary);}
 .section-count{font-size:var(--text-sm-size);color:var(--text-tertiary);}
 
-/* ── Dark mode ── */
+/* ── Dark mode (CSS bug fixed: removed stray .ph-header) ── */
 [data-theme="dark"] body{background:#0C0E12;}
-[data-theme="dark"] .sidebar,.ph-header,[data-theme="dark"] .page-header,[data-theme="dark"] .stat-card,[data-theme="dark"] .rec-card,[data-theme="dark"] .ph-btn,[data-theme="dark"] .filter-tab:not(.active),[data-theme="dark"] .sort-select{background:#161A23;border-color:#2E3448;color:#C1C8D1;}
 [data-theme="dark"] .sidebar{background:#10131C;}
-[data-theme="dark"] .sb-header{border-color:#2E3448;}
-[data-theme="dark"] .sb-footer{border-color:#2E3448;}
+[data-theme="dark"] .sb-header,[data-theme="dark"] .sb-footer{border-color:#2E3448;}
 [data-theme="dark"] .sb-account{background:#1C2130;border-color:#2E3448;}
 [data-theme="dark"] .nav-item:hover,[data-theme="dark"] .nav-item.active{background:#1E2436;}
 [data-theme="dark"] .page-header{background:#10131C;border-color:#2E3448;}
 [data-theme="dark"] .ph-title{color:#F0F2F5;}
+[data-theme="dark"] .ph-btn{background:#161A23;border-color:#2E3448;color:#C1C8D1;}
+[data-theme="dark"] .stat-card{background:#161A23;border-color:#2E3448;}
 [data-theme="dark"] .stat-num,[data-theme="dark"] .section-title,[data-theme="dark"] .rec-card-title{color:#F0F2F5;}
-[data-theme="dark"] .chip{background:#1C2130;border-color:#2E3448;}
+[data-theme="dark"] .rec-card{background:#161A23;border-color:#2E3448;}
+[data-theme="dark"] .chip{background:#1C2130;border-color:#2E3448;color:#C1C8D1;}
 [data-theme="dark"] .rec-moisture-bar{background:#2E3448;}
-[data-theme="dark"] .sb-group-label{color:#636B78;}
-[data-theme="dark"] .sb-drop-list{border-color:#2E3448;}
+[data-theme="dark"] .filter-tab:not(.active){background:#161A23;border-color:#2E3448;color:#C1C8D1;}
+[data-theme="dark"] .sort-select{background:#161A23;border-color:#2E3448;color:#C1C8D1;}
 [data-theme="dark"] .filter-tab.active{background:var(--brand);}
 [data-theme="dark"] .btn-outline{background:#1C2130;border-color:#2E3448;color:#C1C8D1;}
+[data-theme="dark"] .sb-group-label{color:#636B78;}
+[data-theme="dark"] .sb-drop-list{border-color:#2E3448;}
 
+@keyframes spin{to{transform:rotate(360deg)}}
 @media(max-width:900px){
-  :root{--sidebar-w:240px;}
-  .sidebar{position:fixed;left:-100%;z-index:200;transition:left .25s;}
+  :root{--sidebar-w:260px;}
+  .sidebar{position:fixed;left:-100%;transition:left .25s;}
   .sidebar.open{left:0;}
   .stats-row{grid-template-columns:repeat(2,1fr);}
   .rec-grid{grid-template-columns:1fr;}
+  .main-content{padding:var(--sp-xl);}
+  .page-header{padding:0 var(--sp-xl);}
+}
+@media(max-width:480px){
+  .stats-row{grid-template-columns:1fr 1fr;}
+  .filter-row{gap:var(--sp-sm);}
+  .filter-tab{padding:var(--sp-xs) var(--sp-lg);font-size:12px;}
 }
 </style>
 </head>
 <body>
+
+<div class="sidebar-backdrop" id="sb-backdrop" onclick="closeSidebar()"></div>
 
 <!-- ── Sidebar ── -->
 <nav class="sidebar" id="sidebar">
@@ -202,7 +216,7 @@ i[class^="ri-"]{line-height:1;}
 <!-- ── Main ── -->
 <div class="app-layout">
   <header class="page-header">
-    <button class="ph-btn" onclick="document.getElementById('sidebar').classList.toggle('open')" id="menu-btn" style="display:none"><i class="ri-menu-line"></i></button>
+    <button class="ph-btn" onclick="toggleSidebar()" id="menu-btn" style="display:none"><i class="ri-menu-line"></i></button>
     <div style="flex:1">
       <span class="ph-title">Tavsiyalar</span>
       <span class="ph-subtitle" style="margin-left:8px">— sug'orish bo'yicha tavsiyalar</span>
@@ -219,7 +233,6 @@ i[class^="ri-"]{line-height:1;}
   </header>
 
   <div class="main-content">
-
     <!-- Stats -->
     <div class="stats-row" id="stats-row">
       <div class="stat-card">
@@ -289,61 +302,104 @@ i[class^="ri-"]{line-height:1;}
         </div>
       </div>
     </div>
-
-  </div><!-- /main-content -->
+  </div>
 </div>
 
-<style>
-@keyframes spin{to{transform:rotate(360deg)}}
-</style>
 <script>
-const API = 'https://tomchi-tech-api.vercel.app/api';
-const CROP_EMOJI = {pomidor:'🍅',kartoshka:'🥔',paxta:'🌿',uzum:'🍇',bugdoy:'🌾',"makkajo'xori":'🌽',piyoz:'🧅'};
-const ACTION_MAP = {
+/* ── Dummy data (API o'rniga) ── */
+const CROP_EMOJI={pomidor:'🍅',kartoshka:'🥔',paxta:'🌿',uzum:'🍇',bugdoy:'🌾',"makkajo'xori":'🌽',piyoz:'🧅'};
+const ACTION_MAP={
   IRRIGATE_NOW:    {cls:'err',  icon:'ri-alarm-warning-fill', iconCol:'var(--danger)',  lbl:"Darhol sug'or", cardCls:'urgent'},
   IRRIGATE_SOON:   {cls:'warn', icon:'ri-time-line',          iconCol:'var(--warning)', lbl:"Tez sug'or",    cardCls:'warn'},
   STOP_IRRIGATION: {cls:'off',  icon:'ri-stop-circle-line',   iconCol:'var(--neutral)', lbl:"To'xtat",       cardCls:'ok'},
   NO_ACTION:       {cls:'ok',   icon:'ri-check-double-line',  iconCol:'var(--success)', lbl:"Yaxshi holat",  cardCls:'ok'},
 };
-const PRI = {IRRIGATE_NOW:0,IRRIGATE_SOON:1,STOP_IRRIGATION:2,NO_ACTION:3};
+const PRI={IRRIGATE_NOW:0,IRRIGATE_SOON:1,STOP_IRRIGATION:2,NO_ACTION:3};
 
-let _allRecs = [], _filter = 'all', _sort = 'priority';
+const DUMMY_RECS=[
+  {sensor_id:'SNS-003-012',farm_id:'FARM-003',crop_type:'pomidor',action:'IRRIGATE_NOW',current_moisture:14.3,
+   message:"Tuproq namligi kritik darajada past (14.3%). Darhol tomchilatib sug'orish zarur — har kechiktirish ekin hosildorligiga zarar yetkazadi.",
+   water_needed_liters:4800,water_saving_pct:22.5,next_irrigation_time:new Date(Date.now()+2*3600000).toISOString()},
+  {sensor_id:'SNS-008-004',farm_id:'FARM-008',crop_type:'paxta',action:'IRRIGATE_NOW',current_moisture:18.7,
+   message:"Paxta o'simliklarida suv tanqisligi belgilari kuzatilmoqda. 6 soat ichida sug'orish boshlash tavsiya etiladi.",
+   water_needed_liters:6200,water_saving_pct:18.3,next_irrigation_time:new Date(Date.now()+6*3600000).toISOString()},
+  {sensor_id:'SNS-015-007',farm_id:'FARM-015',crop_type:'bugdoy',action:'IRRIGATE_SOON',current_moisture:32.1,
+   message:"Bug'doy maydonida namlik pasaymoqda. 1-2 kun ichida sug'orish rejalashtiring. Tejash imkoniyati mavjud.",
+   water_needed_liters:3100,water_saving_pct:31.2,next_irrigation_time:new Date(Date.now()+24*3600000).toISOString()},
+  {sensor_id:'SNS-009-003',farm_id:'FARM-009',crop_type:'uzum',action:'IRRIGATE_SOON',current_moisture:36.8,
+   message:"Uzum tokida namlik me'yor chegarasiga yaqinlashmoqda. Ertaga sug'orish rejalashtirilsin.",
+   water_needed_liters:2400,water_saving_pct:28.7,next_irrigation_time:new Date(Date.now()+36*3600000).toISOString()},
+  {sensor_id:'SNS-022-005',farm_id:'FARM-022',crop_type:'kartoshka',action:'IRRIGATE_SOON',current_moisture:38.4,
+   message:"Kartoshka o'simliklarida namlik me'yor darajasining pastki chegarasida. 2 kun ichida sug'orish zarur.",
+   water_needed_liters:2800,water_saving_pct:24.1,next_irrigation_time:new Date(Date.now()+48*3600000).toISOString()},
+  {sensor_id:'SNS-002-009',farm_id:'FARM-002',crop_type:'pomidor',action:'STOP_IRRIGATION',current_moisture:75.2,
+   message:"Tuproq namligi optimal darajada (75.2%). Sug'orishni to'xtatish va ortiqcha namlanishdan saqlash tavsiya etiladi.",
+   water_needed_liters:0,water_saving_pct:42.0,next_irrigation_time:new Date(Date.now()+72*3600000).toISOString()},
+  {sensor_id:'SNS-011-006',farm_id:'FARM-011',crop_type:'uzum',action:'NO_ACTION',current_moisture:58.6,
+   message:"Namlik darajasi optimal (58.6%). Hozircha hech qanday aralashuv talab etilmaydi. Kuzatuvni davom ettiring.",
+   water_needed_liters:0,water_saving_pct:35.5,next_irrigation_time:new Date(Date.now()+96*3600000).toISOString()},
+  {sensor_id:'SNS-017-002',farm_id:'FARM-017',crop_type:"makkajo'xori",action:'NO_ACTION',current_moisture:61.3,
+   message:"Makkajo'xori maydonida namlik me'yorda (61.3%). Tizim optimal rejimda ishlayapti.",
+   water_needed_liters:0,water_saving_pct:29.8,next_irrigation_time:new Date(Date.now()+120*3600000).toISOString()},
+  {sensor_id:'SNS-026-001',farm_id:'FARM-026',crop_type:'piyoz',action:'IRRIGATE_SOON',current_moisture:34.5,
+   message:"Piyoz maydonida namlik pasaymoqda. Harorat ko'tarilishi hisobga olinsa, 24 soat ichida sug'orish zarur.",
+   water_needed_liters:1900,water_saving_pct:26.4,next_irrigation_time:new Date(Date.now()+20*3600000).toISOString()},
+];
 
-function toggleSbDrop(btn) {
-  const list = document.getElementById('quick-nav');
-  const arr  = document.getElementById('sb-arr');
-  const open = list.style.display !== 'none';
-  list.style.display = open ? 'none' : 'block';
-  if (arr) arr.style.transform = open ? '' : 'rotate(180deg)';
+const DUMMY_CONFIGS=[
+  {sensor_id:'SNS-001-001',status:'online'},{sensor_id:'SNS-002-001',status:'online'},
+  {sensor_id:'SNS-003-001',status:'warning'},{sensor_id:'SNS-008-001',status:'warning'},
+  {sensor_id:'SNS-009-001',status:'online'},{sensor_id:'SNS-011-001',status:'online'},
+  {sensor_id:'SNS-015-001',status:'warning'},{sensor_id:'SNS-017-001',status:'online'},
+  {sensor_id:'SNS-022-001',status:'online'},{sensor_id:'SNS-026-001',status:'online'},
+];
+
+let _allRecs=[], _filter='all', _sort='priority';
+
+function toggleSidebar(){
+  const sb=document.getElementById('sidebar');
+  const bd=document.getElementById('sb-backdrop');
+  const open=sb.classList.toggle('open');
+  bd.classList.toggle('show',open);
 }
-
-function setFilter(f, btn) {
-  _filter = f;
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sb-backdrop').classList.remove('show');
+}
+function toggleSbDrop(btn){
+  const list=document.getElementById('quick-nav');
+  const arr=document.getElementById('sb-arr');
+  const open=list.style.display!=='none';
+  list.style.display=open?'none':'block';
+  if(arr) arr.style.transform=open?'':'rotate(180deg)';
+}
+function setFilter(f,btn){
+  _filter=f;
   document.querySelectorAll('.filter-tab').forEach(t=>t.classList.remove('active'));
   btn.classList.add('active');
   renderCards();
 }
-function setSortOrder(v) { _sort = v; renderCards(); }
-
-function getFiltered() {
-  let recs = _filter === 'all' ? _allRecs : _allRecs.filter(r=>r.action===_filter);
-  if (_sort==='priority')      recs = [...recs].sort((a,b)=>(PRI[a.action]||3)-(PRI[b.action]||3));
-  else if(_sort==='moisture_asc')  recs = [...recs].sort((a,b)=>a.current_moisture-b.current_moisture);
-  else if(_sort==='moisture_desc') recs = [...recs].sort((a,b)=>b.current_moisture-a.current_moisture);
-  else if(_sort==='saving_desc')   recs = [...recs].sort((a,b)=>b.water_saving_pct-a.water_saving_pct);
+function setSortOrder(v){_sort=v;renderCards();}
+function getFiltered(){
+  let recs=_filter==='all'?_allRecs:_allRecs.filter(r=>r.action===_filter);
+  if(_sort==='priority') recs=[...recs].sort((a,b)=>(PRI[a.action]||3)-(PRI[b.action]||3));
+  else if(_sort==='moisture_asc') recs=[...recs].sort((a,b)=>a.current_moisture-b.current_moisture);
+  else if(_sort==='moisture_desc') recs=[...recs].sort((a,b)=>b.current_moisture-a.current_moisture);
+  else if(_sort==='saving_desc') recs=[...recs].sort((a,b)=>b.water_saving_pct-a.water_saving_pct);
   return recs;
 }
-
-function renderCards() {
-  const recs = getFiltered();
-  document.getElementById('rec-count').textContent = recs.length + ' ta tavsiya';
-  if (!recs.length) {
-    document.getElementById('rec-grid').innerHTML = `<div class="rec-card" style="grid-column:1/-1"><div class="empty-state"><i class="ri-checkbox-circle-line"></i><h3>Bu filtrdagi tavsiyalar yo'q</h3><p>Boshqa filterni tanlang</p></div></div>`;
+function renderCards(){
+  const recs=getFiltered();
+  document.getElementById('rec-count').textContent=recs.length+' ta tavsiya';
+  if(!recs.length){
+    document.getElementById('rec-grid').innerHTML=`<div class="rec-card" style="grid-column:1/-1"><div class="empty-state"><i class="ri-checkbox-circle-line"></i><h3>Bu filtrdagi tavsiyalar yo'q</h3><p>Boshqa filterni tanlang</p></div></div>`;
     return;
   }
-  document.getElementById('rec-grid').innerHTML = recs.map(r=>{
-    const m = ACTION_MAP[r.action]||ACTION_MAP.NO_ACTION;
-    const mc = r.current_moisture < 30 ? 'var(--danger)' : r.current_moisture < 45 ? 'var(--warning)' : 'var(--success)';
+  document.getElementById('rec-grid').innerHTML=recs.map(r=>{
+    const m=ACTION_MAP[r.action]||ACTION_MAP.NO_ACTION;
+    const mc=r.current_moisture<30?'var(--danger)':r.current_moisture<45?'var(--warning)':'var(--success)';
+    const nextDate=r.next_irrigation_time?`<span class="chip"><i class="ri-calendar-line"></i> ${new Date(r.next_irrigation_time).toLocaleDateString('uz-UZ',{day:'numeric',month:'short'})}</span>`:'';
+    const waterChip=r.water_needed_liters>0?`<span class="chip"><i class="ri-drop-line"></i> ${r.water_needed_liters.toLocaleString()} L kerak</span>`:`<span class="chip"><i class="ri-drop-line"></i> Suv kerak emas</span>`;
     return `<div class="rec-card ${m.cardCls}">
       <div class="rec-card-head">
         <div class="rec-card-icon ${m.cls}"><i class="${m.icon}" style="color:${m.iconCol}"></i></div>
@@ -357,83 +413,63 @@ function renderCards() {
       <div class="rec-moisture-bar"><div class="rec-moisture-fill" style="width:${r.current_moisture.toFixed(0)}%;background:${mc}"></div></div>
       <p class="rec-msg">${r.message}</p>
       <div class="rec-chips">
-        <span class="chip"><i class="ri-drop-line"></i> ${r.water_needed_liters.toLocaleString()} L kerak</span>
+        ${waterChip}
         <span class="chip"><i class="ri-recycle-line"></i> ${r.water_saving_pct.toFixed(1)}% tejash</span>
-        ${r.next_irrigation_time ? `<span class="chip"><i class="ri-calendar-line"></i> ${new Date(r.next_irrigation_time).toLocaleDateString('uz-UZ',{day:'numeric',month:'short'})}</span>` : ''}
+        ${nextDate}
       </div>
       <div class="rec-action-row">
         ${r.action==='IRRIGATE_NOW'||r.action==='IRRIGATE_SOON'
-          ? `<button class="btn-sm btn-primary"><i class="ri-drop-fill"></i> Sug'orishni boshlash</button>`
-          : `<button class="btn-sm btn-outline"><i class="ri-check-line"></i> Ko'rib chiqildi</button>`}
+          ?`<button class="btn-sm btn-primary"><i class="ri-drop-fill"></i> Sug'orishni boshlash</button>`
+          :`<button class="btn-sm btn-outline"><i class="ri-check-line"></i> Ko'rib chiqildi</button>`}
         <button class="btn-sm btn-outline"><i class="ri-information-line"></i> Batafsil</button>
       </div>
     </div>`;
   }).join('');
 }
-
-async function loadData() {
-  const icon = document.getElementById('refresh-icon');
-  icon.style.animation = 'spin 1s linear infinite';
-  try {
-    const [recs, configs, alerts] = await Promise.all([
-      fetch(`${API}/recommendations/`).then(r=>r.json()),
-      fetch(`${API}/sensors/configs`).then(r=>r.json()),
-      fetch(`${API}/alerts/`).then(r=>r.json()),
-    ]);
-    _allRecs = recs;
-    const alertArr = alerts.alerts||[];
-
-    // Stats
-    const now   = recs.filter(r=>r.action==='IRRIGATE_NOW').length;
-    const soon  = recs.filter(r=>r.action==='IRRIGATE_SOON').length;
-    const avgSave = recs.length ? recs.reduce((s,r)=>s+r.water_saving_pct,0)/recs.length : 0;
-    document.getElementById('st-total').textContent   = recs.length;
-    document.getElementById('st-total-sub').textContent = `Jami ${configs.length} sensordan`;
-    document.getElementById('st-urgent').textContent  = now;
-    document.getElementById('st-soon').textContent    = soon;
-    document.getElementById('st-saving').textContent  = avgSave.toFixed(1)+'%';
-
-    // Filter counts
-    document.getElementById('fc-all').textContent  = recs.length;
-    document.getElementById('fc-now').textContent  = now;
-    document.getElementById('fc-soon').textContent = soon;
-    document.getElementById('fc-stop').textContent = recs.filter(r=>r.action==='STOP_IRRIGATION').length;
-    document.getElementById('fc-ok').textContent   = recs.filter(r=>r.action==='NO_ACTION').length;
-
-    // Alerts badge
-    document.getElementById('nb-alerts').textContent = alertArr.length||'0';
-    document.getElementById('nb-sensors').textContent = configs.filter(c=>c.status==='online').length;
-    if (alertArr.length>0) document.getElementById('notif-dot').style.display='block';
-
-    // Quick-nav (sensor dropdown)
-    const sorted = [...configs].sort((a,b)=>{const o=['online','warning','offline'];return o.indexOf(a.status)-o.indexOf(b.status);});
-    document.getElementById('quick-nav').innerHTML = sorted.slice(0,6).map(cfg=>{
-      const color = cfg.status==='offline'?'var(--neutral)':cfg.status==='warning'?'var(--warning)':'var(--success)';
+function loadData(){
+  const icon=document.getElementById('refresh-icon');
+  icon.style.animation='spin 1s linear infinite';
+  setTimeout(()=>{
+    _allRecs=DUMMY_RECS;
+    const configs=DUMMY_CONFIGS;
+    const now=_allRecs.filter(r=>r.action==='IRRIGATE_NOW').length;
+    const soon=_allRecs.filter(r=>r.action==='IRRIGATE_SOON').length;
+    const avgSave=_allRecs.length?_allRecs.reduce((s,r)=>s+r.water_saving_pct,0)/_allRecs.length:0;
+    const online=configs.filter(c=>c.status==='online').length;
+    document.getElementById('st-total').textContent=_allRecs.length;
+    document.getElementById('st-total-sub').textContent='Jami '+configs.length+' sensordan';
+    document.getElementById('st-urgent').textContent=now;
+    document.getElementById('st-soon').textContent=soon;
+    document.getElementById('st-saving').textContent=avgSave.toFixed(1)+'%';
+    document.getElementById('fc-all').textContent=_allRecs.length;
+    document.getElementById('fc-now').textContent=now;
+    document.getElementById('fc-soon').textContent=soon;
+    document.getElementById('fc-stop').textContent=_allRecs.filter(r=>r.action==='STOP_IRRIGATION').length;
+    document.getElementById('fc-ok').textContent=_allRecs.filter(r=>r.action==='NO_ACTION').length;
+    document.getElementById('nb-alerts').textContent=3;
+    document.getElementById('nb-sensors').textContent=online;
+    document.getElementById('notif-dot').style.display='block';
+    const sorted=[...configs].sort((a,b)=>{const o=['online','warning','offline'];return o.indexOf(a.status)-o.indexOf(b.status);});
+    document.getElementById('quick-nav').innerHTML=sorted.slice(0,6).map(cfg=>{
+      const color=cfg.status==='offline'?'var(--neutral)':cfg.status==='warning'?'var(--warning)':'var(--success)';
       return `<button class="nav-item" style="font-size:12px;padding:6px 8px"><span class="nav-icon" style="color:${color};font-size:14px"><i class="ri-radio-button-line"></i></span>${cfg.sensor_id}</button>`;
     }).join('');
-
     renderCards();
-  } catch(e) {
-    console.error(e);
-    document.getElementById('rec-grid').innerHTML = `<div class="rec-card" style="grid-column:1/-1"><div class="empty-state"><i class="ri-wifi-off-line" style="color:var(--danger)"></i><h3>API bilan ulanishda xatolik</h3><p style="font-size:13px">${e.message}</p></div></div>`;
-  } finally {
-    icon.style.animation = '';
-  }
+    icon.style.animation='';
+  },350);
 }
-
-function isDark() { return document.documentElement.getAttribute('data-theme')==='dark'; }
-function toggleTheme() {
-  const d = isDark();
-  document.documentElement.setAttribute('data-theme', d?'light':'dark');
-  document.getElementById('theme-icon').className = d?'ri-moon-line':'ri-sun-line';
-  localStorage.setItem('theme', d?'light':'dark');
+function isDark(){return document.documentElement.getAttribute('data-theme')==='dark';}
+function toggleTheme(){
+  const d=isDark();
+  document.documentElement.setAttribute('data-theme',d?'light':'dark');
+  document.getElementById('theme-icon').className=d?'ri-moon-line':'ri-sun-line';
+  localStorage.setItem('theme',d?'light':'dark');
 }
 (()=>{
-  const t = localStorage.getItem('theme')||'light';
+  const t=localStorage.getItem('theme')||'light';
   if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');document.getElementById('theme-icon').className='ri-sun-line';}
   if(window.innerWidth<900) document.getElementById('menu-btn').style.display='flex';
 })();
-
 loadData();
 </script>
 </body>

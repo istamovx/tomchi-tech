@@ -40,29 +40,32 @@ i[class^="ri-"]{line-height:1;}
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:var(--border-secondary);border-radius:99px;}
 
+/* ── Sidebar backdrop (mobile) ── */
+.sidebar-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.48);z-index:150;backdrop-filter:blur(2px);}
+.sidebar-backdrop.show{display:block;}
+
 /* ── Sidebar ── */
-.sidebar{width:var(--sidebar-w);background:var(--bg-primary);border-right:1px solid var(--border-secondary);height:100vh;display:flex;flex-direction:column;flex-shrink:0;z-index:100;overflow:hidden}
-.sb-header{display:flex;flex-direction:column;gap:var(--sp-lg);padding:var(--sp-3xl) var(--sp-2xl) var(--sp-3xl);border-bottom:1px solid var(--border-secondary)}
-.sb-logo{display:flex;align-items:center;gap:var(--sp-md)}
-.sb-logomark{width:32px;height:32px;border-radius:var(--r-md);background:linear-gradient(180deg,#2970FF 0%,#155EEF 100%);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;flex-shrink:0;border:0.2px solid rgba(10,13,18,.12);box-shadow:0 1px 1px rgba(10,13,18,.13),0 1px 3px rgba(10,13,18,.1)}
-.sb-logoname{font-size:var(--text-md-size);font-weight:700;line-height:var(--text-md-lh);color:var(--text-primary)}
-.sb-group-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);padding:var(--sp-lg) var(--sp-lg) var(--sp-xs);margin-top:var(--sp-md)}
-.sb-drop-list{padding-left:var(--sp-lg);border-left:2px solid var(--border-secondary);margin:2px 0 2px var(--sp-xl)}
-.sb-arr{margin-left:auto;font-size:17px;transition:transform .2s;flex-shrink:0}
-.sb-nav{flex:1;overflow-y:auto;padding:var(--sp-xl) var(--sp-xl) 0}
-.nav-item{display:flex;align-items:center;gap:var(--sp-md);padding:var(--sp-md) var(--sp-lg);border-radius:var(--r-sm);cursor:pointer;color:var(--text-secondary);font-size:var(--text-md-size);font-weight:500;line-height:var(--text-md-lh);transition:background .12s;width:100%;margin:1px 0;text-align:left}
-.nav-item:hover{background:var(--bg-secondary)}.nav-item.active{background:var(--bg-secondary);color:var(--text-primary)}
-.nav-icon{font-size:18px;width:20px;height:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.nav-badge{margin-left:auto;font-size:var(--text-xs-size);font-weight:500;line-height:var(--text-xs-lh);padding:var(--sp-xxs) var(--sp-md);border-radius:var(--r-full);background:var(--utility-gray-50);border:1px solid var(--utility-gray-200);color:var(--utility-gray-700)}
-.nav-badge.alert{background:var(--danger-bg);border-color:var(--danger-border);color:var(--danger)}
-.sb-footer{border-top:1px solid var(--border-secondary);padding:var(--sp-xl);display:flex;flex-direction:column;gap:var(--sp-xs)}
-.nav-item.footer-item{gap:var(--sp-md)}
-.sb-account{background:var(--bg-primary-alt);border:1px solid var(--border-secondary);border-radius:var(--r-xl);padding:var(--sp-lg);display:flex;align-items:center;gap:var(--sp-md);cursor:pointer;margin-top:var(--sp-md);transition:background .12s}
-.sb-account:hover{background:var(--bg-secondary)}
-.av-wrap{width:40px;height:40px;border-radius:var(--r-full);background:#E0E0E0;border:1px solid rgba(0,0,0,0.08);position:relative;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--text-secondary)}
-.av-online{position:absolute;bottom:-1px;right:-1px;width:10px;height:10px;border-radius:var(--r-full);background:var(--success);border:1.5px solid var(--bg-primary)}
-.av-name{font-size:var(--text-md-size);font-weight:600;line-height:var(--text-md-lh);color:var(--text-primary)}
-.av-role{font-size:var(--text-sm-size);line-height:var(--text-sm-lh);color:var(--text-tertiary)}
+.sidebar{width:var(--sidebar-w);background:var(--bg-primary);border-right:1px solid var(--border-secondary);height:100vh;display:flex;flex-direction:column;flex-shrink:0;z-index:200;overflow:hidden;}
+.sb-header{display:flex;flex-direction:column;gap:var(--sp-lg);padding:var(--sp-3xl) var(--sp-2xl) var(--sp-3xl);border-bottom:1px solid var(--border-secondary);}
+.sb-logo{display:flex;align-items:center;gap:var(--sp-md);}
+.sb-logomark{width:32px;height:32px;border-radius:var(--r-md);background:linear-gradient(180deg,#2970FF 0%,#155EEF 100%);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;flex-shrink:0;border:0.2px solid rgba(10,13,18,.12);box-shadow:0 1px 1px rgba(10,13,18,.13),0 1px 3px rgba(10,13,18,.1);}
+.sb-logoname{font-size:var(--text-md-size);font-weight:700;line-height:var(--text-md-lh);color:var(--text-primary);}
+.sb-group-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);padding:var(--sp-lg) var(--sp-lg) var(--sp-xs);margin-top:var(--sp-md);}
+.sb-drop-list{padding-left:var(--sp-lg);border-left:2px solid var(--border-secondary);margin:2px 0 2px var(--sp-xl);}
+.sb-arr{margin-left:auto;font-size:17px;transition:transform .2s;flex-shrink:0;}
+.sb-nav{flex:1;overflow-y:auto;padding:var(--sp-xl) var(--sp-xl) 0;}
+.nav-item{display:flex;align-items:center;gap:var(--sp-md);padding:var(--sp-md) var(--sp-lg);border-radius:var(--r-sm);cursor:pointer;color:var(--text-secondary);font-size:var(--text-md-size);font-weight:500;line-height:var(--text-md-lh);transition:background .12s;width:100%;margin:1px 0;text-align:left;}
+.nav-item:hover{background:var(--bg-secondary);}.nav-item.active{background:var(--bg-secondary);color:var(--text-primary);}
+.nav-icon{font-size:18px;width:20px;height:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.nav-badge{margin-left:auto;font-size:var(--text-xs-size);font-weight:500;line-height:var(--text-xs-lh);padding:var(--sp-xxs) var(--sp-md);border-radius:var(--r-full);background:var(--utility-gray-50);border:1px solid var(--utility-gray-200);color:var(--utility-gray-700);}
+.nav-badge.alert{background:var(--danger-bg);border-color:var(--danger-border);color:var(--danger);}
+.sb-footer{border-top:1px solid var(--border-secondary);padding:var(--sp-xl);display:flex;flex-direction:column;gap:var(--sp-xs);}
+.sb-account{background:var(--bg-primary-alt);border:1px solid var(--border-secondary);border-radius:var(--r-xl);padding:var(--sp-lg);display:flex;align-items:center;gap:var(--sp-md);cursor:pointer;margin-top:var(--sp-md);transition:background .12s;}
+.sb-account:hover{background:var(--bg-secondary);}
+.av-wrap{width:40px;height:40px;border-radius:var(--r-full);background:#E0E0E0;border:1px solid rgba(0,0,0,0.08);position:relative;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--text-secondary);}
+.av-online{position:absolute;bottom:-1px;right:-1px;width:10px;height:10px;border-radius:var(--r-full);background:var(--success);border:1.5px solid var(--bg-primary);}
+.av-name{font-size:var(--text-md-size);font-weight:600;line-height:var(--text-md-lh);color:var(--text-primary);}
+.av-role{font-size:var(--text-sm-size);line-height:var(--text-sm-lh);color:var(--text-tertiary);}
 
 /* ── Layout ── */
 .app-layout{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;}
@@ -117,17 +120,14 @@ i[class^="ri-"]{line-height:1;}
 .badge.info{background:var(--brand-50);border-color:var(--brand-100);color:var(--brand);}
 .meta-chip{font-size:var(--text-xs-size);color:var(--text-tertiary);display:flex;align-items:center;gap:4px;}
 .alert-time{font-size:var(--text-xs-size);color:var(--text-tertiary);margin-left:auto;white-space:nowrap;flex-shrink:0;align-self:flex-start;}
-.alert-actions{display:flex;gap:var(--sp-sm);margin-top:var(--sp-lg);}
+.alert-actions{display:flex;gap:var(--sp-sm);margin-top:var(--sp-lg);flex-wrap:wrap;}
 .btn-sm{padding:6px 14px;border-radius:var(--r-md);font-size:var(--text-sm-size);font-weight:600;display:flex;align-items:center;gap:6px;}
 .btn-danger{background:var(--danger);color:#fff;border:1px solid var(--danger);}
 .btn-danger:hover{background:#B42318;}
 .btn-outline{background:var(--bg-primary);color:var(--text-secondary);border:1px solid var(--border-secondary);}
 .btn-outline:hover{background:var(--bg-secondary);}
-
-/* ── Pulse animation for critical ── */
 @keyframes pulse-red{0%,100%{box-shadow:0 0 0 0 rgba(217,45,32,.4);}50%{box-shadow:0 0 0 8px rgba(217,45,32,0);}}
 .pulse{animation:pulse-red 2s infinite;}
-
 .empty-state{text-align:center;padding:64px 24px;color:var(--text-tertiary);}
 .empty-state i{font-size:48px;color:var(--success);display:block;margin-bottom:12px;}
 .empty-state h3{font-size:var(--text-lg-size);font-weight:600;margin-bottom:8px;color:var(--text-secondary);}
@@ -154,15 +154,25 @@ i[class^="ri-"]{line-height:1;}
 
 @keyframes spin{to{transform:rotate(360deg)}}
 @media(max-width:900px){
-  :root{--sidebar-w:240px;}
-  .sidebar{position:fixed;left:-100%;z-index:200;transition:left .25s;}
+  :root{--sidebar-w:260px;}
+  .sidebar{position:fixed;left:-100%;transition:left .25s;}
   .sidebar.open{left:0;}
   .stats-row{grid-template-columns:repeat(2,1fr);}
   .alert-card{flex-direction:column;}
+  .alert-time{margin-left:0;}
+  .main-content{padding:var(--sp-xl);}
+  .page-header{padding:0 var(--sp-xl);}
+}
+@media(max-width:480px){
+  .stats-row{grid-template-columns:1fr 1fr;}
+  .filter-row{gap:var(--sp-sm);}
+  .filter-tab{padding:var(--sp-xs) var(--sp-lg);font-size:12px;}
 }
 </style>
 </head>
 <body>
+
+<div class="sidebar-backdrop" id="sb-backdrop" onclick="closeSidebar()"></div>
 
 <!-- ── Sidebar ── -->
 <nav class="sidebar" id="sidebar">
@@ -204,7 +214,7 @@ i[class^="ri-"]{line-height:1;}
 <!-- ── Main ── -->
 <div class="app-layout">
   <header class="page-header">
-    <button class="ph-btn" onclick="document.getElementById('sidebar').classList.toggle('open')" id="menu-btn" style="display:none"><i class="ri-menu-line"></i></button>
+    <button class="ph-btn" onclick="toggleSidebar()" id="menu-btn" style="display:none"><i class="ri-menu-line"></i></button>
     <div style="flex:1">
       <span class="ph-title">Alertlar</span>
       <span class="ph-subtitle" style="margin-left:8px">— faol ogohlantirishlar va muammolar</span>
@@ -288,75 +298,128 @@ i[class^="ri-"]{line-height:1;}
 </div>
 
 <script>
-const API = 'https://tomchi-tech-api.vercel.app/api';
+/* ── Dummy data (API o'rniga) ── */
+const DUMMY_ALERTS = [
+  {
+    severity:'critical', message:"Namlik kritik darajaga tushdi",
+    description:"FARM-003 fermasida SNS-003-012 sensorida namlik 14.3% ga tushib ketdi. Zudlik bilan sug'orish zarur — har kechiktirish ekin hosildorligiga zarar yetkazadi.",
+    sensor_id:'SNS-003-012', farm_id:'FARM-003', value:14.3,
+    at:new Date(Date.now()-8*60000).toISOString()
+  },
+  {
+    severity:'critical', message:"Sensor aloqasi uzildi",
+    description:"SNS-007-005 sensori 45 daqiqadan beri javob bermayapti. Tarmoq yoki qurilma muammosi bo'lishi mumkin. Tekshirib ko'ring.",
+    sensor_id:'SNS-007-005', farm_id:'FARM-007', value:null,
+    at:new Date(Date.now()-45*60000).toISOString()
+  },
+  {
+    severity:'error', message:"Harorat haddan tashqari yuqori",
+    description:"FARM-015 fermadagi tuproq harorati 42°C dan oshdi. Yuqori harorat ekin ildizlariga zarar yetkazishi mumkin. Soyalatish yoki qo'shimcha sug'orish tavsiya etiladi.",
+    sensor_id:'SNS-015-003', farm_id:'FARM-015', value:19.2,
+    at:new Date(Date.now()-90*60000).toISOString()
+  },
+  {
+    severity:'warning', message:"Namlik pasayish tendensiyasi",
+    description:"FARM-009 fermadagi namlik so'nggi 6 soat ichida 58% dan 37% ga tushdi. Agar tendensiya davom etsa, 12 soat ichida kritik chegaraga yetishi mumkin.",
+    sensor_id:'SNS-009-008', farm_id:'FARM-009', value:37.4,
+    at:new Date(Date.now()-3*3600000).toISOString()
+  },
+  {
+    severity:'warning', message:"Batareya zaryadi past",
+    description:"SNS-021-001 sensorining batareya zaryadi 12% ga tushdi. Batareyani zudlik bilan almashtiring yoki quvvat manbai ulang.",
+    sensor_id:'SNS-021-001', farm_id:'FARM-021', value:null,
+    at:new Date(Date.now()-5*3600000).toISOString()
+  },
+  {
+    severity:'warning', message:"Suv sarfi me'yordan oshdi",
+    description:"FARM-004 fermadagi suv sarfi oxirgi haftaga nisbatan 34% ga oshdi. Quvurda sizish bo'lishi yoki sensor noto'g'ri ishlayotgan bo'lishi mumkin.",
+    sensor_id:'SNS-004-002', farm_id:'FARM-004', value:28.1,
+    at:new Date(Date.now()-8*3600000).toISOString()
+  },
+  {
+    severity:'info', message:"Yangi sensor muvaffaqiyatli ulandi",
+    description:"FARM-011 fermasiga SNS-011-019 yangi sensori ulandi va ma'lumot yuborishni boshladi. Namlik: 52.7%. Holat: Yaxshi.",
+    sensor_id:'SNS-011-019', farm_id:'FARM-011', value:52.7,
+    at:new Date(Date.now()-12*3600000).toISOString()
+  },
+  {
+    severity:'info', message:"Sug'orish avtomatik to'xtatildi",
+    description:"FARM-002 fermasida namlik 75% ga yetganligi sababli avtomatik sug'orish to'xtatildi. Tejash: 240 litr suv. Keyingi sug'orish: 3 kundan so'ng.",
+    sensor_id:'SNS-002-007', farm_id:'FARM-002', value:75.2,
+    at:new Date(Date.now()-24*3600000).toISOString()
+  },
+];
+const DUMMY_CONFIGS = [
+  {sensor_id:'SNS-001-001',status:'online'},{sensor_id:'SNS-002-001',status:'online'},
+  {sensor_id:'SNS-003-001',status:'warning'},{sensor_id:'SNS-004-001',status:'online'},
+  {sensor_id:'SNS-007-001',status:'offline'},{sensor_id:'SNS-009-001',status:'warning'},
+  {sensor_id:'SNS-011-001',status:'online'},{sensor_id:'SNS-015-001',status:'warning'},
+  {sensor_id:'SNS-021-001',status:'online'},{sensor_id:'SNS-025-001',status:'online'},
+  {sensor_id:'SNS-028-001',status:'online'},{sensor_id:'SNS-031-001',status:'offline'},
+];
+
 const SEV_MAP = {
-  critical: {cls:'err',  cardCls:'crit',      iconCls:'crit', icon:'ri-alarm-warning-fill', lbl:'Kritik'},
-  error:    {cls:'err',  cardCls:'crit',      iconCls:'crit', icon:'ri-error-warning-fill', lbl:'Xato'},
-  warning:  {cls:'warn', cardCls:'warn-card', iconCls:'warn', icon:'ri-alert-fill',          lbl:'Diqqat'},
-  info:     {cls:'info', cardCls:'',          iconCls:'info', icon:'ri-information-fill',    lbl:'Xabar'},
+  critical:{cls:'err',  cardCls:'crit',     iconCls:'crit',icon:'ri-alarm-warning-fill', lbl:'Kritik'},
+  error:   {cls:'err',  cardCls:'crit',     iconCls:'crit',icon:'ri-error-warning-fill', lbl:'Xato'},
+  warning: {cls:'warn', cardCls:'warn-card',iconCls:'warn',icon:'ri-alert-fill',          lbl:'Diqqat'},
+  info:    {cls:'info', cardCls:'',         iconCls:'info',icon:'ri-information-fill',    lbl:'Xabar'},
 };
 const SEV_PRI = {critical:0,error:1,warning:2,info:3};
+let _allAlerts=[], _filter='all', _sort='time_desc';
 
-let _allAlerts = [], _filter = 'all', _sort = 'time_desc';
-
-function toggleSbDrop(btn) {
-  const list = document.getElementById('quick-nav');
-  const arr  = document.getElementById('sb-arr');
-  const open = list.style.display !== 'none';
-  list.style.display = open ? 'none' : 'block';
-  if (arr) arr.style.transform = open ? '' : 'rotate(180deg)';
+function toggleSidebar(){
+  const sb=document.getElementById('sidebar');
+  const bd=document.getElementById('sb-backdrop');
+  const open=sb.classList.toggle('open');
+  bd.classList.toggle('show',open);
 }
-
-function setFilter(f, btn) {
-  _filter = f;
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sb-backdrop').classList.remove('show');
+}
+function toggleSbDrop(btn){
+  const list=document.getElementById('quick-nav');
+  const arr=document.getElementById('sb-arr');
+  const open=list.style.display!=='none';
+  list.style.display=open?'none':'block';
+  if(arr) arr.style.transform=open?'':'rotate(180deg)';
+}
+function setFilter(f,btn){
+  _filter=f;
   document.querySelectorAll('.filter-tab').forEach(t=>t.classList.remove('active'));
   btn.classList.add('active');
   renderAlerts();
 }
-function setSortOrder(v) { _sort = v; renderAlerts(); }
-
-function getFiltered() {
-  let arr = _filter === 'all' ? _allAlerts : _allAlerts.filter(a=>a.severity===_filter);
-  if (_sort==='time_desc') arr = [...arr].sort((a,b)=>new Date(b.at)-new Date(a.at));
-  else if(_sort==='time_asc') arr = [...arr].sort((a,b)=>new Date(a.at)-new Date(b.at));
-  else if(_sort==='severity')  arr = [...arr].sort((a,b)=>(SEV_PRI[a.severity]||3)-(SEV_PRI[b.severity]||3));
+function setSortOrder(v){_sort=v;renderAlerts();}
+function getFiltered(){
+  let arr=_filter==='all'?_allAlerts:_allAlerts.filter(a=>a.severity===_filter);
+  if(_sort==='time_desc') arr=[...arr].sort((a,b)=>new Date(b.at)-new Date(a.at));
+  else if(_sort==='time_asc') arr=[...arr].sort((a,b)=>new Date(a.at)-new Date(b.at));
+  else if(_sort==='severity') arr=[...arr].sort((a,b)=>(SEV_PRI[a.severity]||3)-(SEV_PRI[b.severity]||3));
   return arr;
 }
-
-function formatTime(dt) {
-  const d = new Date(dt);
-  const now = new Date();
-  const diff = Math.floor((now-d)/1000);
-  if (diff < 60)  return diff + ' soniya oldin';
-  if (diff < 3600) return Math.floor(diff/60) + ' daqiqa oldin';
-  if (diff < 86400) return Math.floor(diff/3600) + ' soat oldin';
+function formatTime(dt){
+  const d=new Date(dt),now=new Date(),diff=Math.floor((now-d)/1000);
+  if(diff<60) return diff+' soniya oldin';
+  if(diff<3600) return Math.floor(diff/60)+' daqiqa oldin';
+  if(diff<86400) return Math.floor(diff/3600)+' soat oldin';
   return d.toLocaleDateString('uz-UZ',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
 }
-
-function renderAlerts() {
-  const alerts = getFiltered();
-  document.getElementById('alert-count').textContent = alerts.length + ' ta alert';
-  if (!alerts.length) {
-    document.getElementById('alert-list').innerHTML = `
-      <div class="alert-card">
-        <div class="empty-state" style="width:100%">
-          <i class="ri-checkbox-circle-line"></i>
-          <h3>Alertlar yo'q!</h3>
-          <p>Hamma sensor yaxshi ishlayapti 🎉</p>
-        </div>
-      </div>`;
+function renderAlerts(){
+  const alerts=getFiltered();
+  document.getElementById('alert-count').textContent=alerts.length+' ta alert';
+  if(!alerts.length){
+    document.getElementById('alert-list').innerHTML=`<div class="alert-card"><div class="empty-state" style="width:100%"><i class="ri-checkbox-circle-line"></i><h3>Alertlar yo'q!</h3><p>Hamma sensor yaxshi ishlayapti 🎉</p></div></div>`;
     return;
   }
-  document.getElementById('alert-list').innerHTML = alerts.map(a=>{
-    const s = SEV_MAP[a.severity]||SEV_MAP.warning;
-    const isCrit = a.severity==='critical'||a.severity==='error';
+  document.getElementById('alert-list').innerHTML=alerts.map(a=>{
+    const s=SEV_MAP[a.severity]||SEV_MAP.warning;
+    const isCrit=a.severity==='critical'||a.severity==='error';
     return `<div class="alert-card ${s.cardCls}">
-      <div class="alert-icon-wrap ${s.iconCls} ${isCrit?'pulse':''}">
-        <i class="${s.icon}"></i>
-      </div>
+      <div class="alert-icon-wrap ${s.iconCls} ${isCrit?'pulse':''}"><i class="${s.icon}"></i></div>
       <div class="alert-body">
         <div class="alert-title">${a.message}</div>
-        <div class="alert-desc">${a.description||getSeverityDesc(a)}</div>
+        <div class="alert-desc">${a.description||''}</div>
         <div class="alert-meta">
           <span class="badge ${s.cls}"><i class="${s.icon}"></i>${s.lbl}</span>
           <span class="meta-chip"><i class="ri-radar-line"></i>${a.sensor_id}</span>
@@ -365,9 +428,7 @@ function renderAlerts() {
           <span class="alert-time"><i class="ri-time-line"></i> ${formatTime(a.at)}</span>
         </div>
         <div class="alert-actions">
-          ${isCrit
-            ? `<button class="btn-sm btn-danger"><i class="ri-alarm-warning-line"></i> Darhol muolaja</button>`
-            : `<button class="btn-sm btn-outline"><i class="ri-eye-line"></i> Ko'rib chiqish</button>`}
+          ${isCrit?`<button class="btn-sm btn-danger"><i class="ri-alarm-warning-line"></i> Darhol muolaja</button>`:`<button class="btn-sm btn-outline"><i class="ri-eye-line"></i> Ko'rib chiqish</button>`}
           <button class="btn-sm btn-outline"><i class="ri-checkbox-circle-line"></i> Hal qilindi</button>
           <button class="btn-sm btn-outline"><i class="ri-arrow-right-s-line"></i> Batafsil</button>
         </div>
@@ -375,72 +436,47 @@ function renderAlerts() {
     </div>`;
   }).join('');
 }
-
-function getSeverityDesc(a) {
-  if (a.severity==='critical') return `Sensor ${a.sensor_id} da namlik kritik darajaga tushib ketdi. Zudlik bilan sug'orish tavsiya etiladi.`;
-  if (a.severity==='warning')  return `Sensor ${a.sensor_id} da namlik pasayish tendensiyasi kuzatilmoqda. Kuzatuv zarur.`;
-  return `${a.sensor_id} sensori da muammo aniqlandi.`;
-}
-
-async function loadData() {
-  const icon = document.getElementById('refresh-icon');
-  icon.style.animation = 'spin 1s linear infinite';
-  try {
-    const [alertsData, configs] = await Promise.all([
-      fetch(`${API}/alerts/`).then(r=>r.json()),
-      fetch(`${API}/sensors/configs`).then(r=>r.json()),
-    ]);
-    _allAlerts = alertsData.alerts||[];
-
-    // Stats
-    const crit = _allAlerts.filter(a=>a.severity==='critical'||a.severity==='error').length;
-    const warn = _allAlerts.filter(a=>a.severity==='warning').length;
-    const online = configs.filter(c=>c.status==='online').length;
-    document.getElementById('st-total').textContent      = _allAlerts.length;
-    document.getElementById('st-total-sub').textContent  = `${configs.length} sensordan`;
-    document.getElementById('st-crit').textContent       = crit;
-    document.getElementById('st-warn').textContent       = warn;
-    document.getElementById('st-online').textContent     = online;
-
-    // Filter counts
-    document.getElementById('fc-all').textContent  = _allAlerts.length;
-    document.getElementById('fc-crit').textContent = _allAlerts.filter(a=>a.severity==='critical').length;
-    document.getElementById('fc-err').textContent  = _allAlerts.filter(a=>a.severity==='error').length;
-    document.getElementById('fc-warn').textContent = warn;
-
-    // Sidebar badges
-    document.getElementById('nb-alerts').textContent  = _allAlerts.length||'0';
-    document.getElementById('nb-sensors').textContent = online;
-
-    // Quick-nav dropdown
-    const sorted = [...configs].sort((a,b)=>{const o=['online','warning','offline'];return o.indexOf(a.status)-o.indexOf(b.status);});
-    document.getElementById('quick-nav').innerHTML = sorted.slice(0,6).map(cfg=>{
-      const color = cfg.status==='offline'?'var(--neutral)':cfg.status==='warning'?'var(--warning)':'var(--success)';
+function loadData(){
+  const icon=document.getElementById('refresh-icon');
+  icon.style.animation='spin 1s linear infinite';
+  setTimeout(()=>{
+    _allAlerts=DUMMY_ALERTS;
+    const configs=DUMMY_CONFIGS;
+    const crit=_allAlerts.filter(a=>a.severity==='critical'||a.severity==='error').length;
+    const warn=_allAlerts.filter(a=>a.severity==='warning').length;
+    const online=configs.filter(c=>c.status==='online').length;
+    document.getElementById('st-total').textContent=_allAlerts.length;
+    document.getElementById('st-total-sub').textContent=configs.length+' sensordan';
+    document.getElementById('st-crit').textContent=crit;
+    document.getElementById('st-warn').textContent=warn;
+    document.getElementById('st-online').textContent=online;
+    document.getElementById('fc-all').textContent=_allAlerts.length;
+    document.getElementById('fc-crit').textContent=_allAlerts.filter(a=>a.severity==='critical').length;
+    document.getElementById('fc-err').textContent=_allAlerts.filter(a=>a.severity==='error').length;
+    document.getElementById('fc-warn').textContent=warn;
+    document.getElementById('nb-alerts').textContent=_allAlerts.length;
+    document.getElementById('nb-sensors').textContent=online;
+    const sorted=[...configs].sort((a,b)=>{const o=['online','warning','offline'];return o.indexOf(a.status)-o.indexOf(b.status);});
+    document.getElementById('quick-nav').innerHTML=sorted.slice(0,6).map(cfg=>{
+      const color=cfg.status==='offline'?'var(--neutral)':cfg.status==='warning'?'var(--warning)':'var(--success)';
       return `<button class="nav-item" style="font-size:12px;padding:6px 8px"><span class="nav-icon" style="color:${color};font-size:14px"><i class="ri-radio-button-line"></i></span>${cfg.sensor_id}</button>`;
     }).join('');
-
     renderAlerts();
-  } catch(e) {
-    console.error(e);
-    document.getElementById('alert-list').innerHTML = `<div class="alert-card"><div class="empty-state" style="width:100%"><i class="ri-wifi-off-line" style="font-size:40px;color:var(--danger)"></i><h3>API bilan ulanishda xatolik</h3><p style="font-size:13px">${e.message}</p></div></div>`;
-  } finally {
-    icon.style.animation = '';
-  }
+    icon.style.animation='';
+  },350);
 }
-
-function isDark() { return document.documentElement.getAttribute('data-theme')==='dark'; }
-function toggleTheme() {
-  const d = isDark();
-  document.documentElement.setAttribute('data-theme', d?'light':'dark');
-  document.getElementById('theme-icon').className = d?'ri-moon-line':'ri-sun-line';
-  localStorage.setItem('theme', d?'light':'dark');
+function isDark(){return document.documentElement.getAttribute('data-theme')==='dark';}
+function toggleTheme(){
+  const d=isDark();
+  document.documentElement.setAttribute('data-theme',d?'light':'dark');
+  document.getElementById('theme-icon').className=d?'ri-moon-line':'ri-sun-line';
+  localStorage.setItem('theme',d?'light':'dark');
 }
 (()=>{
-  const t = localStorage.getItem('theme')||'light';
+  const t=localStorage.getItem('theme')||'light';
   if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');document.getElementById('theme-icon').className='ri-sun-line';}
   if(window.innerWidth<900) document.getElementById('menu-btn').style.display='flex';
 })();
-
 loadData();
 </script>
 </body>

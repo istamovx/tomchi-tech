@@ -148,13 +148,17 @@ i[class^="ri-"]{line-height:1}
 [data-theme="dark"] .leaflet-popup-content-wrapper{background:#161A23;border:1px solid #2E3448}
 [data-theme="dark"] .leaflet-popup-tip{background:#161A23}
 @media(max-width:1280px){.metrics-row{grid-template-columns:repeat(2,1fr)}.two-pane{grid-template-columns:1fr}}
-@media(max-width:720px){.sidebar{position:fixed;left:-100%;z-index:200;transition:left .25s}.sidebar.open{left:0}.content{padding:var(--sp-xl)}}
+.sidebar-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.48);z-index:150;backdrop-filter:blur(2px);}
+.sidebar-backdrop.show{display:block;}
+@media(max-width:1280px){.metrics-row{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:900px){.two-pane{grid-template-columns:1fr}.sidebar{position:fixed;left:-100%;z-index:200;transition:left .25s}.sidebar.open{left:0}.content{padding:var(--sp-xl)}.ph-menu-btn{display:flex!important}}
 .leaflet-tooltip.alert-tip{background:#FEF3F2;border:1px solid #FECDCA;color:#D92D20;font-weight:600;font-size:12px;padding:6px 10px;border-radius:6px;box-shadow:0 2px 8px rgba(217,45,32,.15)}
 @keyframes alertPulse{0%,100%{opacity:.6;r:var(--pr)}50%{opacity:.2;r:calc(var(--pr)*1.15)}}
 </style>
 </head>
 <body>
 
+<div class="sidebar-backdrop" id="sb-backdrop" onclick="closeSidebar()"></div>
 <nav class="sidebar" id="sidebar">
   <div class="sb-header">
     <div class="sb-logo">
@@ -192,6 +196,7 @@ i[class^="ri-"]{line-height:1}
 
 <div class="main">
   <div class="page-header">
+    <button class="ph-btn ph-menu-btn" onclick="toggleSidebar()" style="display:none;margin-right:4px"><i class="ri-menu-line"></i></button>
     <div class="ph-title">Fermalar <span class="ph-subtitle" id="ph-count"></span></div>
     <div class="ph-search">
       <i class="ri-search-2-line"></i>
@@ -548,9 +553,68 @@ function buildFarms(sensors) {
 
 /* ═══ App state ══════════════════════════════════════════════════════ */
 let allFarms = [], allSensors = [], mapInstance = null, clusterGroup = null;
-let selectedFarm = null, markers = {};
+let selectedFarm = null, markers = {}, farmPolygonLayer = null;
+
+/* ═══ Farm boundary polygon helpers ════════════════════════════════ */
+function farmCentroid(farm){
+  const ss=farm.sensors;
+  if(!ss||!ss.length) return null;
+  const lat=ss.reduce((s,x)=>s+x.lat,0)/ss.length;
+  const lon=ss.reduce((s,x)=>s+x.lon,0)/ss.length;
+  return [lat,lon];
+}
+function areaToPolygon(lat,lon,ha){
+  /* irregular pentagon approximation for farm boundary */
+  const side=Math.sqrt(ha*10000);
+  const dLat=side*0.50/111000;
+  const dLon=side*0.62/(111000*Math.cos(lat*Math.PI/180));
+  return [
+    [lat+dLat*0.9,  lon-dLon*0.5],
+    [lat+dLat*0.4,  lon+dLon],
+    [lat-dLat*0.3,  lon+dLon*0.85],
+    [lat-dLat,      lon+dLon*0.1],
+    [lat-dLat*0.6,  lon-dLon],
+    [lat+dLat*0.2,  lon-dLon*0.9],
+  ];
+}
+function updateFarmPolygons(){
+  if(!mapInstance) return;
+  const zoom=mapInstance.getZoom();
+  if(farmPolygonLayer){ mapInstance.removeLayer(farmPolygonLayer); farmPolygonLayer=null; }
+  if(zoom<13) return;
+  const bounds=mapInstance.getBounds().pad(0.3);
+  farmPolygonLayer=L.featureGroup();
+  allFarms.forEach(f=>{
+    const c=farmCentroid(f);
+    if(!c||!bounds.contains(L.latLng(c[0],c[1]))) return;
+    const st=farmStatus(f.farm_id);
+    const col=st.color.includes('danger')?'#D92D20':st.color.includes('warning')?'#F79009':'#17B26A';
+    const poly=L.polygon(areaToPolygon(c[0],c[1],f.total_area_ha),{
+      color:col,weight:2,opacity:0.85,fillColor:col,fillOpacity:0.13,dashArray:'5 4'
+    });
+    poly.bindTooltip(
+      `<b>${CROP_EMOJI[f.crop_type]||'🌱'} ${f.farmer_name}</b><br>`+
+      `${f.farm_id} · ${f.total_area_ha} ga<br>`+
+      `<span style="color:${col}">${st.label}</span>`,
+      {sticky:true,direction:'top'}
+    );
+    poly.on('click',()=>selectFarm(f.farm_id));
+    farmPolygonLayer.addLayer(poly);
+  });
+  farmPolygonLayer.addTo(mapInstance);
+}
 
 /* ═══ Load ═══════════════════════════════════════════════════════════ */
+function toggleSidebar(){
+  const sb=document.getElementById('sidebar');
+  const bd=document.getElementById('sb-backdrop');
+  const open=sb.classList.toggle('open');
+  bd.classList.toggle('show',open);
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sb-backdrop').classList.remove('show');
+}
 function toggleSbDrop(btn) {
   const list = document.getElementById('sb-sensor-list');
   const arr  = document.getElementById('sb-arr');
@@ -725,7 +789,6 @@ function initMap() {
       iconSize:[size,size], iconAnchor:[size/2,size/2], popupAnchor:[0,-10]
     });
 
-    const mBar = `<div style="width:100%;height:5px;background:#E9EAEB;border-radius:3px;margin-top:5px;overflow:hidden"><div style="width:${s.moisture.toFixed(0)}%;height:100%;background:${dotColor};border-radius:3px"></div></div>`;
     const badge = s.isAlert
       ? `<span style="background:#FEF3F2;border:1px solid #FECDCA;color:#D92D20;font-size:11px;padding:2px 7px;border-radius:99px;font-weight:700">⚠️ ALERT</span>`
       : s.isWarn
@@ -753,6 +816,9 @@ function initMap() {
   mapInstance.addLayer(clusterGroup);
   if(bounds.length) mapInstance.fitBounds(bounds,{padding:[30,30],maxZoom:8});
   else              mapInstance.setView([40.5,68.5],5);
+
+  /* show/hide farm boundaries on zoom */
+  mapInstance.on('zoomend moveend', updateFarmPolygons);
 }
 
 /* ═══ Theme ══════════════════════════════════════════════════════════ */
@@ -771,6 +837,7 @@ function toggleTheme() {
 (()=>{
   const t=localStorage.getItem('theme')||'light';
   if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');document.getElementById('theme-icon').className='ri-sun-line';}
+  if(window.innerWidth<900){const btn=document.querySelector('.ph-menu-btn');if(btn)btn.style.display='flex';}
 })();
 
 function resetMapView(){

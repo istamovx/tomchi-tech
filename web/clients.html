@@ -133,7 +133,78 @@ td.bold{font-weight:600;color:var(--text-primary)}
 .ftab.active{background:var(--bg-primary);color:var(--text-primary);font-weight:600;box-shadow:var(--shadow-xs);border:1px solid var(--border-secondary)}
 
 /* ── Dark mode ── */
-[data-theme="dark"]{--bg-page:#0C0E12;--bg-primary:#161A23;--bg-primary-alt:#1C2130;--bg-secondary:#1E2436;--border-primary:#2E3448;--border-secondary:#242A3A;--border-tertiary:#1A1F2E;--text-primary:#F0F2F5;--text-secondary:#BCC2CE;--text-tertiary:#8B92A0;--text-placeholder:#636B78;--brand-50:#0D1528;--brand-100:#152040;--shadow-xs:0 1px 2px rgba(0,0,0,.4);--shadow-sm:0 1px 3px rgba(0,0,0,.5)}
+[data-theme="dark"]{
+  --bg-page:#0C0E12;--bg-primary:#161A23;--bg-primary-alt:#1C2130;--bg-secondary:#1E2436;
+  --border-primary:#2E3448;--border-secondary:#242A3A;--border-tertiary:#1A1F2E;--border-brand:#2970FF;
+  --text-primary:#F0F2F5;--text-secondary:#BCC2CE;--text-tertiary:#8B92A0;
+  --text-placeholder:#636B78;--text-disabled:#454C58;
+  --success-bg:#0A1E14;--success-border:#0D3320;
+  --warning-bg:#1A1404;--warning-border:#2E2006;
+  --danger-bg:#1A0A08;--danger-border:#2E1210;
+  --neutral-bg:#1C2130;
+  --utility-gray-50:#1C2130;--utility-gray-200:#2E3448;--utility-gray-700:#BCC2CE;
+  --brand-50:#0D1528;--brand-100:#152040;
+  --shadow-xs:0 1px 2px rgba(0,0,0,.4);--shadow-sm:0 1px 3px rgba(0,0,0,.5),0 1px 2px rgba(0,0,0,.3);
+  --shadow-md:0 4px 8px rgba(0,0,0,.5);--shadow-icon:0 1px 2px rgba(0,0,0,.5);
+  --shadow-skeu-border:inset 0 0 0 1px rgba(255,255,255,.06),inset 0 -2px 0 rgba(0,0,0,.2);
+}
+/* Sidebar & nav */
+[data-theme="dark"] .nav-item.active{background:#1E2436;color:#F0F2F5}
+/* Page header */
+[data-theme="dark"] .ph-search{background:#1C2130;border-color:#2E3448}
+[data-theme="dark"] .ph-btn{background:#161A23;border-color:#2E3448;color:#BCC2CE}
+[data-theme="dark"] .ph-divider{background:#242A3A}
+[data-theme="dark"] .page-header{border-color:#242A3A}
+/* Buttons */
+[data-theme="dark"] .btn-secondary{background:#1C2130;border-color:#2E3448;color:#BCC2CE}
+/* Metrics */
+[data-theme="dark"] .metric-card{background:#161A23;border-color:#242A3A}
+[data-theme="dark"] .metric-card:hover{background:#1E2436}
+[data-theme="dark"] .metric-icon{background:#161A23;border-color:#2E3448}
+[data-theme="dark"] .metric-num{color:#F0F2F5}
+/* Table */
+[data-theme="dark"] .table-card{background:#161A23;border-color:#242A3A}
+[data-theme="dark"] .tc-head{border-color:#242A3A}
+[data-theme="dark"] thead tr{border-color:#242A3A}
+[data-theme="dark"] tbody tr{border-color:#1A1F2E}
+[data-theme="dark"] tbody tr:hover{background:#1E2436}
+[data-theme="dark"] td{color:#BCC2CE}
+[data-theme="dark"] th{color:#8B92A0}
+/* Filter tabs */
+[data-theme="dark"] .filter-tabs{background:#1C2130;border-color:#2E3448}
+[data-theme="dark"] .ftab{color:#8B92A0}
+[data-theme="dark"] .ftab.active{background:#161A23;border-color:#2E3448;color:#F0F2F5;box-shadow:0 1px 3px rgba(0,0,0,.4)}
+/* Badge */
+[data-theme="dark"] .badge-gray{background:#1C2130;border-color:#2E3448;color:#8B92A0}
+[data-theme="dark"] .badge-green{background:#0A1E14;border-color:#0D3320;color:#17B26A}
+[data-theme="dark"] .badge-blue{background:#0D1528;border-color:#152040;color:#6B9FFF}
+[data-theme="dark"] .badge-yellow{background:#1A1404;border-color:#2E2006;color:#F79009}
+[data-theme="dark"] .badge-red{background:#1A0A08;border-color:#2E1210;color:#F97066}
+/* Account */
+[data-theme="dark"] .sb-account{background:#1C2130;border-color:#2E3448}
+[data-theme="dark"] .sb-account:hover{background:#242A3A}
+[data-theme="dark"] .av-wrap{background:#2E3448;border-color:rgba(255,255,255,.08);color:#BCC2CE}
+/* Content area */
+[data-theme="dark"] .content{background:var(--bg-page)}
+/* Modal */
+[data-theme="dark"] .modal-card{background:#161A23;border:1px solid #2E3448}
+[data-theme="dark"] .modal-head,[data-theme="dark"] .modal-foot{border-color:#2E3448}
+[data-theme="dark"] .modal-close:hover{background:#1E2436}
+[data-theme="dark"] .modal-icon{background:#0D1528;border-color:#152040}
+[data-theme="dark"] .msec{border-color:#242A3A}
+[data-theme="dark"] .cpill span{background:#1C2130;border-color:#2E3448}
+[data-theme="dark"] .mmap{border-color:#2E3448}
+/* Form inputs */
+[data-theme="dark"] .fi,[data-theme="dark"] .fs,[data-theme="dark"] .fta{background:#1C2130;border-color:#2E3448;color:#F0F2F5}
+[data-theme="dark"] .fi::placeholder,[data-theme="dark"] .fta::placeholder{color:#636B78}
+[data-theme="dark"] .fi:focus,[data-theme="dark"] .fs:focus,[data-theme="dark"] .fta:focus{border-color:#2970FF}
+[data-theme="dark"] .fl label{color:#8B92A0}
+/* Package buttons */
+[data-theme="dark"] .pkg-btn{background:#1C2130;border-color:#2E3448;color:#BCC2CE}
+[data-theme="dark"] .pkg-btn:hover{background:#0D1528;border-color:#2970FF}
+[data-theme="dark"] .pkg-btn.active{background:#0D1528;border-color:#2970FF;color:#6B9FFF}
+/* Sidebar backdrop */
+[data-theme="dark"] .sidebar-backdrop{background:rgba(0,0,0,.65)}
 
 /* ── Modal ── */
 .modal-overlay{position:fixed;inset:0;background:rgba(10,13,18,.55);backdrop-filter:blur(4px);z-index:500;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .2s}
@@ -271,6 +342,9 @@ td.bold{font-weight:600;color:var(--text-primary)}
       <button class="ftab" onclick="setFilter('standard',this)">Standart</button>
       <button class="ftab" onclick="setFilter('basic',this)">Boshlang'ich</button>
     </div>
+    <button class="ph-btn" id="theme-btn" onclick="toggleTheme()" title="Mavzu">
+      <i class="ri-moon-line" id="theme-icon" style="font-size:17px"></i>
+    </button>
     <div class="ph-divider"></div>
     <button class="btn btn-primary" onclick="openClientModal()"><i class="ri-user-add-line"></i>Yangi mijoz</button>
   </div>
@@ -630,16 +704,19 @@ function submitClientForm(){
 }
 
 /* ══════════════ THEME ══════════════ */
+function isDark(){ return document.documentElement.getAttribute('data-theme')==='dark'; }
 function toggleTheme(){
-  const d=document.documentElement;
-  const dark=d.getAttribute('data-theme')==='dark';
-  d.setAttribute('data-theme',dark?'':'dark');
-  document.getElementById('theme-icon').className=dark?'ri-moon-line':'ri-sun-line';
-  localStorage.setItem('theme',dark?'light':'dark');
+  const dark=isDark();
+  document.documentElement.setAttribute('data-theme', dark?'light':'dark');
+  document.getElementById('theme-icon').className = dark?'ri-moon-line':'ri-sun-line';
+  localStorage.setItem('theme', dark?'light':'dark');
 }
 (()=>{
-  const t=localStorage.getItem('theme')||'light';
-  if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');document.getElementById('theme-icon').className='ri-sun-line';}
+  const saved=localStorage.getItem('theme')||'light';
+  if(saved==='dark'){
+    document.documentElement.setAttribute('data-theme','dark');
+    document.getElementById('theme-icon').className='ri-sun-line';
+  }
 })();
 
 renderTable();

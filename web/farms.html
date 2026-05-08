@@ -853,15 +853,22 @@ function initMap() {
       ? `<span style="background:#FFFAEB;border:1px solid #FEDF89;color:#B54708;font-size:11px;padding:2px 7px;border-radius:99px;font-weight:600">⚡ Diqqat</span>`
       : '';
 
+    const mBar = s.moisture < 40
+      ? ` <span style="font-size:11px;color:#B54708">(-${(s.moisture * 0.998).toFixed(1)} kPa)</span>`
+      : '';
+    const moistureBar = `<div style="height:4px;border-radius:2px;background:#E9EAEB;margin:4px 0 6px">
+      <div style="height:4px;border-radius:2px;background:${dotColor};width:${Math.min(s.moisture,100)}%"></div></div>`;
+
     const marker = L.marker([s.lat,s.lon],{icon, isAlert:s.isAlert, isWarn:s.isWarn});
     marker.bindPopup(`
-      <div style="font-family:Inter,sans-serif;min-width:205px;padding:4px 2px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+      <div style="font-family:Inter,sans-serif;min-width:210px;padding:4px 2px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
           <b style="font-size:14px">${CROP_EMOJI[s.crop_type]||'🌱'} ${s.district}</b>
           ${badge}
         </div>
         <div style="font-size:12px;color:#535862;margin-bottom:5px">📍 ${s.region}</div>
-        <div style="font-size:13px;margin-bottom:3px">💧 Namlik: <b style="color:${dotColor}">${s.moisture.toFixed(1)}%</b>${mBar}</div>
+        <div style="font-size:13px;margin-bottom:2px">💧 Namlik: <b style="color:${dotColor}">${s.moisture.toFixed(1)}%</b>${mBar}</div>
+        ${moistureBar}
         <div style="font-size:12px;margin-bottom:3px">🌿 ${CROP_LABEL[s.crop_type]||s.crop_type} · 📐 ${s.total_area_ha} ga</div>
         <div style="font-size:11px;color:#999;margin-top:4px">${s.sensor_id} · ${s.farmer_name}</div>
       </div>`);

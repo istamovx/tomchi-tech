@@ -131,10 +131,18 @@ i[class^="ri-"]{line-height:1}
   --shadow-xs:0 1px 2px rgba(0,0,0,.4);--shadow-sm:0 1px 3px rgba(0,0,0,.5);
   --shadow-icon:0 1px 2px rgba(0,0,0,.5);--shadow-skeu-border:inset 0 0 0 1px rgba(255,255,255,0.06),inset 0 -2px 0 rgba(0,0,0,.2);
 }
-[data-theme="dark"] .nav-item.active{background:#1E2436}
-[data-theme="dark"] .p-tab.active{background:#161A23;border-color:#2E3448}
+[data-theme="dark"] .nav-item.active{background:#1E2436;color:#F0F2F5}
+[data-theme="dark"] .p-tab.active{background:#161A23;border-color:#2E3448;color:#F0F2F5}
 [data-theme="dark"] .p-tab{color:#8B92A0}
 [data-theme="dark"] .saving-table tr:hover td{background:#1E2436}
+[data-theme="dark"] .metric-card:hover{background:#1E2436;border-color:#2E3448}
+[data-theme="dark"] .chart-card{background:#161A23;border-color:#242A3A}
+[data-theme="dark"] .cc-head{border-bottom-color:#242A3A}
+[data-theme="dark"] .saving-table th{background:#1C2130;border-bottom-color:#242A3A}
+[data-theme="dark"] .saving-table td{border-bottom-color:#242A3A}
+[data-theme="dark"] .sb-account{background:#1C2130;border-color:#2E3448}
+[data-theme="dark"] .sb-account:hover{background:#1E2436}
+[data-theme="dark"] .bar-track{background:var(--border-secondary)}
 @media(max-width:1280px){.metrics-row{grid-template-columns:repeat(2,1fr)}.chart-grid{grid-template-columns:1fr}}
 @media(max-width:720px){.sidebar{position:fixed;left:-100%;z-index:200;transition:left .25s}.sidebar.open{left:0}.content{padding:var(--sp-xl)}}
 </style>
@@ -169,7 +177,7 @@ i[class^="ri-"]{line-height:1}
     <button class="nav-item footer-item"><span class="nav-icon"><i class="ri-question-line"></i></span>Yordam</button>
     <div class="sb-account">
       <div class="av-wrap">X<div class="av-online"></div></div>
-      <div style="flex:1;min-width:0"><div class="av-name">Xurshid I.</div><div class="av-role">Admin</div></div>
+      <div style="flex:1;min-width:0"><div class="av-name">Xurshid Istamov</div><div class="av-role">Agrotexnik · Admin</div></div>
       <button class="ph-btn" onclick="toggleTheme()" title="Mavzu"><i class="ri-moon-line" id="theme-icon"></i></button>
     </div>
   </div>
@@ -491,13 +499,18 @@ function exportReport() {
 }
 
 function toggleTheme() {
-  const d = document.documentElement;
-  const dark = d.getAttribute('data-theme')==='dark';
-  d.setAttribute('data-theme', dark?'':'dark');
+  const dark = document.documentElement.getAttribute('data-theme')==='dark';
+  document.documentElement.setAttribute('data-theme', dark?'light':'dark');
   document.getElementById('theme-icon').className = dark?'ri-moon-line':'ri-sun-line';
   localStorage.setItem('theme', dark?'light':'dark');
 }
-(()=>{const t=localStorage.getItem('theme')||'light';if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');document.getElementById('theme-icon').className='ri-sun-line';}})();
+(()=>{
+  const t = localStorage.getItem('theme')||'light';
+  if(t==='dark'){
+    document.documentElement.setAttribute('data-theme','dark');
+    document.getElementById('theme-icon').className='ri-sun-line';
+  }
+})();
 
 loadData();
 </script>

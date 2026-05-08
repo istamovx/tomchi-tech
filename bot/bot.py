@@ -1,8 +1,8 @@
 """TomchiTech Farm Monitoring Bot v2 - Obuna + Sughorish"""
 import os, random, logging, sqlite3, threading, httpx
 from datetime import datetime, timedelta
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup, KeyboardButton
+from telegram.ext import Application, CommandHandler, CallbackQueryHandler, MessageHandler, filters, ContextTypes
 
 logging.basicConfig(format="%(asctime)s [%(levelname)s] %(name)s: %(message)s", level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -202,6 +202,29 @@ def pkgs_kb():
 def back_kb():
     return InlineKeyboardMarkup([[InlineKeyboardButton("⬅ Asosiy menyu", callback_data="menu")]])
 
+# ── Persistent Reply Keyboard ─────────────────────────────────────────────────
+REPLY_TEXTS = {
+    "📊 Hisobot":       "hisobot",
+    "🌾 Fermalar":      "fermalar",
+    "💧 Sug'orish":     "sugorish",
+    "🚨 Ogohlantirishlar": "ogohlar",
+    "📦 Obuna":         "obuna_info",
+    "👨‍🔬 Mutaxassis":  "mutax",
+    "ℹ Yordam":         "yordam",
+}
+
+REPLY_KB = ReplyKeyboardMarkup(
+    [
+        [KeyboardButton("📊 Hisobot"),    KeyboardButton("🌾 Fermalar")],
+        [KeyboardButton("💧 Sug'orish"),  KeyboardButton("🚨 Ogohlantirishlar")],
+        [KeyboardButton("📦 Obuna"),      KeyboardButton("👨‍🔬 Mutaxassis")],
+        [KeyboardButton("ℹ Yordam")],
+    ],
+    resize_keyboard=True,
+    is_persistent=True,
+    input_field_placeholder="Bo'lim tanlang...",
+)
+
 def pkgs_text():
     lines = []
     for k, p in PACKAGES.items():
@@ -228,12 +251,18 @@ async def cmd_start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     sub = get_sub(u.id)
     if not sub:
         await update.message.reply_text(
+            "📱 Menyular tayyor. Quyidagi tugmalardan foydalaning:",
+            reply_markup=REPLY_KB)
+        await update.message.reply_text(
             f"👋 Salom, <b>{u.first_name}</b>!\n\n"
             "🌿 <b>TomchiTech</b> — Aqlli ferma monitoring tizimi\n\n"
             "Xizmatdan foydalanish uchun obuna paketini tanlang:\n\n" + pkgs_text(),
             parse_mode="HTML", reply_markup=pkgs_kb())
     else:
         p = PACKAGES[sub["package"]]
+        await update.message.reply_text(
+            "📱 Menyular tayyor. Quyidagi tugmalardan foydalaning:",
+            reply_markup=REPLY_KB)
         await update.message.reply_text(
             f"👋 Xush kelibsiz, <b>{u.first_name}</b>!\n\n"
             f"📦 Paketingiz: {p['emoji']} <b>{p['nomi']}</b>\n"
@@ -481,6 +510,127 @@ async def cb(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
             matn += f"{st} {u['full_name']} (@{u['username'] or '-'}) — {pk}\n"
         await edit(q, ctx, matn, kb=InlineKeyboardMarkup([[InlineKeyboardButton("⬅ Admin", callback_data="admin")]])); return
 
+# ── Reply keyboard handler ────────────────────────────────────────────────────
+async def reply_menu_handler(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
+    """Reply keyboard tugmalaridagi matnni callback sifatida qayta ishlaydi."""
+    text = update.message.text.strip()
+    data = REPLY_TEXTS.get(text)
+    if not data:
+        return
+    uid = update.effective_user.id
+    sub = get_sub(uid)
+
+    if not sub:
+        await update.message.reply_text(
+            "❌ Bu funksiyadan foydalanish uchun obuna kerak.",
+            reply_markup=pkgs_kb())
+        return
+
+    p  = PACKAGES[sub["package"]]
+    mf = min(p["max_ferma"], len(FARMS))
+
+    if data == "hisobot":
+        await update.message.reply_text("⏳ Yuklanmoqda...")
+        fids = list(FARMS.keys())[:mf]; bloklar = []; kritik = 0
+        for fid in fids:
+            d = sensor(fid); bloklar.append(ferma_blok(fid, d))
+            if holat(d).startswith("🔴"): kritik += 1
+        umumiy = "🔴 DIQQAT: Kritik holatlar!" if kritik else "🟢 Umumiy holat: Yaxshi"
+        await send(ctx, update.effective_chat.id,
+            f"📊 <b>FERMA HISOBOTI</b>\n🕐 {datetime.now().strftime('%d.%m.%Y %H:%M')}\n{umumiy}\n"
+            f"━━━━━━━━━━━━━━━━━━\n\n" + "\n\n━━━━━━━━━━━━━━━━━━\n\n".join(bloklar),
+            kb=back_kb())
+
+    elif data == "fermalar":
+        fids = list(FARMS.keys())[:mf]
+        matn = f"🌾 <b>FERMALARINGIZ ({mf} ta)</b>\n\n"
+        for fid in fids:
+            f = FARMS[fid]; matn += f"<b>{f['nomi']}</b>\n📍 {f['joy']}\n🌱 {', '.join(f['ekin'])}\n\n"
+        rows = [[InlineKeyboardButton(f"🌾 {FARMS[fid]['nomi']}", callback_data=f"farm_{fid}")] for fid in fids]
+        rows.append([InlineKeyboardButton("⬅ Asosiy menyu", callback_data="menu")])
+        await send(ctx, update.effective_chat.id, matn, kb=InlineKeyboardMarkup(rows))
+
+    elif data == "sugorish":
+        if not p["sugorish"]:
+            await update.message.reply_text("❌ Bu funksiya faqat Standart va Premium paketlarda mavjud.")
+            return
+        fids = list(FARMS.keys())[:mf]
+        matn = "💧 <b>SUGHORISH BOSHQARUVI</b>\n\nQaysi fermada sughorish boshlamoqchisiz?\n\n"
+        for fid in fids:
+            d = sensor(fid)
+            matn += f"🌾 <b>{FARMS[fid]['nomi']}</b> — 🌱 Tuproq: <b>{d['soil']}%</b>\n"
+        rows = [[InlineKeyboardButton(f"💧 {FARMS[fid]['nomi']}", callback_data=f"irr_{fid}")] for fid in fids]
+        rows.append([InlineKeyboardButton("📋 Sughorish tarixi", callback_data="irr_history")])
+        rows.append([InlineKeyboardButton("⬅ Asosiy menyu",      callback_data="menu")])
+        await send(ctx, update.effective_chat.id, matn, kb=InlineKeyboardMarkup(rows))
+
+    elif data == "ogohlar":
+        fids = list(FARMS.keys())[:mf]; krit = []; eht = []
+        for fid in fids:
+            d = sensor(fid); h = holat(d)
+            if h.startswith("🔴"): krit.append(ferma_blok(fid, d))
+            elif h.startswith("🟡"): eht.append(ferma_blok(fid, d))
+        cid = update.effective_chat.id
+        if krit:
+            kb_rows = [[InlineKeyboardButton("⬅ Asosiy menyu", callback_data="menu")]]
+            if p["mutaxassis"]: kb_rows.insert(0,[InlineKeyboardButton("👨‍🔬 Mutaxassis", callback_data="mutax")])
+            await send(ctx, cid,
+                f"🚨 <b>KRITIK OGOHLANTIRISHLAR</b>\n⏱ {datetime.now().strftime('%d.%m.%Y %H:%M')}\n"
+                f"━━━━━━━━━━━━━━━━━━\n\n" + "\n\n━━━━━━━━━━━━━━━━━━\n\n".join(krit),
+                kb=InlineKeyboardMarkup(kb_rows))
+        elif eht:
+            await send(ctx, cid,
+                f"🟡 <b>EHTIYOT HOLATLAR</b>\n━━━━━━━━━━━━━━━━━━\n\n" + "\n\n━━━━━━━━━━━━━━━━━━\n\n".join(eht),
+                kb=back_kb())
+        else:
+            await send(ctx, cid, "✅ <b>Hozirda hech qanday ogohlantirish yoq.</b>\n\nBarcha fermalar normal. 🌿", kb=back_kb())
+
+    elif data == "obuna_info":
+        remaining = (datetime.strptime(sub["end_date"][:10], "%Y-%m-%d") - datetime.now()).days
+        funks     = "\n".join(f"  ✅ {f}" for f in p["funksiyalar"])
+        rows      = []
+        if sub["package"] != "premium": rows.append([InlineKeyboardButton("⬆ Paketni yuksaltirish", callback_data="show_pkgs")])
+        rows.append([InlineKeyboardButton("⬅ Asosiy menyu", callback_data="menu")])
+        await send(ctx, update.effective_chat.id,
+            f"📦 <b>OBUNA MALUMOTLARI</b>\n━━━━━━━━━━━━━━━━━━\n\n"
+            f"{p['emoji']} Paket: <b>{p['nomi']}</b>\n"
+            f"💰 {p['narx']:,} som/oy\n"
+            f"📅 Tugash: {sub['end_date'][:10]}\n"
+            f"🕐 Qolgan: <b>{remaining} kun</b>\n\n"
+            f"<b>Funksiyalar:</b>\n{funks}",
+            kb=InlineKeyboardMarkup(rows))
+
+    elif data == "mutax":
+        if not p["mutaxassis"]:
+            await send(ctx, update.effective_chat.id,
+                "👨‍🔬 <b>Mutaxassis chaqirish</b>\n\n❌ Bu funksiya faqat <b>Premium</b> paket uchun.\n\nObunangizni Premium ga yuksaltiring:",
+                kb=InlineKeyboardMarkup([
+                    [InlineKeyboardButton("🏆 Premium ga otish", callback_data="pkg_premium")],
+                    [InlineKeyboardButton("⬅ Asosiy menyu",      callback_data="menu")],
+                ]))
+            return
+        matn = "👨‍🔬 <b>MUTAXASSISLAR</b>\nKritik holatlarda quyidagilar bilan boglanin:\n━━━━━━━━━━━━━━━━━━\n\n"
+        for m in MUTAXASSISLAR:
+            matn += f"<b>{m['ism']}</b>\n💼 {m['lavozim']}\n🔬 {m['soha']}\n📞 {m['tel']}\n\n"
+        matn += "⏰ Ish vaqti: Du-Jum 08:00-18:00\n🆘 Favqulodda: 24/7"
+        await send(ctx, update.effective_chat.id, matn, kb=back_kb())
+
+    elif data == "yordam":
+        await send(ctx, update.effective_chat.id,
+            "ℹ <b>YORDAM</b>\n\n"
+            "📊 Hisobot — sensor malumotlari hisoboti\n"
+            "🌾 Fermalar — alohida ferma sensori\n"
+            "💧 Sug'orish — tomchilatib sughorish boshqaruvi\n"
+            "🚨 Ogohlantirishlar — kritik/ehtiyot holatlar\n"
+            "👨‍🔬 Mutaxassis — Premium foydalanuvchilar uchun\n\n"
+            f"Kritik chegara:\n"
+            f"• Harorat > {ALERT_TEMP_MAX}C\n"
+            f"• Namlik < {ALERT_HUMID_MIN}%\n"
+            f"• Tuproq namligi < {ALERT_SOIL_MIN}%\n\n"
+            "🔔 Har soatda avtomatik hisobot\n\n"
+            "📞 support@tomchitech.uz",
+            kb=back_kb())
+
 # ── Admin commands ────────────────────────────────────────────────────────────
 async def cmd_admin(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     uid = update.effective_user.id
@@ -567,6 +717,7 @@ def main():
     app.add_handler(CommandHandler("start", cmd_start))
     app.add_handler(CommandHandler("admin", cmd_admin))
     app.add_handler(CommandHandler("grant", cmd_grant))
+    app.add_handler(MessageHandler(filters.Text(list(REPLY_TEXTS.keys())), reply_menu_handler))
     app.add_handler(CallbackQueryHandler(cb))
     jq = app.job_queue
     jq.run_repeating(job_soatlik,   interval=3600, first=60)

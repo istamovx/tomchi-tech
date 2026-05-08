@@ -206,7 +206,10 @@ i[class^="ri-"]{line-height:1;}
   .filter-tab{padding:var(--sp-xs) var(--sp-lg);font-size:12px;}
   .ph-menu-btn{display:flex!important}
 }
+.ph-lang{display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:var(--r-md);border:1px solid var(--border-secondary);background:var(--bg-primary);font-size:12px;font-weight:600;color:var(--text-secondary);cursor:pointer;box-shadow:var(--shadow-xs);transition:background .12s}
+.ph-lang:hover{background:var(--bg-secondary)}
 </style>
+<script src="js/i18n.js"></script>
 </head>
 <body>
 
@@ -266,6 +269,10 @@ i[class^="ri-"]{line-height:1;}
     <div class="ph-divider"></div>
     <button class="ph-btn" id="theme-btn" onclick="toggleTheme()" title="Mavzu">
       <i class="ri-moon-line" id="theme-icon" style="font-size:17px"></i>
+    </button>
+    <button class="ph-btn ph-lang" id="lang-btn" onclick="cycleLang()" title="Til o'zgartirish" style="gap:4px;font-weight:600;font-size:12px">
+      <i class="ri-global-line" style="font-size:15px"></i>
+      <span id="lang-label">UZ</span>
     </button>
   </header>
 
@@ -662,10 +669,4 @@ function toggleTheme(){
 }
 (()=>{
   const t=localStorage.getItem('theme')||'light';
-  if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');document.getElementById('theme-icon').className='ri-sun-line';}
-  if(window.innerWidth<900) document.getElementById('menu-btn').style.display='flex';
-})();
-loadData();
-</script>
-</body>
-</html>
+  if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');document.getElementById('theme-i

@@ -258,7 +258,10 @@ td.bold{font-weight:600;color:var(--text-primary)}
 @media(max-width:1280px){.metrics-row{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:900px){.sidebar{position:fixed;left:-100%;z-index:200;transition:left .25s}.sidebar.open{left:0}.content{padding:var(--sp-xl)}.ph-menu-btn{display:flex!important}}
 @media(max-width:480px){.metrics-row{grid-template-columns:1fr}.page-header{padding:0 var(--sp-xl)}.ftab{font-size:12px;padding:5px 8px}}
+.ph-lang{display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:var(--r-md);border:1px solid var(--border-secondary);background:var(--bg-primary);font-size:12px;font-weight:600;color:var(--text-secondary);cursor:pointer;box-shadow:var(--shadow-xs);transition:background .12s}
+.ph-lang:hover{background:var(--bg-secondary)}
 </style>
+<script src="js/i18n.js"></script>
 </head>
 <body>
 
@@ -345,6 +348,10 @@ td.bold{font-weight:600;color:var(--text-primary)}
     </div>
     <button class="ph-btn" id="theme-btn" onclick="toggleTheme()" title="Mavzu">
       <i class="ri-moon-line" id="theme-icon" style="font-size:17px"></i>
+    </button>
+    <button class="ph-btn ph-lang" id="lang-btn" onclick="cycleLang()" title="Til o'zgartirish" style="gap:4px;font-weight:600;font-size:12px">
+      <i class="ri-global-line" style="font-size:15px"></i>
+      <span id="lang-label">UZ</span>
     </button>
     <div class="ph-divider"></div>
     <button class="btn btn-primary" onclick="openClientModal()"><i class="ri-user-add-line"></i>Yangi mijoz</button>

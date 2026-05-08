@@ -180,7 +180,10 @@ i[class^="ri-"]{line-height:1}
 @media(max-width:1280px){.status-grid{grid-template-columns:repeat(2,1fr)}.field-grid{grid-template-columns:1fr}}
 @media(max-width:900px){.sidebar{position:fixed;left:-100%;z-index:200;transition:left .25s}.sidebar.open{left:0}.content{padding:var(--sp-xl)}.ph-menu-btn{display:flex!important}}
 @media(max-width:600px){.status-grid{grid-template-columns:1fr 1fr}.field-grid.span2{grid-column:span 1}.page-header{padding:0 var(--sp-xl)}}
+.ph-lang{display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:var(--r-md);border:1px solid var(--border-secondary);background:var(--bg-primary);font-size:12px;font-weight:600;color:var(--text-secondary);cursor:pointer;box-shadow:var(--shadow-xs);transition:background .12s}
+.ph-lang:hover{background:var(--bg-secondary)}
 </style>
+<script src="js/i18n.js"></script>
 </head>
 <body>
 
@@ -207,6 +210,10 @@ i[class^="ri-"]{line-height:1}
       <div class="av-wrap">X<div class="av-online"></div></div>
       <div style="flex:1;min-width:0"><div class="av-name">Xurshid Istamov</div><div class="av-role">Agrotexnik · Admin</div></div>
       <button class="ph-btn" onclick="toggleTheme()" title="Mavzu"><i class="ri-moon-line" id="theme-icon"></i></button>
+    <button class="ph-btn ph-lang" id="lang-btn" onclick="cycleLang()" title="Til o'zgartirish" style="gap:4px;font-weight:600;font-size:12px">
+      <i class="ri-global-line" style="font-size:15px"></i>
+      <span id="lang-label">UZ</span>
+    </button>
     </div>
   </div>
 </nav>

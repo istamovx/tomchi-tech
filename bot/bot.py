@@ -1,6 +1,21 @@
-"""TomchiTech Farm Monitoring Bot v2 - Obuna + Sughorish"""
-import os, random, logging, sqlite3, threading, httpx, json, asyncio
+"""TomchiTech Farm Monitoring Bot v2 - Obuna + Sughorish + Ko'p tilli"""
+import os, sys, random, logging, sqlite3, threading, httpx, json, asyncio
 from http.server import HTTPServer, BaseHTTPRequestHandler
+
+# ── Locale import (bot/ papkasi ichida ishlaydi) ─────────────────────────────
+_HERE = os.path.dirname(os.path.abspath(__file__))
+if _HERE not in sys.path:
+    sys.path.insert(0, _HERE)
+try:
+    import importlib as _il
+    _lmod = _il.import_module('locale')
+    tr = _lmod.tr
+    LANG_LABELS    = _lmod.LANG_LABELS
+    LANG_CHANGED_KEY = _lmod.LANG_CHANGED_KEY
+except Exception:
+    def tr(key, lang='uz', **kw): return key   # fallback — no translation
+    LANG_LABELS      = {'uz': "🇺🇿 O'zbek", 'ru': "🇷🇺 Русский", 'en': "🇬🇧 English"}
+    LANG_CHANGED_KEY = {'uz': 'lang_changed_uz', 'ru': 'lang_changed_ru', 'en': 'lang_changed_en'}
 from datetime import datetime, timedelta
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup, KeyboardButton
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, MessageHandler, filters, ContextTypes
@@ -66,7 +81,8 @@ def init_db():
         c.executescript("""
             CREATE TABLE IF NOT EXISTS users (
                 user_id INTEGER PRIMARY KEY, username TEXT, full_name TEXT,
-                joined_at TEXT DEFAULT (datetime('now')));
+                joined_at TEXT DEFAULT (datetime('now')),
+                user_lang TEXT DEFAULT 'uz');
             CREATE TABLE IF NOT EXISTS subscriptions (
                 user_id INTEGER PRIMARY KEY, package TEXT,
                 start_date TEXT, end_date TEXT, status TEXT DEFAULT 'active');
@@ -75,7 +91,13 @@ def init_db():
                 farm_id TEXT, farm_name TEXT, logged_at TEXT DEFAULT (datetime('now')),
                 duration_min INTEGER, trigger_type TEXT, soil_before REAL, water_liters REAL);
         """)
-        c.commit(); c.close()
+        # Migrate: user_lang column qo'shimcha (eski DB uchun)
+        try:
+            c.execute("ALTER TABLE users ADD COLUMN user_lang TEXT DEFAULT 'uz'")
+            c.commit()
+        except Exception:
+            pass  # already exists
+        c.close()
 
 def save_user(uid, username, full_name):
     with DB_LOCK:
@@ -124,6 +146,21 @@ def all_users():
                             FROM users u LEFT JOIN subscriptions s ON u.user_id=s.user_id""").fetchall()
         c.close()
     return [dict(r) for r in rows]
+
+def get_user_lang(uid: int) -> str:
+    with DB_LOCK:
+        c   = db()
+        row = c.execute("SELECT user_lang FROM users WHERE user_id=?", (uid,)).fetchone()
+        c.close()
+    return (row["user_lang"] if row and row["user_lang"] else None) or 'uz'
+
+def set_user_lang(uid: int, lang: str):
+    if lang not in ('uz', 'ru', 'en'):
+        lang = 'uz'
+    with DB_LOCK:
+        c = db()
+        c.execute("UPDATE users SET user_lang=? WHERE user_id=?", (lang, uid))
+        c.commit(); c.close()
 
 # ── Sensor + Sughorish ────────────────────────────────────────────────────────
 def sensor(fid):
@@ -207,13 +244,14 @@ def back_kb():
 
 # ── Persistent Reply Keyboard ─────────────────────────────────────────────────
 REPLY_TEXTS = {
-    "📊 Hisobot":       "hisobot",
-    "🌾 Fermalar":      "fermalar",
-    "💧 Sug'orish":     "sugorish",
+    "📊 Hisobot":          "hisobot",
+    "🌾 Fermalar":         "fermalar",
+    "💧 Sug'orish":        "sugorish",
     "🚨 Ogohlantirishlar": "ogohlar",
-    "📦 Obuna":         "obuna_info",
-    "👨‍🔬 Mutaxassis":  "mutax",
-    "ℹ Yordam":         "yordam",
+    "📦 Obuna":            "obuna_info",
+    "👨‍🔬 Mutaxassis":    "mutax",
+    "ℹ Yordam":            "yordam",
+    "🌐 Til":              "til",
 }
 
 REPLY_KB = ReplyKeyboardMarkup(
@@ -221,7 +259,7 @@ REPLY_KB = ReplyKeyboardMarkup(
         [KeyboardButton("📊 Hisobot"),    KeyboardButton("🌾 Fermalar")],
         [KeyboardButton("💧 Sug'orish"),  KeyboardButton("🚨 Ogohlantirishlar")],
         [KeyboardButton("📦 Obuna"),      KeyboardButton("👨‍🔬 Mutaxassis")],
-        [KeyboardButton("ℹ Yordam")],
+        [KeyboardButton("ℹ Yordam"),      KeyboardButton("🌐 Til")],
     ],
     resize_keyboard=True,
     is_persistent=True,
@@ -248,25 +286,37 @@ def is_admin(uid): return uid in ADMIN_IDS
 
 # ── /start ────────────────────────────────────────────────────────────────────
 async def cmd_start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
-    u = update.effective_user
+    u    = update.effective_user
     save_user(u.id, u.username, u.full_name)
     ctx.bot_data.setdefault("subscribers", set()).add(update.effective_chat.id)
-    sub = get_sub(u.id)
+    lang = get_user_lang(u.id)
+    sub  = get_sub(u.id)
     if not sub:
         await update.message.reply_text(
-            f"👋 Salom, <b>{u.first_name}</b>!\n\n"
-            "🌿 <b>TomchiTech</b> — Aqlli ferma monitoring tizimi\n\n"
-            "Xizmatdan foydalanish uchun obuna paketini tanlang:\n\n" + pkgs_text(),
+            tr('welcome_new', lang, name=u.first_name) + "\n\n" + pkgs_text(),
             parse_mode="HTML", reply_markup=pkgs_kb())
     else:
         p = PACKAGES[sub["package"]]
         await update.message.reply_text(
-            f"👋 Xush kelibsiz, <b>{u.first_name}</b>!\n\n"
-            f"📦 Paketingiz: {p['emoji']} <b>{p['nomi']}</b>\n"
-            f"📅 {sub['end_date'][:10]} gacha\n\n"
-            f"⌨️ Pastdagi tugmalar panelini ochish uchun input maydonidagi "
-            f"klaviatura ikonkasini bosing.",
+            tr('welcome_back', lang,
+               name=u.first_name, emoji=p['emoji'],
+               package=p['nomi'], end_date=sub['end_date'][:10]),
             parse_mode="HTML")
+
+# ── /til  (language selector) ─────────────────────────────────────────────────
+async def cmd_til(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
+    uid  = update.effective_user.id
+    lang = get_user_lang(uid)
+    def _lbl(code):
+        return LANG_LABELS[code] + (" ✓" if lang == code else "")
+    await update.message.reply_text(
+        tr('lang_choose', lang),
+        reply_markup=InlineKeyboardMarkup([[
+            InlineKeyboardButton(_lbl('uz'), callback_data="lang_uz"),
+            InlineKeyboardButton(_lbl('ru'), callback_data="lang_ru"),
+            InlineKeyboardButton(_lbl('en'), callback_data="lang_en"),
+        ]])
+    )
 
 # ── Callback ──────────────────────────────────────────────────────────────────
 async def cb(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
@@ -274,6 +324,20 @@ async def cb(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     data = q.data
     uid  = q.from_user.id
     await q.answer()
+
+    # ── Til o'zgartirish ─────────────────────────────────────────────────────
+    if data.startswith("lang_"):
+        new_lang = data[5:]  # uz, ru, en
+        if new_lang in ('uz', 'ru', 'en'):
+            set_user_lang(uid, new_lang)
+            key = LANG_CHANGED_KEY.get(new_lang, 'lang_changed_uz')
+            changed_text = tr(key, new_lang)
+            try:
+                await q.message.edit_text(changed_text, reply_markup=None)
+            except Exception:
+                await send(ctx, q.message.chat_id, changed_text)
+        return
+
     sub = get_sub(uid)
 
     # Paket tanlash
@@ -619,20 +683,16 @@ async def reply_menu_handler(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         await send(ctx, update.effective_chat.id, matn, kb=back_kb())
 
     elif data == "yordam":
+        lang = get_user_lang(uid)
         await send(ctx, update.effective_chat.id,
-            "ℹ <b>YORDAM</b>\n\n"
-            "📊 Hisobot — sensor malumotlari hisoboti\n"
-            "🌾 Fermalar — alohida ferma sensori\n"
-            "💧 Sug'orish — tomchilatib sughorish boshqaruvi\n"
-            "🚨 Ogohlantirishlar — kritik/ehtiyot holatlar\n"
-            "👨‍🔬 Mutaxassis — Premium foydalanuvchilar uchun\n\n"
-            f"Kritik chegara:\n"
-            f"• Harorat > {ALERT_TEMP_MAX}C\n"
-            f"• Namlik < {ALERT_HUMID_MIN}%\n"
-            f"• Tuproq namligi < {ALERT_SOIL_MIN}%\n\n"
-            "🔔 Har soatda avtomatik hisobot\n\n"
-            "📞 support@tomchitech.uz",
+            tr('help_text', lang,
+               temp_max=ALERT_TEMP_MAX,
+               humid_min=ALERT_HUMID_MIN,
+               soil_min=ALERT_SOIL_MIN),
             kb=back_kb())
+
+    elif data == "til":
+        await cmd_til(update, ctx)
 
 # ── Admin commands ────────────────────────────────────────────────────────────
 async def cmd_admin(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
@@ -720,10 +780,10 @@ async def job_auto_irr(ctx: ContextTypes.DEFAULT_TYPE):
 
 async def _auto_irr_stop(ctx: ContextTypes.DEFAULT_TYPE):
     d = ctx.job.data
-    cid       = d["cid"]
-    f         = d["farm"]
-    dur       = d["dur"]
-    soil_b    = d["soil_before"]
+    cid        = d["cid"]
+    f          = d["farm"]
+    dur        = d["dur"]
+    soil_b     = d["soil_before"]
     soil_after = min(75.0, soil_b + dur * 0.4)
     await send(ctx, cid,
         f"✅ <b>AVTOMATIK SUGHORISH YAKUNLANDI</b>\n\n"
@@ -733,165 +793,12 @@ async def _auto_irr_stop(ctx: ContextTypes.DEFAULT_TYPE):
         f"🕐 {datetime.now().strftime('%d.%m.%Y %H:%M')}\n\n"
         f"🟢 Tizim normal rejimga qaytdi.")
 
-# ── Web Dashboard → Bot API ───────────────────────────────────────────────────
-def make_api_handler(loop, bot, bot_data):
-    """Web dashboard dan keladigan irrigatsiya bildirishnomalarini qabul qiladi."""
-    class APIHandler(BaseHTTPRequestHandler):
-        def do_OPTIONS(self):
-            self.send_response(200)
-            self._cors(); self.end_headers()
-
-        def do_POST(self):
-            if self.path not in ('/api/irrigate', '/api/irrigate/'):
-                self.send_response(404); self._cors(); self.end_headers()
-                self.wfile.write(b'{"error":"not found"}'); return
-
-            secret = self.headers.get('X-Notify-Secret', '')
-            if secret != NOTIFY_SECRET:
-                self.send_response(403); self._cors(); self.end_headers()
-                self.wfile.write(b'{"error":"forbidden"}'); return
-
-            try:
-                length = int(self.headers.get('Content-Length', 0))
-                body   = json.loads(self.rfile.read(length) or b'{}')
-            except Exception:
-                self.send_response(400); self._cors(); self.end_headers()
-                self.wfile.write(b'{"error":"bad json"}'); return
-
-            asyncio.run_coroutine_threadsafe(
-                _broadcast_irrigate(bot, bot_data, body), loop
-            )
-            self.send_response(200); self._cors()
-            self.send_header('Content-Type', 'application/json')
-            self.end_headers()
-            self.wfile.write(b'{"ok":true}')
-
-        def _cors(self):
-            self.send_header('Access-Control-Allow-Origin', '*')
-            self.send_header('Access-Control-Allow-Headers', 'Content-Type,X-Notify-Secret')
-            self.send_header('Access-Control-Allow-Methods', 'POST,OPTIONS')
-
-        def log_message(self, fmt, *args): pass  # suppress access logs
-
-    return APIHandler
-
-async def _broadcast_irrigate(bot, bot_data, data):
-    subs      = bot_data.get("subscribers", set())
-    sensor_id = data.get('sensor_id', 'Noma\'lum')
-    farm      = data.get('farm_name', sensor_id)
-    dur       = data.get('duration_min', 0)
-    soil      = data.get('soil_moisture', '?')
-    water     = data.get('water_needed', 0)
-    trigger   = data.get('trigger', 'web_dashboard')
-    now_str   = datetime.now().strftime('%d.%m.%Y %H:%M')
-
-    if dur and int(dur) > 0:
-        msg = (
-            f"💧 <b>WEB DASHBOARD: SUGHORISH BOSHLANDI!</b>\n\n"
-            f"🌾 Sensor/Ferma: <b>{farm}</b>\n"
-            f"🌱 Tuproq namligi: <b>{soil}%</b>\n"
-            f"⏱ Davomiylik: <b>{dur} daqiqa</b>\n"
-            f"💦 Suv sarfi: ~<b>{water:.0f} litr</b>\n"
-            f"🖥 Manba: Web dashboard\n"
-            f"🕐 {now_str}\n\n"
-            f"Tomchilatib sughorish tizimi ishga tushdi."
-        )
-    else:
-        soil_str = f"{float(soil):.1f}" if str(soil).replace('.','').isdigit() else str(soil)
-        msg = (
-            f"🏁 <b>WEB DASHBOARD: SUGHORISH YAKUNLANDI!</b>\n\n"
-            f"🌾 Sensor/Ferma: <b>{farm}</b>\n"
-            f"🌱 Yangi namlik: <b>{soil_str}%</b>\n"
-            f"🕐 {now_str}\n\n"
-            f"🟢 Tizim normal rejimga qaytdi."
-        )
-    for cid in list(subs):
-        try:
-            await bot.send_message(cid, msg, parse_mode='HTML')
-        except Exception as e:
-            logger.warning("broadcast_irrigate %s: %s", cid, e)
-
-def start_api_server(loop, bot, bot_data):
-    handler = make_api_handler(loop, bot, bot_data)
-    try:
-        server = HTTPServer(('0.0.0.0', API_PORT), handler)
-        t = threading.Thread(target=server.serve_forever, daemon=True)
-        t.start()
-        logger.info("API server started on port %s", API_PORT)
-    except OSError as e:
-        logger.warning("API server could not start: %s", e)
-
 async def job_keepalive(ctx: ContextTypes.DEFAULT_TYPE):
     if WEBHOOK_URL:
         try:
             async with httpx.AsyncClient() as cl:
                 await cl.get(f"{WEBHOOK_URL}/healthz", timeout=10)
         except Exception: pass
-
-# ── Main ──────────────────────────────────────────────────────────────────────
-async def post_init(application):
-    """Bot initialize bo'lgandan so'ng API serverni ham yoqadi."""
-    loop = asyncio.get_event_loop()
-    start_api_server(loop, application.bot, application.bot_data)
-
-def main():
-    init_db()
-    app = Application.builder().token(BOT_TOKEN).post_init(post_init).build()
-    app.add_handler(CommandHandler("start", cmd_start))
-    app.add_handler(CommandHandler("admin", cmd_admin))
-    app.add_handler(CommandHandler("grant", cmd_grant))
-    app.add_handler(MessageHandler(filters.Text(list(REPLY_TEXTS.keys())), reply_menu_handler))
-    app.add_handler(CallbackQueryHandler(cb))
-    jq = app.job_queue
-    jq.run_repeating(job_soatlik,   interval=3600, first=60)
-    jq.run_repeating(job_kritik,    interval=300,  first=30)
-    jq.run_repeating(job_auto_irr,  interval=1800, first=120)
-    jq.run_repeating(job_keepalive, interval=840,  first=120)
-    if WEBHOOK_URL:
-        logger.info("Webhook: %s", WEBHOOK_URL)
-        app.run_webhook(listen="0.0.0.0", port=PORT,
-                        webhook_url=f"{WEBHOOK_URL}/{BOT_TOKEN}",
-                        secret_token="tomchitech-2025", url_path=BOT_TOKEN)
-    else:
-        logger.info("Polling rejimida...")
-        app.run_polling(drop_pending_updates=True)
-
-if __name__ == "__main__":
-    main()
-ctx, cid, "✅ <b>Hozirda hech qanday ogohlantirish yoq.</b>\n\nBarcha fermalar normal. 🌿", kb=back_kb())
-
-    elif data == "yordam":
-        await send(ctx, update.effective_chat.id,
-            "ℹ <b>YORDAM</b>\n\n"
-            "📊 Hisobot — sensor malumotlari hisoboti\n"
-            "🌾 Fermalar — alohida ferma sensori\n"
-            "💧 Sug'orish — tomchilatib sughorish boshqaruvi\n"
-            "🚨 Ogohlantirishlar — kritik/ehtiyot holatlar\n"
-            "👨‍🔬 Mutaxassis — Premium foydalanuvchilar uchun\n\n"
-            "📞 support@tomchitech.uz",
-            kb=back_kb())
-
-    elif data == "mutax":
-        if not p["mutaxassis"]:
-            await update.message.reply_text("❌ Bu funksiya faqat Premium paketda mavjud.")
-            return
-        matn = "👨‍🔬 <b>MUTAXASSISLAR</b>\nKritik holatlarda quyidagilar bilan boglanin:\n━━━━━━━━━━━━━━━━━━\n\n"
-        for m in MUTAXASSISLAR:
-            matn += f"<b>{m['ism']}</b>\n💼 {m['lavozim']}\n🔬 {m['soha']}\n📞 {m['tel']}\n\n"
-        await send(ctx, update.effective_chat.id, matn, kb=back_kb())
-
-    elif data == "obuna_info":
-        remaining = (datetime.strptime(sub["end_date"][:10], "%Y-%m-%d") - datetime.now()).days
-        funks     = "\n".join(f"  ✅ {f}" for f in p["funksiyalar"])
-        await send(ctx, update.effective_chat.id,
-            f"📦 <b>OBUNA MALUMOTLARI</b>\n━━━━━━━━━━━━━━━━━━\n\n"
-            f"{p['emoji']} Paket: <b>{p['nomi']}</b>\n"
-            f"💰 {p['narx']:,} som/oy\n"
-            f"📅 Tugash: {sub['end_date'][:10]}\n"
-            f"🕐 Qolgan: <b>{remaining} kun</b>\n\n"
-            f"<b>Funksiyalar:</b>\n{funks}",
-            kb=back_kb())
-
 
 # ══════════════════════════════════════════════════════════════════════════════
 #  2-DAQIQALIK ALERT BUFFER TIZIMI
@@ -900,10 +807,12 @@ ctx, cid, "✅ <b>Hozirda hech qanday ogohlantirish yoq.</b>\n\nBarcha fermalar 
 ALERT_BUFFER: dict = {}
 _BUF_LOCK = threading.Lock()
 
+
 def buf_add(chat_id: int, alert: dict):
     """Bufferga yangi alert qo'shadi."""
     with _BUF_LOCK:
         ALERT_BUFFER.setdefault(chat_id, []).append(alert)
+
 
 async def flush_alerts(context: ContextTypes.DEFAULT_TYPE):
     """
@@ -919,21 +828,22 @@ async def flush_alerts(context: ContextTypes.DEFAULT_TYPE):
         n   = len(alerts)
         now = datetime.now().strftime("%d.%m.%Y %H:%M")
 
+        sep   = '━' * 26
         lines = [
             f"🔔 <b>{n} ta yangi bildirishnoma</b>\n"
-            f"⏰ {now}\n"
-            f"{'━' * 26}"
+            f"⏰ {now}\n" + sep
         ]
         for i, a in enumerate(alerts, 1):
             h    = a.get("holat", "ehtiyot")
             icon = "🔴" if h == "kritik" else "🟡" if h == "ehtiyot" else "🟢"
+            farm_name = a.get("farm", "Noma'lum ferma")
             lines.append(
-                f"{i}. {icon} <b>{a.get('farm', 'Noma\'lum ferma')}</b>\n"
+                f"{i}. {icon} <b>{farm_name}</b>\n"
                 f"   📡 {a.get('sensor', 'Sensor')} · <code>{a.get('qiymat', '—')}</code>\n"
                 f"   💬 {a.get('xabar', '')}\n"
                 f"   🕐 {a.get('time', '')}"
             )
-        lines.append(f"{'━' * 26}\n📌 <i>Ushbu xabar log sifatida saqlanadi</i>")
+        lines.append(sep + "\n📌 <i>Ushbu xabar log sifatida saqlanadi</i>")
 
         markup = InlineKeyboardMarkup([[
             InlineKeyboardButton("✅ Ko'rib chiqdim", callback_data="ack_log")
@@ -970,6 +880,7 @@ async def cb_ack_log(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
 # ══════════════════════════════════════════════════════════════════════════════
 _app_ref = None   # Application instance (main() da o'rnatiladi)
 
+
 class AlertHandler(BaseHTTPRequestHandler):
     """
     POST /alert   →  dashboard dan sensor alertini qabul qiladi
@@ -1003,7 +914,6 @@ class AlertHandler(BaseHTTPRequestHandler):
         if self.path != "/alert":
             self._respond(404, b'{"error":"Not found"}'); return
 
-        # Secret tekshiruvi
         secret = self.headers.get("X-Secret", "")
         if secret != NOTIFY_SECRET:
             self._respond(403, b'{"error":"Forbidden"}'); return
@@ -1027,7 +937,6 @@ class AlertHandler(BaseHTTPRequestHandler):
         if chat_id:
             buf_add(int(chat_id), alert)
         elif _app_ref:
-            # Barcha obunachilarga yuborish
             for cid in _app_ref.bot_data.get("subscribers", set()):
                 buf_add(cid, alert)
 
@@ -1055,21 +964,30 @@ def main():
     app = Application.builder().token(BOT_TOKEN).build()
     _app_ref = app
 
-    # Handlerlar
+    # ── Handlerlar ────────────────────────────────────────────────────────────
     app.add_handler(CommandHandler("start", cmd_start))
+    app.add_handler(CommandHandler("til",   cmd_til))       # /til — til tanlash
+    app.add_handler(CommandHandler("admin", cmd_admin))
+    app.add_handler(CommandHandler("grant", cmd_grant))
+    # ack_log pattern MUST come before the generic cb handler
     app.add_handler(CallbackQueryHandler(cb_ack_log, pattern=r"^ack_log$"))
     app.add_handler(CallbackQueryHandler(cb))
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, reply_menu_handler))
+    app.add_handler(MessageHandler(
+        filters.Text(list(REPLY_TEXTS.keys())), reply_menu_handler))
 
-    # 2-daqiqalik alert flush (job_queue)
+    # ── Job queue ─────────────────────────────────────────────────────────────
     jq = app.job_queue
-    jq.run_repeating(flush_alerts, interval=120, first=10, name="alert_flush")
-    logger.info("Alert flush job: har 120 soniyada ishlaydi")
+    jq.run_repeating(flush_alerts,  interval=120,  first=10,  name="alert_flush")
+    jq.run_repeating(job_soatlik,   interval=3600, first=60,  name="soatlik")
+    jq.run_repeating(job_kritik,    interval=300,  first=30,  name="kritik")
+    jq.run_repeating(job_auto_irr,  interval=1800, first=120, name="auto_irr")
+    jq.run_repeating(job_keepalive, interval=840,  first=120, name="keepalive")
+    logger.info("Jobs: alert_flush(120s), soatlik(1h), kritik(5m), auto_irr(30m), keepalive(14m)")
 
-    # HTTP API server
+    # ── HTTP Alert API server ─────────────────────────────────────────────────
     start_api_server()
 
-    # Ishga tushirish
+    # ── Ishga tushirish ───────────────────────────────────────────────────────
     if WEBHOOK_URL:
         hook_url = WEBHOOK_URL.rstrip("/") + "/webhook"
         logger.info("Webhook mode: %s", hook_url)

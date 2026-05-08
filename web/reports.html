@@ -149,7 +149,10 @@ i[class^="ri-"]{line-height:1}
 @media(max-width:1280px){.metrics-row{grid-template-columns:repeat(2,1fr)}.chart-grid{grid-template-columns:1fr}}
 @media(max-width:900px){.sidebar{position:fixed;left:-100%;z-index:200;transition:left .25s}.sidebar.open{left:0}.content{padding:var(--sp-xl)}.ph-menu-btn{display:flex!important}}
 @media(max-width:480px){.metrics-row{grid-template-columns:1fr}.page-header{padding:0 var(--sp-xl)}.saving-table th:nth-child(5),.saving-table td:nth-child(5),.saving-table th:nth-child(6),.saving-table td:nth-child(6){display:none}}
+.ph-lang{display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:var(--r-md);border:1px solid var(--border-secondary);background:var(--bg-primary);font-size:12px;font-weight:600;color:var(--text-secondary);cursor:pointer;box-shadow:var(--shadow-xs);transition:background .12s}
+.ph-lang:hover{background:var(--bg-secondary)}
 </style>
+<script src="js/i18n.js"></script>
 </head>
 <body>
 
@@ -184,6 +187,10 @@ i[class^="ri-"]{line-height:1}
       <div class="av-wrap">X<div class="av-online"></div></div>
       <div style="flex:1;min-width:0"><div class="av-name">Xurshid Istamov</div><div class="av-role">Agrotexnik · Admin</div></div>
       <button class="ph-btn" onclick="toggleTheme()" title="Mavzu"><i class="ri-moon-line" id="theme-icon"></i></button>
+    <button class="ph-btn ph-lang" id="lang-btn" onclick="cycleLang()" title="Til o'zgartirish" style="gap:4px;font-weight:600;font-size:12px">
+      <i class="ri-global-line" style="font-size:15px"></i>
+      <span id="lang-label">UZ</span>
+    </button>
     </div>
   </div>
 </nav>
@@ -480,56 +487,4 @@ function renderSavingTable(recs) {
         <div class="bar-cell">
           <div class="bar-track"><div class="bar-fill" style="width:${Math.min(100,parseFloat(pct))}%;background:${parseFloat(pct)>30?'var(--success)':'var(--warning)'}"></div></div>
           <span style="font-weight:600;color:${parseFloat(pct)>30?'var(--success)':'var(--warning)'};min-width:36px">${pct}%</span>
-        </div>
-      </td>
-    </tr>`;
-  }).join('');
-  document.getElementById('saving-tbody').innerHTML = html;
-}
-
-function setPeriod(days, btn) {
-  trendDays = days;
-  document.querySelectorAll('.p-tab').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  fetch(API+'/sensors/configs').then(x=>x.json()).then(c=>renderTrendChart(c, days));
-}
-
-function exportReport() {
-  const rows = [['sensor_id','farm_id','crop_type','action','water_needed_L','traditional_L','saving_pct']];
-  document.querySelectorAll('#saving-tbody tr').forEach(tr=>{
-    const cells = [...tr.querySelectorAll('td')].map(td=>td.textContent.trim().replace(/\s+/g,' '));
-    if(cells.length>1) rows.push(cells);
-  });
-  const blob = new Blob([rows.map(r=>r.join(',')).join('\n')],{type:'text/csv'});
-  const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='hisobot.csv'; a.click();
-}
-
-function toggleSidebar(){
-  document.getElementById('sidebar').classList.toggle('open');
-  document.getElementById('sb-backdrop').classList.toggle('show');
-}
-window.addEventListener('resize',()=>{
-  if(window.innerWidth>900){
-    document.getElementById('sidebar').classList.remove('open');
-    document.getElementById('sb-backdrop').classList.remove('show');
-  }
-});
-
-function toggleTheme() {
-  const dark = document.documentElement.getAttribute('data-theme')==='dark';
-  document.documentElement.setAttribute('data-theme', dark?'light':'dark');
-  document.getElementById('theme-icon').className = dark?'ri-moon-line':'ri-sun-line';
-  localStorage.setItem('theme', dark?'light':'dark');
-}
-(()=>{
-  const t = localStorage.getItem('theme')||'light';
-  if(t==='dark'){
-    document.documentElement.setAttribute('data-theme','dark');
-    document.getElementById('theme-icon').className='ri-sun-line';
-  }
-})();
-
-loadData();
-</script>
-</body>
-</html>
+     

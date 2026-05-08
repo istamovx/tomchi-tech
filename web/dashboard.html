@@ -811,6 +811,7 @@ i[class^="ri-"] { line-height: 1; }
   .ph-search { display: none; }
 }
 </style>
+<script src="js/i18n.js"></script>
 </head>
 <body>
 
@@ -1717,27 +1718,20 @@ function toggleTheme() {
 const saved = localStorage.getItem('theme')||'light';
 if (saved==='dark') { document.documentElement.setAttribute('data-theme','dark'); document.getElementById('theme-icon').className='ri-sun-line'; }
 
-// ── Lang ──────────────────────────────────────────────────────
-const LANGS=['UZ','RU','EN']; let langIdx=parseInt(localStorage.getItem('lang')||'0');
-document.getElementById('lang-label').textContent = LANGS[langIdx];
-function cycleLang() { langIdx=(langIdx+1)%3; document.getElementById('lang-label').textContent=LANGS[langIdx]; localStorage.setItem('lang',langIdx); }
 
-// ── Responsive ────────────────────────────────────────────────
-function toggleSidebar(){
-  const sb=document.getElementById('sidebar');
-  const bd=document.getElementById('sb-backdrop');
-  sb.classList.toggle('open');
-  bd.classList.toggle('show');
+// ── i18n — til o'zgartirish ──────────────────────────────────────────────────
+const _LANG_LABELS = {uz:'UZ', ru:'RU', en:'EN'};
+function cycleLang() {
+  const codes = ['uz','ru','en'];
+  const cur   = (typeof getCurrentLang === 'function') ? getCurrentLang() : (localStorage.getItem('lang')||'uz');
+  const next  = codes[(codes.indexOf(cur)+1)%3];
+  if(typeof setLang === 'function') setLang(next);
+  else { localStorage.setItem('lang',next); location.reload(); }
+  const el = document.getElementById('lang-label');
+  if(el) el.textContent = _LANG_LABELS[next] || 'UZ';
 }
-window.addEventListener('resize',()=>{
-  if(window.innerWidth>900){
-    document.getElementById('sidebar').classList.remove('open');
-    document.getElementById('sb-backdrop').classList.remove('show');
-  }
-});
-
-// ── Init ──────────────────────────────────────────────────────
-initMap(); fetchAll(); setInterval(fetchAll, 30000);
-</script>
-</body>
-</html>
+(function(){
+  const lang = (typeof getCurrentLang==='function') ? getCurrentLang() : (localStorage.getItem('lang')||'uz');
+  const el = document.getElementById('lang-label');
+  if(el) el.textContent = _LANG_LABELS[lang] || 'UZ';
+})();

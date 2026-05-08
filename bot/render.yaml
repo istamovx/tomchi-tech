@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: tomchitech-bot
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python bot.py
+    envVars:
+      - key: BOT_TOKEN
+        value: 8655345849:AAGzYvepKRkyZPo7hw5_a0LFU8NMeSV3kH4
+      - key: PYTHON_VERSION
+        value: "3.11.0"

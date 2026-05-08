@@ -7,11 +7,11 @@
 <title>Tomchi Tech — Fermalar</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css"/>
-<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css"/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.css"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.markercluster@1.4.1/dist/MarkerCluster.css"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css"/>
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.min.js"></script>
 <style>
 :root{
   --bg-page:#F5F5F5;--bg-primary:#FFFFFF;--bg-primary-alt:#FAFAFA;--bg-secondary:#F9FAFB;
@@ -761,16 +761,26 @@ function initMap() {
   /* — create base map once — */
   if(!mapInstance){
     mapInstance = L.map('map',{zoomControl:true,preferCanvas:true});
+    /* Set default view immediately so map always shows tiles */
+    mapInstance.setView([40.5, 68.5], 6);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
       attribution:'© OpenStreetMap contributors',
       maxZoom:19,
-      crossOrigin:true,
     }).addTo(mapInstance);
+    /* Backup tile server if OSM fails */
+    mapInstance.on('tileerror', function(){
+      if(!mapInstance._backupAdded){
+        mapInstance._backupAdded=true;
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
+          attribution:'© OpenStreetMap contributors', maxZoom:19,
+        }).addTo(mapInstance);
+      }
+    });
     /* Leaflet o'lchami aniqlash */
     requestAnimationFrame(()=>{
       mapInstance.invalidateSize();
-      setTimeout(()=>{ mapInstance.invalidateSize(); }, 200);
-      setTimeout(()=>{ mapInstance.invalidateSize(); }, 600);
+      setTimeout(()=>{ mapInstance.invalidateSize(); }, 300);
+      setTimeout(()=>{ mapInstance.invalidateSize(); }, 800);
     });
 
     /* — alert zone circles (semi-transparent red halos) — */
@@ -795,7 +805,9 @@ function initMap() {
   if(clusterGroup){ mapInstance.removeLayer(clusterGroup); clusterGroup=null; }
   markers = {};
 
-  clusterGroup = L.markerClusterGroup({
+  /* Try markercluster, fall back to plain featureGroup if plugin missing */
+  const hasCluster = typeof L.markerClusterGroup === 'function';
+  clusterGroup = hasCluster ? L.markerClusterGroup({
     maxClusterRadius: 65,
     spiderfyOnMaxZoom: true,
     showCoverageOnHover: false,
@@ -821,7 +833,7 @@ function initMap() {
         className:'', iconSize:[size,size], iconAnchor:[size/2,size/2]
       });
     }
-  });
+  }) : L.featureGroup();
 
   const bounds = [];
 
@@ -897,11 +909,8 @@ function resetMapView(){
   else mapInstance.setView([40.5,68.5],5);
 }
 
-if(document.readyState==='loading'){
-  document.addEventListener('DOMContentLoaded', loadData);
-} else {
-  loadData();
-}
+/* Run after all scripts are ready */
+window.addEventListener('load', loadData);
 </script>
 </body>
 </html>

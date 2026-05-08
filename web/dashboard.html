@@ -755,8 +755,30 @@ i[class^="ri-"] { line-height: 1; }
 [data-theme="dark"] .metric-card:hover   { background: #1E2436; }
 [data-theme="dark"] .leaflet-tile        { filter: brightness(.6) invert(1) contrast(2) hue-rotate(200deg) saturate(.3) brightness(.7); }
 [data-theme="dark"] .leaflet-container   { background: #0C0E12; }
-[data-theme="dark"] .leaflet-popup-content-wrapper { background: #161A23; border: 1px solid #2E3448; }
-[data-theme="dark"] .leaflet-popup-tip  { background: #161A23; }
+/* Popup base */
+.leaflet-popup-content-wrapper {
+  border-radius: 14px !important;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.14) !important;
+  border: 1px solid rgba(0,0,0,0.07);
+  overflow: hidden;
+}
+.leaflet-popup-content { margin: 14px 16px !important; }
+.leaflet-popup-close-button { top: 8px !important; right: 10px !important; font-size: 18px !important; }
+
+/* Dark mode — glass effect */
+[data-theme="dark"] .leaflet-popup-content-wrapper {
+  background: rgba(14, 18, 28, 0.78) !important;
+  backdrop-filter: blur(18px) saturate(1.4);
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
+  border: 1px solid rgba(255,255,255,0.09) !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.07) !important;
+}
+[data-theme="dark"] .leaflet-popup-tip { background: rgba(14,18,28,0.78) !important; }
+[data-theme="dark"] .leaflet-popup-close-button { color: rgba(255,255,255,0.45) !important; }
+[data-theme="dark"] .pop-title  { color: #E8ECF4 !important; }
+[data-theme="dark"] .pop-region { color: #8B92A0 !important; }
+[data-theme="dark"] .pop-crop   { color: #A0A8B8 !important; }
+[data-theme="dark"] .pop-meta   { color: #636B78 !important; border-top-color: rgba(255,255,255,0.07) !important; }
 [data-theme="dark"] .ph-dot             { border-color: #161A23; }
 [data-theme="dark"] .live-bar           { border-color: #1A1F2E; }
 [data-theme="dark"] .nav-item.active    { background: #1E2436; }
@@ -1318,14 +1340,14 @@ function initMap() {
       : '';
     const marker = L.marker([s.lat, s.lon], { icon, isAlert: s.isAlert, isWarn: s.isWarn });
     marker.bindPopup(`
-      <div style="font-family:Inter,sans-serif;min-width:205px;padding:4px 2px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-          <b style="font-size:14px">${CROP_EMOJI[s.crop_type]||'🌱'} ${s.district}</b>${badge}
+      <div style="font-family:Inter,sans-serif;min-width:210px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px">
+          <b class="pop-title" style="font-size:14px;color:#181D27">${CROP_EMOJI[s.crop_type]||'🌱'} ${s.district}</b>${badge}
         </div>
-        <div style="font-size:12px;color:#535862;margin-bottom:5px">📍 ${s.region}</div>
-        <div style="font-size:13px;margin-bottom:3px">💧 Namlik: <b style="color:${dotColor}">${s.moisture.toFixed(1)}%</b>${mBar}</div>
-        <div style="font-size:12px;margin-bottom:3px">${CROP_EMOJI[s.crop_type]||'🌱'} ${s.crop_type} · 📐 ${s.total_area_ha} ga</div>
-        <div style="font-size:11px;color:#999;margin-top:4px">${s.sensor_id} · ${s.farmer_name}</div>
+        <div class="pop-region" style="font-size:12px;color:#535862;margin-bottom:6px">📍 ${s.region}</div>
+        <div style="font-size:13px;margin-bottom:6px">💧 Namlik: <b style="color:${dotColor}">${s.moisture.toFixed(1)}%</b>${mBar}</div>
+        <div class="pop-crop" style="font-size:12px;color:#414651;margin-bottom:2px">${CROP_EMOJI[s.crop_type]||'🌱'} ${s.crop_type} · 📐 ${s.total_area_ha} ga</div>
+        <div class="pop-meta" style="font-size:11px;color:#717680;margin-top:5px;padding-top:5px;border-top:1px solid rgba(0,0,0,0.07)">${s.sensor_id} · ${s.farmer_name}</div>
       </div>`);
     clusterGroup.addLayer(marker);
     bounds.push([s.lat, s.lon]);

@@ -29,8 +29,13 @@
   --r-xs:4px;--r-sm:6px;--r-md:8px;--r-lg:10px;--r-xl:12px;--r-2xl:16px;--r-full:9999px;
   --utility-gray-50:#FAFAFA;--utility-gray-200:#E9EAEB;--utility-gray-700:#414651;
   --bg-primary-alt:#FAFAFA;--neutral-bg:#F9FAFB;
-  --text-xs-size:12px;--text-sm-size:14px;--text-md-size:16px;--text-lg-size:18px;--text-xl-size:20px;--text-xl-lh:30px;
-  --display-xs-size:24px;--display-sm-size:30px;
+  --text-xs-size:12px;--text-xs-lh:18px;
+  --text-sm-size:14px;--text-sm-lh:20px;
+  --text-md-size:16px;--text-md-lh:24px;
+  --text-lg-size:18px;--text-lg-lh:28px;
+  --text-xl-size:20px;--text-xl-lh:30px;
+  --display-xs-size:24px;--display-xs-lh:32px;
+  --display-sm-size:30px;--display-sm-lh:38px;
   --sidebar-w:280px;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -233,11 +238,11 @@ td.bold{font-weight:600;color:var(--text-primary)}
       <span class="nav-icon"><i class="ri-settings-3-line"></i></span>
       Sozlamalar
     </button>
-    <button class="nav-item footer-item" onclick="sessionStorage.clear();window.location.replace('login.html')">
-      <span class="nav-icon"><i class="ri-logout-box-line"></i></span>
-      Chiqish
+    <button class="nav-item footer-item">
+      <span class="nav-icon"><i class="ri-question-line"></i></span>
+      Yordam
     </button>
-    <div class="sb-account">
+    <div class="sb-account" onclick="sessionStorage.clear();window.location.replace('login.html')" title="Chiqish">
       <div class="av-wrap">
         X
         <div class="av-online"></div>

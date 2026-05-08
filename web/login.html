@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Tomchi Tech — Kirish</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
+<style>
+:root {
+  --bg-page:          #F5F5F5;
+  --bg-primary:       #FFFFFF;
+  --text-primary:     #181D27;
+  --text-secondary:   #414651;
+  --text-tertiary:    #535862;
+  --text-placeholder: #717680;
+  --text-disabled:    #A4A7AE;
+  --border-primary:   #D5D7DA;
+  --border-secondary: #E9EAEB;
+  --border-brand:     #2970FF;
+  --brand:            #155EEF;
+  --brand-hover:      #1248C7;
+  --brand-50:         #EFF4FF;
+  --brand-100:        #D1E0FF;
+  --danger:           #D92D20;
+  --danger-bg:        #FEF3F2;
+  --danger-border:    #FECDCA;
+  --shadow-sm:        0px 1px 3px rgba(10,13,18,0.08), 0px 1px 2px rgba(10,13,18,0.04);
+  --shadow-md:        0px 4px 8px rgba(10,13,18,0.08), 0px 2px 4px rgba(10,13,18,0.04);
+  --shadow-xl:        0px 20px 24px rgba(10,13,18,0.10), 0px 8px 8px rgba(10,13,18,0.04);
+  --r-sm:   6px;
+  --r-md:   8px;
+  --r-lg:   10px;
+  --r-xl:   12px;
+  --r-2xl:  16px;
+  --r-full: 9999px;
+  --sp-xs:  4px;
+  --sp-sm:  6px;
+  --sp-md:  8px;
+  --sp-lg:  12px;
+  --sp-xl:  16px;
+  --sp-2xl: 20px;
+  --sp-3xl: 24px;
+  --sp-4xl: 32px;
+  --sp-5xl: 40px;
+  --sp-6xl: 48px;
+  --text-xs-size: 12px;
+  --text-sm-size: 14px;
+  --text-md-size: 16px;
+  --text-lg-size: 18px;
+  --text-xl-size: 20px;
+  --display-xs-size: 24px;
+  --display-sm-size: 30px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; }
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--bg-page);
+  color: var(--text-primary);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-font-smoothing: antialiased;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── Background decoration ── */
+.bg-decoration {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+.bg-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.18;
+}
+.bg-blob-1 {
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, #2970FF 0%, #155EEF 100%);
+  top: -200px; right: -150px;
+}
+.bg-blob-2 {
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, #17B26A 0%, #0E9955 100%);
+  bottom: -100px; left: -100px;
+  opacity: 0.10;
+}
+.bg-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(21,94,239,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(21,94,239,0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* ── Card ── */
+.login-wrap {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 420px;
+  padding: var(--sp-xl);
+}
+
+.login-card {
+  background: var(--bg-primary);
+  border-radius: var(--r-2xl);
+  box-shadow: var(--shadow-xl), 0 0 0 1px rgba(10,13,18,0.06);
+  overflow: hidden;
+}
+
+/* ── Card header strip ── */
+.card-top {
+  background: linear-gradient(135deg, #155EEF 0%, #2970FF 50%, #1248C7 100%);
+  padding: var(--sp-5xl) var(--sp-5xl) var(--sp-4xl);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.card-top::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 30% 0%, rgba(255,255,255,0.15) 0%, transparent 60%);
+}
+.card-top-inner { position: relative; z-index: 1; }
+
+/* Logo */
+.logo-mark {
+  width: 56px; height: 56px;
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(10px);
+  border: 1.5px solid rgba(255,255,255,0.3);
+  border-radius: var(--r-xl);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--sp-xl);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+}
+.logo-mark i {
+  font-size: 26px;
+  color: #fff;
+}
+.brand-name {
+  font-size: var(--display-xs-size);
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.5px;
+  margin-bottom: var(--sp-xs);
+}
+.brand-sub {
+  font-size: var(--text-sm-size);
+  color: rgba(255,255,255,0.75);
+  font-weight: 400;
+}
+
+/* ── Form area ── */
+.card-body {
+  padding: var(--sp-5xl) var(--sp-5xl) var(--sp-4xl);
+}
+
+.form-title {
+  font-size: var(--text-xl-size);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--sp-xs);
+}
+.form-subtitle {
+  font-size: var(--text-sm-size);
+  color: var(--text-tertiary);
+  margin-bottom: var(--sp-4xl);
+}
+
+/* Error alert */
+.error-alert {
+  display: none;
+  align-items: center;
+  gap: var(--sp-md);
+  padding: var(--sp-lg) var(--sp-xl);
+  background: var(--danger-bg);
+  border: 1px solid var(--danger-border);
+  border-radius: var(--r-md);
+  margin-bottom: var(--sp-3xl);
+  animation: shake 0.35s ease;
+}
+.error-alert.show { display: flex; }
+.error-alert i { color: var(--danger); font-size: 18px; flex-shrink: 0; }
+.error-alert span {
+  font-size: var(--text-sm-size);
+  color: var(--danger);
+  font-weight: 500;
+}
+
+@keyframes shake {
+  0%,100%{ transform: translateX(0); }
+  20%    { transform: translateX(-6px); }
+  40%    { transform: translateX(6px); }
+  60%    { transform: translateX(-4px); }
+  80%    { transform: translateX(4px); }
+}
+
+/* Field */
+.field { margin-bottom: var(--sp-2xl); }
+.field-label {
+  display: block;
+  font-size: var(--text-sm-size);
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: var(--sp-sm);
+}
+.input-wrap {
+  position: relative;
+}
+.input-icon {
+  position: absolute;
+  left: 14px; top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-placeholder);
+  font-size: 18px;
+  pointer-events: none;
+  transition: color 0.2s;
+}
+.field-input {
+  width: 100%;
+  height: 44px;
+  padding: 0 44px 0 42px;
+  border: 1.5px solid var(--border-primary);
+  border-radius: var(--r-md);
+  font-family: inherit;
+  font-size: var(--text-sm-size);
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.field-input::placeholder { color: var(--text-placeholder); }
+.field-input:focus {
+  border-color: var(--border-brand);
+  box-shadow: 0 0 0 3px rgba(41,112,255,0.12);
+}
+.field-input:focus ~ .input-icon,
+.input-wrap:focus-within .input-icon {
+  color: var(--brand);
+}
+.field-input.error { border-color: var(--danger); }
+.field-input.error:focus { box-shadow: 0 0 0 3px rgba(217,45,32,0.10); }
+
+/* Password toggle */
+.pw-toggle {
+  position: absolute;
+  right: 12px; top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-placeholder);
+  font-size: 18px;
+  padding: var(--sp-xs);
+  border-radius: var(--r-sm);
+  line-height: 1;
+  transition: color 0.2s;
+}
+.pw-toggle:hover { color: var(--text-secondary); }
+
+/* Submit button */
+.btn-login {
+  width: 100%;
+  height: 44px;
+  background: linear-gradient(180deg, #2970FF 0%, #155EEF 100%);
+  color: #fff;
+  font-family: inherit;
+  font-size: var(--text-sm-size);
+  font-weight: 600;
+  border: none;
+  border-radius: var(--r-md);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-md);
+  box-shadow: 0 1px 2px rgba(10,13,18,0.15), inset 0 1px 0 rgba(255,255,255,0.15);
+  transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+  margin-top: var(--sp-3xl);
+  position: relative;
+  overflow: hidden;
+}
+.btn-login::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, transparent 100%);
+}
+.btn-login:hover {
+  background: linear-gradient(180deg, #1C64F2 0%, #1248C7 100%);
+  box-shadow: 0 2px 8px rgba(21,94,239,0.35), inset 0 1px 0 rgba(255,255,255,0.15);
+}
+.btn-login:active { transform: translateY(1px); }
+.btn-login:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Loading spinner inside button */
+.btn-spinner {
+  display: none;
+  width: 18px; height: 18px;
+  border: 2px solid rgba(255,255,255,0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+.btn-login.loading .btn-text { display: none; }
+.btn-login.loading .btn-spinner { display: block; }
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Footer ── */
+.card-footer {
+  padding: var(--sp-xl) var(--sp-5xl);
+  border-top: 1px solid var(--border-secondary);
+  text-align: center;
+}
+.card-footer p {
+  font-size: var(--text-xs-size);
+  color: var(--text-placeholder);
+  line-height: 1.6;
+}
+.card-footer strong { color: var(--text-tertiary); font-weight: 600; }
+
+/* ── Version tag ── */
+.version-tag {
+  text-align: center;
+  margin-top: var(--sp-xl);
+  font-size: 11px;
+  color: var(--text-disabled);
+  letter-spacing: 0.3px;
+}
+</style>
+</head>
+<body>
+
+<!-- Background -->
+<div class="bg-decoration">
+  <div class="bg-grid"></div>
+  <div class="bg-blob bg-blob-1"></div>
+  <div class="bg-blob bg-blob-2"></div>
+</div>
+
+<!-- Login Card -->
+<div class="login-wrap">
+  <div class="login-card">
+
+    <!-- Top brand strip -->
+    <div class="card-top">
+      <div class="card-top-inner">
+        <div class="logo-mark">
+          <i class="ri-drop-fill"></i>
+        </div>
+        <div class="brand-name">Tomchi Tech</div>
+        <div class="brand-sub">Aqlli qishloq xo'jaligi platformasi</div>
+      </div>
+    </div>
+
+    <!-- Form -->
+    <div class="card-body">
+      <div class="form-title">Xush kelibsiz 👋</div>
+      <div class="form-subtitle">Davom etish uchun tizimga kiring</div>
+
+      <!-- Error -->
+      <div class="error-alert" id="errorAlert">
+        <i class="ri-error-warning-line"></i>
+        <span id="errorMsg">Foydalanuvchi nomi yoki parol noto'g'ri</span>
+      </div>
+
+      <form id="loginForm" autocomplete="off" novalidate>
+
+        <!-- Username -->
+        <div class="field">
+          <label class="field-label" for="username">Foydalanuvchi nomi</label>
+          <div class="input-wrap">
+            <i class="ri-user-3-line input-icon"></i>
+            <input
+              id="username"
+              class="field-input"
+              type="text"
+              placeholder="Foydalanuvchi nomini kiriting"
+              autocomplete="username"
+              spellcheck="false"
+              autocapitalize="none"
+            />
+          </div>
+        </div>
+
+        <!-- Password -->
+        <div class="field">
+          <label class="field-label" for="password">Parol</label>
+          <div class="input-wrap">
+            <i class="ri-lock-2-line input-icon"></i>
+            <input
+              id="password"
+              class="field-input"
+              type="password"
+              placeholder="Parolni kiriting"
+              autocomplete="current-password"
+            />
+            <button type="button" class="pw-toggle" id="pwToggle" tabindex="-1" aria-label="Parolni ko'rsatish">
+              <i class="ri-eye-line" id="pwIcon"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Submit -->
+        <button type="submit" class="btn-login" id="loginBtn">
+          <span class="btn-text">
+            <i class="ri-login-box-line"></i>
+            Kirish
+          </span>
+          <div class="btn-spinner"></div>
+        </button>
+
+      </form>
+    </div>
+
+    <!-- Footer -->
+    <div class="card-footer">
+      <p>Muammo bo'lsa, <strong>admin</strong> bilan bog'laning</p>
+    </div>
+
+  </div>
+
+  <div class="version-tag">Tomchi Tech v2.0 &nbsp;·&nbsp; 2025</div>
+</div>
+
+<script>
+// ── Auth check: already logged in? ──────────────────────────────
+if (sessionStorage.getItem('tomchi_auth') === '1') {
+  window.location.replace('dashboard.html');
+}
+
+// ── Credentials ──────────────────────────────────────────────────
+const CREDS = { username: 'Istamoffx', password: 'IstamoffX' };
+
+// ── DOM refs ─────────────────────────────────────────────────────
+const form      = document.getElementById('loginForm');
+const usernameEl = document.getElementById('username');
+const passwordEl = document.getElementById('password');
+const loginBtn  = document.getElementById('loginBtn');
+const errorAlert = document.getElementById('errorAlert');
+const errorMsg  = document.getElementById('errorMsg');
+const pwToggle  = document.getElementById('pwToggle');
+const pwIcon    = document.getElementById('pwIcon');
+
+// ── Password show/hide ───────────────────────────────────────────
+pwToggle.addEventListener('click', () => {
+  const isPass = passwordEl.type === 'password';
+  passwordEl.type = isPass ? 'text' : 'password';
+  pwIcon.className = isPass ? 'ri-eye-off-line' : 'ri-eye-line';
+});
+
+// ── Hide error on typing ─────────────────────────────────────────
+[usernameEl, passwordEl].forEach(el => {
+  el.addEventListener('input', () => {
+    errorAlert.classList.remove('show');
+    el.classList.remove('error');
+  });
+});
+
+// ── Form submit ──────────────────────────────────────────────────
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const uVal = usernameEl.value.trim();
+  const pVal = passwordEl.value;
+
+  // Basic empty check
+  if (!uVal) {
+    usernameEl.classList.add('error');
+    showError("Foydalanuvchi nomini kiriting");
+    usernameEl.focus();
+    return;
+  }
+  if (!pVal) {
+    passwordEl.classList.add('error');
+    showError("Parolni kiriting");
+    passwordEl.focus();
+    return;
+  }
+
+  // Loading state
+  loginBtn.classList.add('loading');
+  loginBtn.disabled = true;
+  errorAlert.classList.remove('show');
+
+  // Simulate short delay for UX (feels real)
+  await delay(600);
+
+  // Check credentials (case-sensitive)
+  if (uVal === CREDS.username && pVal === CREDS.password) {
+    sessionStorage.setItem('tomchi_auth', '1');
+    sessionStorage.setItem('tomchi_user', uVal);
+    // Short success pause, then redirect
+    await delay(200);
+    window.location.replace('dashboard.html');
+  } else {
+    loginBtn.classList.remove('loading');
+    loginBtn.disabled = false;
+    usernameEl.classList.add('error');
+    passwordEl.classList.add('error');
+    showError("Foydalanuvchi nomi yoki parol noto'g'ri");
+    passwordEl.value = '';
+    passwordEl.focus();
+  }
+});
+
+function showError(msg) {
+  errorMsg.textContent = msg;
+  errorAlert.classList.remove('show');
+  // Force reflow to restart animation
+  void errorAlert.offsetWidth;
+  errorAlert.classList.add('show');
+}
+
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// ── Focus username on load ───────────────────────────────────────
+window.addEventListener('load', () => {
+  usernameEl.focus();
+});
+</script>
+</body>
+</html>

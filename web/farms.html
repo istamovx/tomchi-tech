@@ -154,6 +154,8 @@ i[class^="ri-"]{line-height:1}
 @media(max-width:1280px){.metrics-row{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:900px){.two-pane{grid-template-columns:1fr}.sidebar{position:fixed;left:-100%;z-index:200;transition:left .25s}.sidebar.open{left:0}.content{padding:var(--sp-xl)}.ph-menu-btn{display:flex!important}}
 .leaflet-tooltip.alert-tip{background:#FEF3F2;border:1px solid #FECDCA;color:#D92D20;font-weight:600;font-size:12px;padding:6px 10px;border-radius:6px;box-shadow:0 2px 8px rgba(217,45,32,.15)}
+.leaflet-tooltip.farm-poly-tip{background:rgba(24,29,39,0.88);border:1px solid rgba(255,255,255,0.12);color:#F0F2F5;font-size:12px;padding:7px 11px;border-radius:7px;box-shadow:0 4px 12px rgba(0,0,0,0.35);backdrop-filter:blur(4px)}
+.leaflet-tooltip.farm-poly-tip::before{border-top-color:rgba(24,29,39,0.88)}
 @keyframes alertPulse{0%,100%{opacity:.6;r:var(--pr)}50%{opacity:.2;r:calc(var(--pr)*1.15)}}
 </style>
 </head>
@@ -564,43 +566,74 @@ function farmCentroid(farm){
   const lon=ss.reduce((s,x)=>s+x.lon,0)/ss.length;
   return [lat,lon];
 }
-function areaToPolygon(lat,lon,ha){
-  /* irregular pentagon approximation for farm boundary */
+function areaToPolygon(lat,lon,ha,seed){
+  /* Realistic agricultural field shape — trapezoid-ish with slight irregularity */
   const side=Math.sqrt(ha*10000);
-  const dLat=side*0.50/111000;
-  const dLon=side*0.62/(111000*Math.cos(lat*Math.PI/180));
+  const dLat=side*0.55/111000;
+  const dLon=side*0.72/(111000*Math.cos(lat*Math.PI/180));
+  /* Per-farm deterministic jitter so each field looks unique */
+  const j=seed%7;
+  const skew=[0.08,0.12,0.06,0.10,0.14,0.07,0.11][j];
+  const rot =[0.04,0.07,0.03,0.09,0.05,0.08,0.02][j];
   return [
-    [lat+dLat*0.9,  lon-dLon*0.5],
-    [lat+dLat*0.4,  lon+dLon],
-    [lat-dLat*0.3,  lon+dLon*0.85],
-    [lat-dLat,      lon+dLon*0.1],
-    [lat-dLat*0.6,  lon-dLon],
-    [lat+dLat*0.2,  lon-dLon*0.9],
+    [lat+dLat,        lon-dLon*0.5 +dLon*skew],
+    [lat+dLat*0.9,    lon+dLon    +dLon*rot],
+    [lat-dLat*0.05,   lon+dLon*0.95-dLon*skew*0.3],
+    [lat-dLat,        lon+dLon*0.2 -dLon*rot*0.5],
+    [lat-dLat*0.85,   lon-dLon    -dLon*skew*0.2],
+    [lat+dLat*0.05,   lon-dLon*0.85+dLon*rot*0.3],
   ];
 }
 function updateFarmPolygons(){
   if(!mapInstance) return;
   const zoom=mapInstance.getZoom();
   if(farmPolygonLayer){ mapInstance.removeLayer(farmPolygonLayer); farmPolygonLayer=null; }
-  if(zoom<13) return;
-  const bounds=mapInstance.getBounds().pad(0.3);
+  if(zoom<11) return;
+  const bounds=mapInstance.getBounds().pad(0.4);
   farmPolygonLayer=L.featureGroup();
-  allFarms.forEach(f=>{
+  allFarms.forEach((f,fi)=>{
     const c=farmCentroid(f);
     if(!c||!bounds.contains(L.latLng(c[0],c[1]))) return;
     const st=farmStatus(f.farm_id);
-    const col=st.color.includes('danger')?'#D92D20':st.color.includes('warning')?'#F79009':'#17B26A';
-    const poly=L.polygon(areaToPolygon(c[0],c[1],f.total_area_ha),{
-      color:col,weight:2,opacity:0.85,fillColor:col,fillOpacity:0.13,dashArray:'5 4'
+    const isAlert=st.color.includes('danger');
+    const isWarn =st.color.includes('warning');
+    const col  =isAlert?'#E53935':isWarn?'#FB8C00':'#2E7D32';
+    const fill =isAlert?'#EF5350':isWarn?'#FFA726':'#43A047';
+    /* Opacity scales with zoom: subtle at 11, solid at 15+ */
+    const t=Math.min(1,(zoom-11)/4);
+    const fo=0.18+t*0.22;   /* 0.18 → 0.40 */
+    const wo=0.6 +t*0.4;    /* 0.6  → 1.0  */
+
+    const poly=L.polygon(areaToPolygon(c[0],c[1],f.total_area_ha,fi),{
+      color:col, weight:2, opacity:wo,
+      fillColor:fill, fillOpacity:fo,
+      lineJoin:'round',
     });
     poly.bindTooltip(
       `<b>${CROP_EMOJI[f.crop_type]||'🌱'} ${f.farmer_name}</b><br>`+
       `${f.farm_id} · ${f.total_area_ha} ga<br>`+
-      `<span style="color:${col}">${st.label}</span>`,
-      {sticky:true,direction:'top'}
+      `<span style="color:${fill}">${st.label}</span>`,
+      {sticky:true,direction:'top',className:'farm-poly-tip'}
     );
     poly.on('click',()=>selectFarm(f.farm_id));
     farmPolygonLayer.addLayer(poly);
+
+    /* Permanent label on the field when zoom >= 14 */
+    if(zoom>=14){
+      const labelIcon=L.divIcon({
+        className:'',
+        html:`<div style="
+          background:rgba(0,0,0,0.55);
+          color:#fff;
+          font-size:11px;font-weight:600;font-family:Inter,sans-serif;
+          padding:3px 7px;border-radius:4px;
+          white-space:nowrap;pointer-events:none;
+          border:1px solid rgba(255,255,255,0.2);
+        ">${CROP_EMOJI[f.crop_type]||'🌱'} ${f.total_area_ha} ga</div>`,
+        iconAnchor:[0,0]
+      });
+      farmPolygonLayer.addLayer(L.marker(c,{icon:labelIcon,interactive:false,zIndexOffset:-100}));
+    }
   });
   farmPolygonLayer.addTo(mapInstance);
 }

@@ -155,6 +155,39 @@ i[class^="ri-"]{line-height:1;}
 [data-theme="dark"] .sb-group-label{color:#636B78;}
 [data-theme="dark"] .sb-drop-list{border-color:#2E3448;}
 
+/* ── Modal ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.48);backdrop-filter:blur(3px);z-index:600;align-items:center;justify-content:center;padding:16px;}
+.modal-overlay.show{display:flex;}
+.modal-box{background:var(--bg-primary);border:1px solid var(--border-secondary);border-radius:var(--r-2xl);box-shadow:0 24px 48px rgba(10,13,18,.18);width:500px;max-width:100%;max-height:88vh;display:flex;flex-direction:column;overflow:hidden;animation:modalIn .2s ease;}
+@keyframes modalIn{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--border-secondary);flex-shrink:0;}
+.modal-title{font-size:var(--text-lg-size);font-weight:700;color:var(--text-primary);}
+.modal-close{width:32px;height:32px;border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;color:var(--text-tertiary);font-size:20px;transition:background .12s;flex-shrink:0;}
+.modal-close:hover{background:var(--bg-secondary);}
+.modal-body{padding:24px;overflow-y:auto;flex:1;}
+.modal-footer{padding:16px 24px;border-top:1px solid var(--border-secondary);display:flex;gap:10px;justify-content:flex-end;flex-shrink:0;}
+.modal-info-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border-secondary);font-size:var(--text-sm-size);}
+.modal-info-row:last-child{border-bottom:none;}
+.modal-info-label{color:var(--text-tertiary);}
+.modal-info-val{font-weight:600;color:var(--text-primary);}
+.modal-step{display:flex;gap:12px;align-items:flex-start;padding:12px;border-radius:var(--r-lg);background:var(--bg-secondary);margin-bottom:8px;}
+.modal-step-num{width:24px;height:24px;border-radius:50%;background:var(--brand);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.modal-step-text{font-size:var(--text-sm-size);color:var(--text-secondary);line-height:1.5;}
+.btn-success{background:var(--success);color:#fff;border:1px solid var(--success);}
+.btn-success:hover{background:#0D9E57;}
+/* ── Toast ── */
+.toast{position:fixed;bottom:24px;right:24px;padding:12px 18px;border-radius:var(--r-xl);font-size:var(--text-sm-size);font-weight:500;color:#fff;box-shadow:0 8px 24px rgba(10,13,18,.22);z-index:999;transform:translateY(80px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);pointer-events:none;max-width:320px;display:flex;align-items:center;gap:8px;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.success{background:#17B26A;}.toast.error{background:#D92D20;}.toast.info{background:#155EEF;}.toast.warn{background:#F79009;color:#fff;}
+/* ── Card states ── */
+.rec-card.irrigating{border-left-color:var(--brand)!important;background:linear-gradient(90deg,var(--brand-50)0%,var(--bg-primary)15%)!important;}
+.rec-card.done{opacity:0.55;border-left-color:var(--neutral)!important;}
+/* ── Dark modal ── */
+[data-theme="dark"] .modal-box{background:#10131C;border-color:#2E3448;}
+[data-theme="dark"] .modal-header,[data-theme="dark"] .modal-footer{border-color:#2E3448;}
+[data-theme="dark"] .modal-title{color:#F0F2F5;}[data-theme="dark"] .modal-info-row{border-color:#2E3448;}
+[data-theme="dark"] .modal-info-val{color:#F0F2F5;}[data-theme="dark"] .modal-step{background:#1C2130;}
+
 @keyframes spin{to{transform:rotate(360deg)}}
 @media(max-width:900px){
   :root{--sidebar-w:260px;}
@@ -305,6 +338,19 @@ i[class^="ri-"]{line-height:1;}
   </div>
 </div>
 
+<!-- Modal -->
+<div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-title"></span>
+      <button class="modal-close" onclick="closeModal()"><i class="ri-close-line"></i></button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-footer" id="modal-footer"></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
 <script>
 /* ── Dummy data (API o'rniga) ── */
 const CROP_EMOJI={pomidor:'🍅',kartoshka:'🥔',paxta:'🌿',uzum:'🍇',bugdoy:'🌾',"makkajo'xori":'🌽',piyoz:'🧅'};
@@ -354,7 +400,119 @@ const DUMMY_CONFIGS=[
   {sensor_id:'SNS-022-001',status:'online'},{sensor_id:'SNS-026-001',status:'online'},
 ];
 
-let _allRecs=[], _filter='all', _sort='priority';
+let _allRecs=[], _filter='all', _sort='priority', _recMap={};
+
+/* ── Modal ── */
+function openModal(title,bodyHTML,footerHTML){
+  document.getElementById('modal-title').innerHTML=title;
+  document.getElementById('modal-body').innerHTML=bodyHTML;
+  document.getElementById('modal-footer').innerHTML=footerHTML;
+  document.getElementById('modal-overlay').classList.add('show');
+}
+function closeModal(){document.getElementById('modal-overlay').classList.remove('show');}
+
+/* ── Toast ── */
+let _toastTimer;
+function showToast(msg,type='success'){
+  const t=document.getElementById('toast');
+  clearTimeout(_toastTimer);
+  t.className='toast '+type;
+  t.innerHTML=`<i class="ri-${type==='success'?'checkbox-circle':'type'==='error'?'error-warning':'information'}-line"></i> ${msg}`;
+  t.innerHTML=`${msg}`;
+  setTimeout(()=>t.classList.add('show'),10);
+  _toastTimer=setTimeout(()=>t.classList.remove('show'),3200);
+}
+
+/* ── Sug'orishni boshlash ── */
+function startIrrigation(sensorId){
+  const r=_recMap[sensorId]; if(!r) return;
+  const durationMin=r.water_needed_liters>0?Math.max(20,Math.round(r.water_needed_liters/55)):0;
+  const mc=r.current_moisture<30?'var(--danger)':r.current_moisture<45?'var(--warning)':'var(--success)';
+  const urgentBadge=r.action==='IRRIGATE_NOW'
+    ?`<span style="background:var(--danger-bg);border:1px solid var(--danger-border);color:var(--danger);font-size:11px;padding:3px 9px;border-radius:99px;font-weight:700">⚠️ Darhol zarur</span>`
+    :`<span style="background:var(--warning-bg);border:1px solid var(--warning-border);color:#B54708;font-size:11px;padding:3px 9px;border-radius:99px;font-weight:600">⏱ Tez sug'or</span>`;
+  openModal(
+    `💧 Sug'orishni tasdiqlash`,
+    `<div style="margin-bottom:16px;display:flex;align-items:center;gap:10px">
+       <span style="font-size:28px">${CROP_EMOJI[r.crop_type]||'🌱'}</span>
+       <div><div style="font-weight:700;font-size:16px">${r.sensor_id}</div><div style="font-size:13px;color:var(--text-tertiary)">${r.farm_id} · ${r.crop_type}</div></div>
+       <div style="margin-left:auto">${urgentBadge}</div>
+     </div>
+     <div style="background:var(--bg-secondary);border-radius:var(--r-xl);padding:16px;margin-bottom:16px">
+       <div class="modal-info-row"><span class="modal-info-label">Joriy namlik</span><span class="modal-info-val" style="color:${mc}">${r.current_moisture.toFixed(1)}%</span></div>
+       <div style="width:100%;height:6px;background:var(--border-secondary);border-radius:99px;margin:-4px 0 8px;overflow:hidden"><div style="width:${r.current_moisture.toFixed(0)}%;height:100%;background:${mc};border-radius:99px"></div></div>
+       <div class="modal-info-row"><span class="modal-info-label">⏱ Tavsiya etilgan davomiylik</span><span class="modal-info-val">${durationMin} daqiqa</span></div>
+       <div class="modal-info-row"><span class="modal-info-label">💧 Kerakli suv miqdori</span><span class="modal-info-val">${r.water_needed_liters.toLocaleString()} litr</span></div>
+       <div class="modal-info-row"><span class="modal-info-label">♻️ Suv tejash</span><span class="modal-info-val" style="color:var(--success)">${r.water_saving_pct.toFixed(1)}%</span></div>
+     </div>
+     <div style="background:var(--brand-50);border:1px solid var(--brand-100);border-radius:var(--r-lg);padding:12px;font-size:13px;color:var(--brand)">
+       <i class="ri-information-line"></i> ${r.message}
+     </div>`,
+    `<button class="btn-sm btn-outline" onclick="closeModal()" style="padding:8px 18px">Bekor qilish</button>
+     <button class="btn-sm btn-success" style="padding:8px 20px" onclick="confirmIrrigation('${sensorId}',${durationMin})">
+       <i class="ri-drop-fill"></i> Sug'orishni boshlash
+     </button>`
+  );
+}
+
+function confirmIrrigation(sensorId,durationMin){
+  closeModal();
+  const r=_recMap[sensorId]; if(!r) return;
+  r._state='irrigating';
+  renderCards();
+  showToast(`✅ ${sensorId} uchun ${durationMin} daqiqalik sug'orish boshlandi!`,'success');
+  // Avtomatik to'xtatish simulyatsiyasi (3s demo)
+  setTimeout(()=>{
+    const rec=_recMap[sensorId]; if(!rec) return;
+    rec._state='done'; rec.action='STOP_IRRIGATION'; rec.current_moisture=71+Math.random()*6;
+    renderCards();
+    updateFilterCounts();
+    showToast(`🏁 ${sensorId} sug'orish yakunlandi. Namlik: ${rec.current_moisture.toFixed(1)}%`,'info');
+  },3000);
+}
+
+function markReviewed(btn,sensorId){
+  const card=btn.closest('.rec-card');
+  card.classList.add('done');
+  btn.innerHTML='<i class="ri-check-double-line"></i> Bajarildi';
+  btn.disabled=true; btn.style.opacity='0.6';
+  const r=_recMap[sensorId]; if(r) r._state='done';
+  showToast(`✅ ${sensorId} ko'rib chiqildi`,'success');
+}
+
+function showRecDetails(sensorId){
+  const r=_recMap[sensorId]; if(!r) return;
+  const m=ACTION_MAP[r.action]||ACTION_MAP.NO_ACTION;
+  const mc=r.current_moisture<30?'var(--danger)':r.current_moisture<45?'var(--warning)':'var(--success)';
+  const nextDate=r.next_irrigation_time?new Date(r.next_irrigation_time).toLocaleDateString('uz-UZ',{day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'}):'—';
+  openModal(
+    `${CROP_EMOJI[r.crop_type]||'🌱'} ${r.sensor_id} — Batafsil`,
+    `<div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+       <span class="badge ${m.cls}" style="font-size:13px;padding:4px 12px">${m.lbl}</span>
+       <span style="font-size:13px;color:var(--text-tertiary)">${r.farm_id} · ${r.crop_type}</span>
+     </div>
+     <div style="margin-bottom:12px;font-size:13px;color:var(--text-secondary);line-height:1.6;background:var(--bg-secondary);padding:12px;border-radius:var(--r-lg)">${r.message}</div>
+     <div style="background:var(--bg-secondary);border-radius:var(--r-xl);padding:16px">
+       <div class="modal-info-row"><span class="modal-info-label">💧 Joriy namlik</span><span class="modal-info-val" style="color:${mc}">${r.current_moisture.toFixed(1)}%</span></div>
+       <div style="width:100%;height:5px;background:var(--border-secondary);border-radius:99px;margin:-4px 0 10px;overflow:hidden"><div style="width:${r.current_moisture.toFixed(0)}%;height:100%;background:${mc};border-radius:99px"></div></div>
+       <div class="modal-info-row"><span class="modal-info-label">💧 Kerakli suv</span><span class="modal-info-val">${r.water_needed_liters>0?r.water_needed_liters.toLocaleString()+' litr':'Kerak emas'}</span></div>
+       <div class="modal-info-row"><span class="modal-info-label">♻️ Suv tejash</span><span class="modal-info-val" style="color:var(--success)">${r.water_saving_pct.toFixed(1)}%</span></div>
+       <div class="modal-info-row"><span class="modal-info-label">📅 Keyingi sug'orish</span><span class="modal-info-val">${nextDate}</span></div>
+     </div>`,
+    `<button class="btn-sm btn-outline" style="padding:8px 18px" onclick="closeModal()">Yopish</button>
+     ${r.action==='IRRIGATE_NOW'||r.action==='IRRIGATE_SOON'
+       ?`<button class="btn-sm btn-success" style="padding:8px 18px" onclick="closeModal();startIrrigation('${sensorId}')"><i class="ri-drop-fill"></i> Sug'orishni boshlash</button>`
+       :''}`
+  );
+}
+
+function updateFilterCounts(){
+  document.getElementById('fc-all').textContent=_allRecs.length;
+  document.getElementById('fc-now').textContent=_allRecs.filter(r=>r.action==='IRRIGATE_NOW').length;
+  document.getElementById('fc-soon').textContent=_allRecs.filter(r=>r.action==='IRRIGATE_SOON').length;
+  document.getElementById('fc-stop').textContent=_allRecs.filter(r=>r.action==='STOP_IRRIGATION').length;
+  document.getElementById('fc-ok').textContent=_allRecs.filter(r=>r.action==='NO_ACTION').length;
+}
 
 function toggleSidebar(){
   const sb=document.getElementById('sidebar');
@@ -400,7 +558,8 @@ function renderCards(){
     const mc=r.current_moisture<30?'var(--danger)':r.current_moisture<45?'var(--warning)':'var(--success)';
     const nextDate=r.next_irrigation_time?`<span class="chip"><i class="ri-calendar-line"></i> ${new Date(r.next_irrigation_time).toLocaleDateString('uz-UZ',{day:'numeric',month:'short'})}</span>`:'';
     const waterChip=r.water_needed_liters>0?`<span class="chip"><i class="ri-drop-line"></i> ${r.water_needed_liters.toLocaleString()} L kerak</span>`:`<span class="chip"><i class="ri-drop-line"></i> Suv kerak emas</span>`;
-    return `<div class="rec-card ${m.cardCls}">
+    const stateClass=r._state==='irrigating'?' irrigating':r._state==='done'?' done':'';
+    return `<div class="rec-card ${m.cardCls}${stateClass}">
       <div class="rec-card-head">
         <div class="rec-card-icon ${m.cls}"><i class="${m.icon}" style="color:${m.iconCol}"></i></div>
         <div style="flex:1;min-width:0">
@@ -419,9 +578,9 @@ function renderCards(){
       </div>
       <div class="rec-action-row">
         ${r.action==='IRRIGATE_NOW'||r.action==='IRRIGATE_SOON'
-          ?`<button class="btn-sm btn-primary"><i class="ri-drop-fill"></i> Sug'orishni boshlash</button>`
-          :`<button class="btn-sm btn-outline"><i class="ri-check-line"></i> Ko'rib chiqildi</button>`}
-        <button class="btn-sm btn-outline"><i class="ri-information-line"></i> Batafsil</button>
+          ?`<button class="btn-sm btn-primary" onclick="startIrrigation('${r.sensor_id}')"><i class="ri-drop-fill"></i> Sug'orishni boshlash</button>`
+          :`<button class="btn-sm btn-outline" onclick="markReviewed(this,'${r.sensor_id}')"><i class="ri-check-line"></i> Ko'rib chiqildi</button>`}
+        <button class="btn-sm btn-outline" onclick="showRecDetails('${r.sensor_id}')"><i class="ri-information-line"></i> Batafsil</button>
       </div>
     </div>`;
   }).join('');
@@ -430,7 +589,8 @@ function loadData(){
   const icon=document.getElementById('refresh-icon');
   icon.style.animation='spin 1s linear infinite';
   setTimeout(()=>{
-    _allRecs=DUMMY_RECS;
+    _allRecs=DUMMY_RECS.map(r=>({...r}));
+    _allRecs.forEach(r=>{_recMap[r.sensor_id]=r;});
     const configs=DUMMY_CONFIGS;
     const now=_allRecs.filter(r=>r.action==='IRRIGATE_NOW').length;
     const soon=_allRecs.filter(r=>r.action==='IRRIGATE_SOON').length;

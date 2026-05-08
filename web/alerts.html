@@ -152,6 +152,35 @@ i[class^="ri-"]{line-height:1;}
 [data-theme="dark"] .sb-group-label{color:#636B78;}
 [data-theme="dark"] .sb-drop-list{border-color:#2E3448;}
 
+/* ── Modal ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.48);backdrop-filter:blur(3px);z-index:600;align-items:center;justify-content:center;padding:16px;}
+.modal-overlay.show{display:flex;}
+.modal-box{background:var(--bg-primary);border:1px solid var(--border-secondary);border-radius:var(--r-2xl);box-shadow:0 24px 48px rgba(10,13,18,.18);width:500px;max-width:100%;max-height:88vh;display:flex;flex-direction:column;overflow:hidden;animation:modalIn .2s ease;}
+@keyframes modalIn{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--border-secondary);flex-shrink:0;}
+.modal-title{font-size:var(--text-lg-size);font-weight:700;color:var(--text-primary);}
+.modal-close{width:32px;height:32px;border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;color:var(--text-tertiary);font-size:20px;transition:background .12s;flex-shrink:0;}
+.modal-close:hover{background:var(--bg-secondary);}
+.modal-body{padding:24px;overflow-y:auto;flex:1;}
+.modal-footer{padding:16px 24px;border-top:1px solid var(--border-secondary);display:flex;gap:10px;justify-content:flex-end;flex-shrink:0;}
+.modal-info-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border-secondary);font-size:var(--text-sm-size);}
+.modal-info-row:last-child{border-bottom:none;}
+.modal-info-label{color:var(--text-tertiary);}
+.modal-info-val{font-weight:600;color:var(--text-primary);}
+.modal-step{display:flex;gap:12px;align-items:flex-start;padding:12px;border-radius:var(--r-lg);background:var(--bg-secondary);margin-bottom:8px;}
+.modal-step-num{width:24px;height:24px;border-radius:50%;background:var(--danger);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.modal-step-text{font-size:var(--text-sm-size);color:var(--text-secondary);line-height:1.5;}
+.btn-success{background:#17B26A;color:#fff;border:1px solid #17B26A;}.btn-success:hover{background:#0D9E57;}
+/* ── Toast ── */
+.toast{position:fixed;bottom:24px;right:24px;padding:12px 18px;border-radius:var(--r-xl);font-size:var(--text-sm-size);font-weight:500;color:#fff;box-shadow:0 8px 24px rgba(10,13,18,.22);z-index:999;transform:translateY(80px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);pointer-events:none;max-width:340px;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.success{background:#17B26A;}.toast.error{background:#D92D20;}.toast.info{background:#155EEF;}.toast.warn{background:#F79009;}
+.alert-card.viewed{opacity:0.55;border-left-color:var(--neutral)!important;}
+[data-theme="dark"] .modal-box{background:#10131C;border-color:#2E3448;}
+[data-theme="dark"] .modal-header,[data-theme="dark"] .modal-footer{border-color:#2E3448;}
+[data-theme="dark"] .modal-title{color:#F0F2F5;}[data-theme="dark"] .modal-info-row{border-color:#2E3448;}
+[data-theme="dark"] .modal-info-val{color:#F0F2F5;}[data-theme="dark"] .modal-step{background:#1C2130;}
+
 @keyframes spin{to{transform:rotate(360deg)}}
 @media(max-width:900px){
   :root{--sidebar-w:260px;}
@@ -297,6 +326,19 @@ i[class^="ri-"]{line-height:1;}
   </div>
 </div>
 
+<!-- Modal -->
+<div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-title"></span>
+      <button class="modal-close" onclick="closeModal()"><i class="ri-close-line"></i></button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-footer" id="modal-footer"></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
 <script>
 /* ── Dummy data (API o'rniga) ── */
 const DUMMY_ALERTS = [
@@ -365,7 +407,136 @@ const SEV_MAP = {
   info:    {cls:'info', cardCls:'',         iconCls:'info',icon:'ri-information-fill',    lbl:'Xabar'},
 };
 const SEV_PRI = {critical:0,error:1,warning:2,info:3};
-let _allAlerts=[], _filter='all', _sort='time_desc';
+let _allAlerts=[], _filter='all', _sort='time_desc', _alertMap={};
+
+/* ── Modal ── */
+function openModal(title,bodyHTML,footerHTML){
+  document.getElementById('modal-title').innerHTML=title;
+  document.getElementById('modal-body').innerHTML=bodyHTML;
+  document.getElementById('modal-footer').innerHTML=footerHTML;
+  document.getElementById('modal-overlay').classList.add('show');
+}
+function closeModal(){document.getElementById('modal-overlay').classList.remove('show');}
+
+/* ── Toast ── */
+let _toastTimer;
+function showToast(msg,type='success'){
+  const t=document.getElementById('toast');
+  clearTimeout(_toastTimer);
+  t.className='toast '+type;
+  t.textContent=msg;
+  setTimeout(()=>t.classList.add('show'),10);
+  _toastTimer=setTimeout(()=>t.classList.remove('show'),3400);
+}
+
+/* ── Darhol muolaja ── */
+function emergencyAction(sensorId){
+  const a=_alertMap[sensorId]; if(!a) return;
+  const SEV_LABEL={critical:'Kritik',error:'Xato',warning:'Diqqat',info:'Xabar'};
+  openModal(
+    `🚨 Darhol muolaja — ${sensorId}`,
+    `<div style="background:var(--danger-bg);border:1px solid var(--danger-border);border-radius:var(--r-lg);padding:14px;margin-bottom:16px">
+       <div style="font-weight:700;color:var(--danger);margin-bottom:4px">${a.message}</div>
+       <div style="font-size:13px;color:var(--text-secondary)">${a.description||''}</div>
+     </div>
+     <div style="font-size:13px;font-weight:600;color:var(--text-tertiary);margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em">Harakat tartibi</div>
+     <div class="modal-step"><div class="modal-step-num">1</div><div class="modal-step-text"><b>Sug'orish tizimini yoqing</b> — ${a.farm_id} fermasidagi asosiy suv klapanini oching. Minimal debiti 8-10 l/min bo'lsin.</div></div>
+     <div class="modal-step"><div class="modal-step-num">2</div><div class="modal-step-text"><b>Sensorni tekshiring</b> — ${sensorId} sensorini fizik ko'zdan kechirib, ulanish va batareya holati tekshirilsin.</div></div>
+     <div class="modal-step"><div class="modal-step-num">3</div><div class="modal-step-text"><b>Ekinlarni ko'zdan kechiring</b> — barglar so'lish, rangi o'zgarish belgilarini kuzating. Foto yozing.</div></div>
+     <div class="modal-step"><div class="modal-step-num">4</div><div class="modal-step-text"><b>Agrotexnikga xabar bering</b> — holat haqida to'liq ma'lumot yetkazing va sug'orish jarayonini kuzatib boring.</div></div>
+     <div style="background:var(--warning-bg);border:1px solid var(--warning-border);border-radius:var(--r-lg);padding:12px;margin-top:12px;font-size:13px;color:#B54708">
+       ⏱ Taxminiy muolaja vaqti: 30-45 daqiqa
+     </div>`,
+    `<button class="btn-sm btn-outline" style="padding:8px 18px" onclick="closeModal()">Keyinroq</button>
+     <button class="btn-sm btn-danger" style="padding:8px 18px" onclick="confirmEmergency('${sensorId}')">
+       <i class="ri-checkbox-circle-line"></i> Muolaja boshlandi
+     </button>`
+  );
+}
+
+function confirmEmergency(sensorId){
+  closeModal();
+  resolveAlertById(sensorId);
+  showToast('🚨 Muolaja boshlandi. Alert yopildi.','error');
+}
+
+/* ── Ko'rib chiqish ── */
+function viewAlert(sensorId,btn){
+  const card=btn.closest('.alert-card');
+  if(card.classList.contains('viewed')) return;
+  card.classList.add('viewed');
+  btn.innerHTML='<i class="ri-eye-check-line"></i> Ko\'rildi';
+  btn.disabled=true; btn.style.opacity='0.6';
+  showToast(`👁 ${sensorId} ko'rib chiqildi`,'info');
+}
+
+/* ── Hal qilindi ── */
+function resolveAlert(sensorId,btn){
+  resolveAlertById(sensorId);
+  showToast(`✅ ${sensorId} hal qilindi`,'success');
+}
+
+function resolveAlertById(sensorId){
+  const card=document.querySelector(`[data-alert-id="${sensorId}"]`);
+  if(card){
+    card.style.transition='opacity .35s,transform .35s';
+    card.style.opacity='0'; card.style.transform='translateX(30px)';
+    setTimeout(()=>{
+      card.remove();
+      _allAlerts=_allAlerts.filter(a=>a.sensor_id!==sensorId);
+      delete _alertMap[sensorId];
+      updateAlertCounts();
+    },350);
+  } else {
+    _allAlerts=_allAlerts.filter(a=>a.sensor_id!==sensorId);
+    delete _alertMap[sensorId];
+    updateAlertCounts();
+  }
+}
+
+function updateAlertCounts(){
+  const crit=_allAlerts.filter(a=>a.severity==='critical'||a.severity==='error').length;
+  const warn=_allAlerts.filter(a=>a.severity==='warning').length;
+  document.getElementById('st-total').textContent=_allAlerts.length;
+  document.getElementById('st-crit').textContent=crit;
+  document.getElementById('st-warn').textContent=warn;
+  document.getElementById('fc-all').textContent=_allAlerts.length;
+  document.getElementById('fc-crit').textContent=_allAlerts.filter(a=>a.severity==='critical').length;
+  document.getElementById('fc-err').textContent=_allAlerts.filter(a=>a.severity==='error').length;
+  document.getElementById('fc-warn').textContent=warn;
+  document.getElementById('nb-alerts').textContent=_allAlerts.length;
+  document.getElementById('alert-count').textContent=_allAlerts.length+' ta alert';
+  if(!_allAlerts.length){
+    document.getElementById('alert-list').innerHTML=`<div class="alert-card"><div class="empty-state" style="width:100%"><i class="ri-checkbox-circle-line"></i><h3>Barcha alertlar hal qilindi!</h3><p>Tizim yaxshi ishlayapti 🎉</p></div></div>`;
+  }
+}
+
+/* ── Batafsil ── */
+function showAlertDetails(sensorId){
+  const a=_alertMap[sensorId]; if(!a) return;
+  const s=SEV_MAP[a.severity]||SEV_MAP.warning;
+  const isCrit=a.severity==='critical'||a.severity==='error';
+  openModal(
+    `🔍 Alert tafsiloti`,
+    `<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;padding:14px;border-radius:var(--r-xl);background:${isCrit?'var(--danger-bg)':'var(--warning-bg)'}">
+       <span style="font-size:28px;color:${isCrit?'var(--danger)':'var(--warning)'}"><i class="${s.icon}"></i></span>
+       <div><div style="font-weight:700;font-size:15px">${a.message}</div>
+       <span class="badge ${s.cls}" style="margin-top:4px">${s.lbl}</span></div>
+     </div>
+     <div style="font-size:13px;color:var(--text-secondary);line-height:1.6;margin-bottom:16px;padding:12px;background:var(--bg-secondary);border-radius:var(--r-lg)">${a.description||''}</div>
+     <div style="background:var(--bg-secondary);border-radius:var(--r-xl);padding:16px">
+       <div class="modal-info-row"><span class="modal-info-label">📡 Sensor</span><span class="modal-info-val">${a.sensor_id}</span></div>
+       <div class="modal-info-row"><span class="modal-info-label">🌿 Ferma</span><span class="modal-info-val">${a.farm_id}</span></div>
+       ${a.value!=null?`<div class="modal-info-row"><span class="modal-info-label">💧 Qiymat</span><span class="modal-info-val">${a.value.toFixed(1)}%</span></div>`:''}
+       <div class="modal-info-row"><span class="modal-info-label">🕐 Vaqt</span><span class="modal-info-val">${formatTime(a.at)}</span></div>
+     </div>`,
+    `<button class="btn-sm btn-outline" style="padding:8px 18px" onclick="closeModal()">Yopish</button>
+     ${isCrit
+       ?`<button class="btn-sm btn-danger" style="padding:8px 18px" onclick="closeModal();emergencyAction('${sensorId}')"><i class="ri-alarm-warning-line"></i> Darhol muolaja</button>`
+       :`<button class="btn-sm btn-success" style="padding:8px 18px" onclick="closeModal();resolveAlertById('${sensorId}');showToast('✅ ${sensorId} hal qilindi','success')"><i class="ri-checkbox-circle-line"></i> Hal qilindi</button>`}
+    `
+  );
+}
 
 function toggleSidebar(){
   const sb=document.getElementById('sidebar');
@@ -415,7 +586,7 @@ function renderAlerts(){
   document.getElementById('alert-list').innerHTML=alerts.map(a=>{
     const s=SEV_MAP[a.severity]||SEV_MAP.warning;
     const isCrit=a.severity==='critical'||a.severity==='error';
-    return `<div class="alert-card ${s.cardCls}">
+    return `<div class="alert-card ${s.cardCls}" data-alert-id="${a.sensor_id}">
       <div class="alert-icon-wrap ${s.iconCls} ${isCrit?'pulse':''}"><i class="${s.icon}"></i></div>
       <div class="alert-body">
         <div class="alert-title">${a.message}</div>
@@ -428,9 +599,9 @@ function renderAlerts(){
           <span class="alert-time"><i class="ri-time-line"></i> ${formatTime(a.at)}</span>
         </div>
         <div class="alert-actions">
-          ${isCrit?`<button class="btn-sm btn-danger"><i class="ri-alarm-warning-line"></i> Darhol muolaja</button>`:`<button class="btn-sm btn-outline"><i class="ri-eye-line"></i> Ko'rib chiqish</button>`}
-          <button class="btn-sm btn-outline"><i class="ri-checkbox-circle-line"></i> Hal qilindi</button>
-          <button class="btn-sm btn-outline"><i class="ri-arrow-right-s-line"></i> Batafsil</button>
+          ${isCrit?`<button class="btn-sm btn-danger" onclick="emergencyAction('${a.sensor_id}')"><i class="ri-alarm-warning-line"></i> Darhol muolaja</button>`:`<button class="btn-sm btn-outline" onclick="viewAlert('${a.sensor_id}',this)"><i class="ri-eye-line"></i> Ko'rib chiqish</button>`}
+          <button class="btn-sm btn-outline" onclick="resolveAlert('${a.sensor_id}',this)"><i class="ri-checkbox-circle-line"></i> Hal qilindi</button>
+          <button class="btn-sm btn-outline" onclick="showAlertDetails('${a.sensor_id}')"><i class="ri-arrow-right-s-line"></i> Batafsil</button>
         </div>
       </div>
     </div>`;
@@ -440,7 +611,8 @@ function loadData(){
   const icon=document.getElementById('refresh-icon');
   icon.style.animation='spin 1s linear infinite';
   setTimeout(()=>{
-    _allAlerts=DUMMY_ALERTS;
+    _allAlerts=DUMMY_ALERTS.map(a=>({...a}));
+    _allAlerts.forEach(a=>{_alertMap[a.sensor_id]=a;});
     const configs=DUMMY_CONFIGS;
     const crit=_allAlerts.filter(a=>a.severity==='critical'||a.severity==='error').length;
     const warn=_allAlerts.filter(a=>a.severity==='warning').length;

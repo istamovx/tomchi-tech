@@ -143,12 +143,17 @@ i[class^="ri-"]{line-height:1}
 [data-theme="dark"] .sb-account{background:#1C2130;border-color:#2E3448}
 [data-theme="dark"] .sb-account:hover{background:#1E2436}
 [data-theme="dark"] .bar-track{background:var(--border-secondary)}
+.sidebar-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.48);z-index:150;backdrop-filter:blur(2px)}
+.sidebar-backdrop.show{display:block}
+[data-theme="dark"] .sidebar-backdrop{background:rgba(0,0,0,.65)}
 @media(max-width:1280px){.metrics-row{grid-template-columns:repeat(2,1fr)}.chart-grid{grid-template-columns:1fr}}
-@media(max-width:720px){.sidebar{position:fixed;left:-100%;z-index:200;transition:left .25s}.sidebar.open{left:0}.content{padding:var(--sp-xl)}}
+@media(max-width:900px){.sidebar{position:fixed;left:-100%;z-index:200;transition:left .25s}.sidebar.open{left:0}.content{padding:var(--sp-xl)}.ph-menu-btn{display:flex!important}}
+@media(max-width:480px){.metrics-row{grid-template-columns:1fr}.page-header{padding:0 var(--sp-xl)}.saving-table th:nth-child(5),.saving-table td:nth-child(5),.saving-table th:nth-child(6),.saving-table td:nth-child(6){display:none}}
 </style>
 </head>
 <body>
 
+<div class="sidebar-backdrop" id="sb-backdrop" onclick="toggleSidebar()"></div>
 <nav class="sidebar" id="sidebar">
   <div class="sb-header">
     <div class="sb-logo">
@@ -185,6 +190,7 @@ i[class^="ri-"]{line-height:1}
 
 <div class="main">
   <div class="page-header">
+    <button class="ph-btn ph-menu-btn" onclick="toggleSidebar()" style="display:none;margin-right:4px"><i class="ri-menu-line"></i></button>
     <div class="ph-title">Hisobotlar</div>
     <div class="ph-divider"></div>
     <button class="ph-btn" onclick="loadData()" title="Yangilash"><i class="ri-refresh-line"></i></button>
@@ -497,6 +503,17 @@ function exportReport() {
   const blob = new Blob([rows.map(r=>r.join(',')).join('\n')],{type:'text/csv'});
   const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='hisobot.csv'; a.click();
 }
+
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sb-backdrop').classList.toggle('show');
+}
+window.addEventListener('resize',()=>{
+  if(window.innerWidth>900){
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sb-backdrop').classList.remove('show');
+  }
+});
 
 function toggleTheme() {
   const dark = document.documentElement.getAttribute('data-theme')==='dark';

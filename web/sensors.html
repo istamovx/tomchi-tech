@@ -203,12 +203,17 @@ tbody td:last-child{padding-right:var(--sp-3xl)}
 [data-theme="dark"] .nav-item.active{background:#1E2436}
 [data-theme="dark"] .modal{background:#161A23;border-color:#242A3A}
 [data-theme="dark"] .filter-group{background:#161A23;border-color:#242A3A}
+.sidebar-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.48);z-index:150;backdrop-filter:blur(2px)}
+.sidebar-backdrop.show{display:block}
+[data-theme="dark"] .sidebar-backdrop{background:rgba(0,0,0,.65)}
 @media(max-width:1280px){.metrics-row{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:720px){.sidebar{position:fixed;left:-100%;z-index:200;transition:left .25s}.sidebar.open{left:0}.content{padding:var(--sp-xl)}}
+@media(max-width:900px){.sidebar{position:fixed;left:-100%;z-index:200;transition:left .25s}.sidebar.open{left:0}.content{padding:var(--sp-xl)}.ph-menu-btn{display:flex!important}}
+@media(max-width:480px){.metrics-row{grid-template-columns:1fr}.page-header{padding:0 var(--sp-xl)}.f-tab{font-size:12px;padding:5px 8px}}
 </style>
 </head>
 <body>
 
+<div class="sidebar-backdrop" id="sb-backdrop" onclick="toggleSidebar()"></div>
 <!-- SIDEBAR -->
 <nav class="sidebar" id="sidebar">
   <div class="sb-header">
@@ -250,7 +255,7 @@ tbody td:last-child{padding-right:var(--sp-3xl)}
 <!-- MAIN -->
 <div class="main">
   <div class="page-header">
-    <button class="ph-btn" id="menu-btn" onclick="document.getElementById('sidebar').classList.toggle('open')" style="display:none"><i class="ri-menu-line"></i></button>
+    <button class="ph-btn ph-menu-btn" id="menu-btn" onclick="toggleSidebar()" style="display:none;margin-right:4px"><i class="ri-menu-line"></i></button>
     <div class="ph-title">Sensorlar <span class="ph-subtitle" id="ph-count"></span></div>
     <div class="ph-search">
       <i class="ri-search-2-line"></i>
@@ -585,10 +590,20 @@ function exportCSV() {
   const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='sensorlar.csv'; a.click();
 }
 
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sb-backdrop').classList.toggle('show');
+}
+window.addEventListener('resize',()=>{
+  if(window.innerWidth>900){
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sb-backdrop').classList.remove('show');
+  }
+});
+
 function toggleTheme() {
-  const d = document.documentElement;
-  const dark = d.getAttribute('data-theme')==='dark';
-  d.setAttribute('data-theme', dark?'':'dark');
+  const dark = document.documentElement.getAttribute('data-theme')==='dark';
+  document.documentElement.setAttribute('data-theme', dark?'light':'dark');
   document.getElementById('theme-icon').className = dark?'ri-moon-line':'ri-sun-line';
   localStorage.setItem('theme', dark?'light':'dark');
 }

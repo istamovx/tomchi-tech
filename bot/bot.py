@@ -1,5 +1,6 @@
 """TomchiTech Farm Monitoring Bot v2 - Obuna + Sughorish"""
-import os, random, logging, sqlite3, threading, httpx
+import os, random, logging, sqlite3, threading, httpx, json, asyncio
+from http.server import HTTPServer, BaseHTTPRequestHandler
 from datetime import datetime, timedelta
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup, KeyboardButton
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, MessageHandler, filters, ContextTypes
@@ -7,12 +8,14 @@ from telegram.ext import Application, CommandHandler, CallbackQueryHandler, Mess
 logging.basicConfig(format="%(asctime)s [%(levelname)s] %(name)s: %(message)s", level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-BOT_TOKEN   = os.environ.get("BOT_TOKEN", "8655345849:AAGzYvepKRkyZPo7hw5_a0LFU8NMeSV3kH4")
-PORT        = int(os.environ.get("PORT", 8443))
-WEBHOOK_URL = os.environ.get("WEBHOOK_URL") or os.environ.get("RENDER_EXTERNAL_URL", "")
-ADMIN_IDS   = set(int(x) for x in os.environ.get("ADMIN_IDS","").split(",") if x.strip().isdigit())
-DB_PATH     = "tomchitech.db"
-DB_LOCK     = threading.Lock()
+BOT_TOKEN     = os.environ.get("BOT_TOKEN", "8655345849:AAGzYvepKRkyZPo7hw5_a0LFU8NMeSV3kH4")
+PORT          = int(os.environ.get("PORT", 8443))
+API_PORT      = int(os.environ.get("API_PORT", 8080))
+WEBHOOK_URL   = os.environ.get("WEBHOOK_URL") or os.environ.get("RENDER_EXTERNAL_URL", "")
+ADMIN_IDS     = set(int(x) for x in os.environ.get("ADMIN_IDS","").split(",") if x.strip().isdigit())
+NOTIFY_SECRET = os.environ.get("NOTIFY_SECRET", "tomchitech-irr-2025")
+DB_PATH       = "tomchitech.db"
+DB_LOCK       = threading.Lock()
 
 ALERT_TEMP_MAX   = 35.0
 ALERT_HUMID_MIN  = 20.0
@@ -697,11 +700,126 @@ async def job_auto_irr(ctx: ContextTypes.DEFAULT_TYPE):
             if d["soil"] >= ALERT_SOIL_IRRIG: continue
             c = calc_irr(d["soil"], d["temp"], f["area"])
             log_irr(cid, fid, f["nomi"], c["davomiylik"], "auto", d["soil"], c["suv_litr"])
+            # Boshlash bildirishnomasini yuborish
             await send(ctx, cid,
                 f"🤖 <b>AVTOMATIK SUGHORISH BOSHLANDI</b>\n\n"
-                f"🌾 {f['nomi']}\n🌱 Tuproq: <b>{d['soil']}%</b> (kritik)\n"
+                f"🌾 {f['nomi']}\n"
+                f"🌱 Tuproq namligi: <b>{d['soil']}%</b> (kritik – {ALERT_SOIL_IRRIG}% dan past)\n"
                 f"⏱ Davomiylik: <b>{c['davomiylik']} daqiqa</b>\n"
-                f"💦 Suv sarfi: <b>{c['suv_litr']} litr</b>")
+                f"💦 Suv sarfi: <b>{c['suv_litr']} litr</b>\n"
+                f"🎯 Maqsad namlik: <b>{c['maqsad']}%</b>\n\n"
+                f"⏰ {c['davomiylik']} daqiqadan keyin to'xtaydi.")
+            # To'xtatish bildirishnomasini keyinroq rejalashtirish
+            ctx.job_queue.run_once(
+                _auto_irr_stop,
+                when=c["davomiylik"] * 60,
+                data={"cid": cid, "farm": f, "dur": c["davomiylik"],
+                      "soil_before": d["soil"], "maqsad": c["maqsad"]},
+                name=f"irr_stop_{cid}_{fid}",
+            )
+
+async def _auto_irr_stop(ctx: ContextTypes.DEFAULT_TYPE):
+    d = ctx.job.data
+    cid       = d["cid"]
+    f         = d["farm"]
+    dur       = d["dur"]
+    soil_b    = d["soil_before"]
+    soil_after = min(75.0, soil_b + dur * 0.4)
+    await send(ctx, cid,
+        f"✅ <b>AVTOMATIK SUGHORISH YAKUNLANDI</b>\n\n"
+        f"🌾 {f['nomi']}\n"
+        f"⏱ Davomiylik: <b>{dur} daqiqa</b>\n"
+        f"🌱 Tuproq namligi: {soil_b}% → <b>{soil_after:.1f}%</b>\n"
+        f"🕐 {datetime.now().strftime('%d.%m.%Y %H:%M')}\n\n"
+        f"🟢 Tizim normal rejimga qaytdi.")
+
+# ── Web Dashboard → Bot API ───────────────────────────────────────────────────
+def make_api_handler(loop, bot, bot_data):
+    """Web dashboard dan keladigan irrigatsiya bildirishnomalarini qabul qiladi."""
+    class APIHandler(BaseHTTPRequestHandler):
+        def do_OPTIONS(self):
+            self.send_response(200)
+            self._cors(); self.end_headers()
+
+        def do_POST(self):
+            if self.path not in ('/api/irrigate', '/api/irrigate/'):
+                self.send_response(404); self._cors(); self.end_headers()
+                self.wfile.write(b'{"error":"not found"}'); return
+
+            secret = self.headers.get('X-Notify-Secret', '')
+            if secret != NOTIFY_SECRET:
+                self.send_response(403); self._cors(); self.end_headers()
+                self.wfile.write(b'{"error":"forbidden"}'); return
+
+            try:
+                length = int(self.headers.get('Content-Length', 0))
+                body   = json.loads(self.rfile.read(length) or b'{}')
+            except Exception:
+                self.send_response(400); self._cors(); self.end_headers()
+                self.wfile.write(b'{"error":"bad json"}'); return
+
+            asyncio.run_coroutine_threadsafe(
+                _broadcast_irrigate(bot, bot_data, body), loop
+            )
+            self.send_response(200); self._cors()
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            self.wfile.write(b'{"ok":true}')
+
+        def _cors(self):
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.send_header('Access-Control-Allow-Headers', 'Content-Type,X-Notify-Secret')
+            self.send_header('Access-Control-Allow-Methods', 'POST,OPTIONS')
+
+        def log_message(self, fmt, *args): pass  # suppress access logs
+
+    return APIHandler
+
+async def _broadcast_irrigate(bot, bot_data, data):
+    subs      = bot_data.get("subscribers", set())
+    sensor_id = data.get('sensor_id', 'Noma\'lum')
+    farm      = data.get('farm_name', sensor_id)
+    dur       = data.get('duration_min', 0)
+    soil      = data.get('soil_moisture', '?')
+    water     = data.get('water_needed', 0)
+    trigger   = data.get('trigger', 'web_dashboard')
+    now_str   = datetime.now().strftime('%d.%m.%Y %H:%M')
+
+    if dur and int(dur) > 0:
+        msg = (
+            f"💧 <b>WEB DASHBOARD: SUGHORISH BOSHLANDI!</b>\n\n"
+            f"🌾 Sensor/Ferma: <b>{farm}</b>\n"
+            f"🌱 Tuproq namligi: <b>{soil}%</b>\n"
+            f"⏱ Davomiylik: <b>{dur} daqiqa</b>\n"
+            f"💦 Suv sarfi: ~<b>{water:.0f} litr</b>\n"
+            f"🖥 Manba: Web dashboard\n"
+            f"🕐 {now_str}\n\n"
+            f"Tomchilatib sughorish tizimi ishga tushdi."
+        )
+    else:
+        soil_str = f"{float(soil):.1f}" if str(soil).replace('.','').isdigit() else str(soil)
+        msg = (
+            f"🏁 <b>WEB DASHBOARD: SUGHORISH YAKUNLANDI!</b>\n\n"
+            f"🌾 Sensor/Ferma: <b>{farm}</b>\n"
+            f"🌱 Yangi namlik: <b>{soil_str}%</b>\n"
+            f"🕐 {now_str}\n\n"
+            f"🟢 Tizim normal rejimga qaytdi."
+        )
+    for cid in list(subs):
+        try:
+            await bot.send_message(cid, msg, parse_mode='HTML')
+        except Exception as e:
+            logger.warning("broadcast_irrigate %s: %s", cid, e)
+
+def start_api_server(loop, bot, bot_data):
+    handler = make_api_handler(loop, bot, bot_data)
+    try:
+        server = HTTPServer(('0.0.0.0', API_PORT), handler)
+        t = threading.Thread(target=server.serve_forever, daemon=True)
+        t.start()
+        logger.info("API server started on port %s", API_PORT)
+    except OSError as e:
+        logger.warning("API server could not start: %s", e)
 
 async def job_keepalive(ctx: ContextTypes.DEFAULT_TYPE):
     if WEBHOOK_URL:
@@ -711,9 +829,14 @@ async def job_keepalive(ctx: ContextTypes.DEFAULT_TYPE):
         except Exception: pass
 
 # ── Main ──────────────────────────────────────────────────────────────────────
+async def post_init(application):
+    """Bot initialize bo'lgandan so'ng API serverni ham yoqadi."""
+    loop = asyncio.get_event_loop()
+    start_api_server(loop, application.bot, application.bot_data)
+
 def main():
     init_db()
-    app = Application.builder().token(BOT_TOKEN).build()
+    app = Application.builder().token(BOT_TOKEN).post_init(post_init).build()
     app.add_handler(CommandHandler("start", cmd_start))
     app.add_handler(CommandHandler("admin", cmd_admin))
     app.add_handler(CommandHandler("grant", cmd_grant))

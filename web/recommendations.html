@@ -28,6 +28,7 @@
   --r-xs:4px;--r-sm:6px;--r-md:8px;--r-lg:10px;--r-xl:12px;--r-2xl:16px;--r-full:9999px;
   --text-xs-size:12px;--text-xs-lh:18px;--text-sm-size:14px;--text-sm-lh:20px;
   --text-md-size:16px;--text-md-lh:24px;--text-lg-size:18px;--text-lg-lh:28px;
+  --text-xl-size:20px;--text-xl-lh:30px;
   --sidebar-w:280px;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -70,8 +71,8 @@ i[class^="ri-"]{line-height:1;}
 /* ── Layout ── */
 .app-layout{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;}
 .main-content{flex:1;overflow-y:auto;padding:var(--sp-3xl);}
-.page-header{height:64px;border-bottom:1px solid var(--border-secondary);background:var(--bg-primary);display:flex;align-items:center;gap:var(--sp-xl);padding:0 var(--sp-3xl);flex-shrink:0;}
-.ph-title{font-size:var(--text-md-size);font-weight:700;color:var(--text-primary);}
+.page-header{height:80px;border-bottom:1px solid var(--border-secondary);background:var(--bg-primary);display:flex;align-items:center;gap:var(--sp-lg);padding:0 var(--sp-4xl);flex-shrink:0;}
+.ph-title{font-size:var(--text-xl-size);font-weight:700;color:var(--text-primary);flex:1;}
 .ph-subtitle{font-size:var(--text-sm-size);color:var(--text-tertiary);}
 .ph-btn{width:36px;height:36px;border-radius:var(--r-md);border:1px solid var(--border-secondary);background:var(--bg-primary);color:var(--text-secondary);display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:var(--shadow-xs);transition:background .12s;}
 .ph-btn:hover{background:var(--bg-secondary);}
@@ -352,6 +353,33 @@ i[class^="ri-"]{line-height:1;}
 <div class="toast" id="toast"></div>
 
 <script>
+/* ── Bot API konfiguratsiya ── */
+const BOT_API_URL = 'http://localhost:8080';
+const NOTIFY_SECRET = 'tomchitech-irr-2025';
+
+async function notifyBot(sensorId, rec, durationMin) {
+  try {
+    const resp = await fetch(`${BOT_API_URL}/api/irrigate`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Notify-Secret': NOTIFY_SECRET,
+      },
+      body: JSON.stringify({
+        sensor_id:    sensorId,
+        farm_name:    rec.farm_name || sensorId,
+        duration_min: durationMin,
+        soil_moisture: rec.current_moisture,
+        water_needed:  rec.water_needed_liters || 0,
+        trigger:      'web_dashboard',
+      }),
+    });
+    if (!resp.ok) console.warn('Bot notify: HTTP', resp.status);
+  } catch (e) {
+    console.info('Bot notify yuborilmadi (lokal rejim?):', e.message);
+  }
+}
+
 /* ── Dummy data (API o'rniga) ── */
 const CROP_EMOJI={pomidor:'🍅',kartoshka:'🥔',paxta:'🌿',uzum:'🍇',bugdoy:'🌾',"makkajo'xori":'🌽',piyoz:'🧅'};
 const ACTION_MAP={
@@ -461,6 +489,8 @@ function confirmIrrigation(sensorId,durationMin){
   r._state='irrigating';
   renderCards();
   showToast(`✅ ${sensorId} uchun ${durationMin} daqiqalik sug'orish boshlandi!`,'success');
+  // Telegram botga bildirishnoma yuborish
+  notifyBot(sensorId, r, durationMin);
   // Avtomatik to'xtatish simulyatsiyasi (3s demo)
   setTimeout(()=>{
     const rec=_recMap[sensorId]; if(!rec) return;
@@ -468,6 +498,8 @@ function confirmIrrigation(sensorId,durationMin){
     renderCards();
     updateFilterCounts();
     showToast(`🏁 ${sensorId} sug'orish yakunlandi. Namlik: ${rec.current_moisture.toFixed(1)}%`,'info');
+    // To'xtatilganda ham botga xabar
+    notifyBot(sensorId, rec, 0);
   },3000);
 }
 

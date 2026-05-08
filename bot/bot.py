@@ -858,3 +858,231 @@ def main():
 
 if __name__ == "__main__":
     main()
+ctx, cid, "✅ <b>Hozirda hech qanday ogohlantirish yoq.</b>\n\nBarcha fermalar normal. 🌿", kb=back_kb())
+
+    elif data == "yordam":
+        await send(ctx, update.effective_chat.id,
+            "ℹ <b>YORDAM</b>\n\n"
+            "📊 Hisobot — sensor malumotlari hisoboti\n"
+            "🌾 Fermalar — alohida ferma sensori\n"
+            "💧 Sug'orish — tomchilatib sughorish boshqaruvi\n"
+            "🚨 Ogohlantirishlar — kritik/ehtiyot holatlar\n"
+            "👨‍🔬 Mutaxassis — Premium foydalanuvchilar uchun\n\n"
+            "📞 support@tomchitech.uz",
+            kb=back_kb())
+
+    elif data == "mutax":
+        if not p["mutaxassis"]:
+            await update.message.reply_text("❌ Bu funksiya faqat Premium paketda mavjud.")
+            return
+        matn = "👨‍🔬 <b>MUTAXASSISLAR</b>\nKritik holatlarda quyidagilar bilan boglanin:\n━━━━━━━━━━━━━━━━━━\n\n"
+        for m in MUTAXASSISLAR:
+            matn += f"<b>{m['ism']}</b>\n💼 {m['lavozim']}\n🔬 {m['soha']}\n📞 {m['tel']}\n\n"
+        await send(ctx, update.effective_chat.id, matn, kb=back_kb())
+
+    elif data == "obuna_info":
+        remaining = (datetime.strptime(sub["end_date"][:10], "%Y-%m-%d") - datetime.now()).days
+        funks     = "\n".join(f"  ✅ {f}" for f in p["funksiyalar"])
+        await send(ctx, update.effective_chat.id,
+            f"📦 <b>OBUNA MALUMOTLARI</b>\n━━━━━━━━━━━━━━━━━━\n\n"
+            f"{p['emoji']} Paket: <b>{p['nomi']}</b>\n"
+            f"💰 {p['narx']:,} som/oy\n"
+            f"📅 Tugash: {sub['end_date'][:10]}\n"
+            f"🕐 Qolgan: <b>{remaining} kun</b>\n\n"
+            f"<b>Funksiyalar:</b>\n{funks}",
+            kb=back_kb())
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+#  2-DAQIQALIK ALERT BUFFER TIZIMI
+# ══════════════════════════════════════════════════════════════════════════════
+# {chat_id: [{"time":..., "farm":..., "sensor":..., "holat":..., "qiymat":..., "xabar":...}]}
+ALERT_BUFFER: dict = {}
+_BUF_LOCK = threading.Lock()
+
+def buf_add(chat_id: int, alert: dict):
+    """Bufferga yangi alert qo'shadi."""
+    with _BUF_LOCK:
+        ALERT_BUFFER.setdefault(chat_id, []).append(alert)
+
+async def flush_alerts(context: ContextTypes.DEFAULT_TYPE):
+    """
+    Har 2 daqiqada PTB job_queue tomonidan chaqiriladi.
+    Bufferdagi alertlarni bitta log xabar sifatida yuboradi.
+    """
+    with _BUF_LOCK:
+        snapshot = {cid: list(alerts) for cid, alerts in ALERT_BUFFER.items() if alerts}
+        for cid in snapshot:
+            ALERT_BUFFER[cid].clear()
+
+    for cid, alerts in snapshot.items():
+        n   = len(alerts)
+        now = datetime.now().strftime("%d.%m.%Y %H:%M")
+
+        lines = [
+            f"🔔 <b>{n} ta yangi bildirishnoma</b>\n"
+            f"⏰ {now}\n"
+            f"{'━' * 26}"
+        ]
+        for i, a in enumerate(alerts, 1):
+            h    = a.get("holat", "ehtiyot")
+            icon = "🔴" if h == "kritik" else "🟡" if h == "ehtiyot" else "🟢"
+            lines.append(
+                f"{i}. {icon} <b>{a.get('farm', 'Noma\'lum ferma')}</b>\n"
+                f"   📡 {a.get('sensor', 'Sensor')} · <code>{a.get('qiymat', '—')}</code>\n"
+                f"   💬 {a.get('xabar', '')}\n"
+                f"   🕐 {a.get('time', '')}"
+            )
+        lines.append(f"{'━' * 26}\n📌 <i>Ushbu xabar log sifatida saqlanadi</i>")
+
+        markup = InlineKeyboardMarkup([[
+            InlineKeyboardButton("✅ Ko'rib chiqdim", callback_data="ack_log")
+        ]])
+        try:
+            await context.bot.send_message(
+                cid,
+                "\n\n".join(lines)[:4096],
+                parse_mode="HTML",
+                reply_markup=markup
+            )
+        except Exception as e:
+            logger.error("flush_alerts → chat %s: %s", cid, e)
+
+
+async def cb_ack_log(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
+    """
+    'Ko'rib chiqdim' tugmasi bosilganda xabarni yangilaydi:
+    tugma yo'qoladi, pastga "Ko'rib chiqildi" qo'shiladi.
+    """
+    q   = update.callback_query
+    now = datetime.now().strftime("%d.%m.%Y %H:%M:%S")
+    await q.answer("✅ Belgilandi!")
+    try:
+        orig = (q.message.text or "").rstrip()
+        new  = orig + f"\n\n{'─' * 26}\n✅ <b>Ko'rib chiqildi</b> — {q.from_user.first_name}\n🕐 {now}"
+        await q.message.edit_text(new[:4096], parse_mode="HTML", reply_markup=None)
+    except Exception as e:
+        logger.warning("cb_ack_log edit: %s", e)
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+#  HTTP API SERVER  (dashboard → bot alertlar)
+# ══════════════════════════════════════════════════════════════════════════════
+_app_ref = None   # Application instance (main() da o'rnatiladi)
+
+class AlertHandler(BaseHTTPRequestHandler):
+    """
+    POST /alert   →  dashboard dan sensor alertini qabul qiladi
+    GET  /ping    →  health check
+    """
+    def log_message(self, *a): pass   # access log ni o'chirish
+
+    def _respond(self, code: int, body: bytes = b""):
+        self.send_response(code)
+        self.send_header("Content-Type", "application/json")
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.end_headers()
+        if body:
+            self.wfile.write(body)
+
+    def do_OPTIONS(self):
+        self.send_response(204)
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type, X-Secret")
+        self.end_headers()
+
+    def do_GET(self):
+        if self.path == "/ping":
+            buffered = sum(len(v) for v in ALERT_BUFFER.values())
+            self._respond(200, json.dumps({"ok": True, "buffered": buffered}).encode())
+        else:
+            self._respond(404, b'{"error":"Not found"}')
+
+    def do_POST(self):
+        if self.path != "/alert":
+            self._respond(404, b'{"error":"Not found"}'); return
+
+        # Secret tekshiruvi
+        secret = self.headers.get("X-Secret", "")
+        if secret != NOTIFY_SECRET:
+            self._respond(403, b'{"error":"Forbidden"}'); return
+
+        length = int(self.headers.get("Content-Length", 0))
+        try:
+            data = json.loads(self.rfile.read(length))
+        except Exception:
+            self._respond(400, b'{"error":"Bad JSON"}'); return
+
+        alert = {
+            "time":   datetime.now().strftime("%H:%M:%S"),
+            "farm":   data.get("farm", "Noma'lum ferma"),
+            "sensor": data.get("sensor", "Sensor"),
+            "holat":  data.get("holat", "ehtiyot"),   # kritik | ehtiyot | normal
+            "qiymat": data.get("qiymat", "—"),
+            "xabar":  data.get("xabar") or data.get("message", ""),
+        }
+
+        chat_id = data.get("chat_id")
+        if chat_id:
+            buf_add(int(chat_id), alert)
+        elif _app_ref:
+            # Barcha obunachilarga yuborish
+            for cid in _app_ref.bot_data.get("subscribers", set()):
+                buf_add(cid, alert)
+
+        total = sum(len(v) for v in ALERT_BUFFER.values())
+        self._respond(200, json.dumps({"ok": True, "buffered": total}).encode())
+
+
+def start_api_server():
+    try:
+        server = HTTPServer(("0.0.0.0", API_PORT), AlertHandler)
+        t = threading.Thread(target=server.serve_forever, daemon=True)
+        t.start()
+        logger.info("Alert API server: port %s  (secret: %s***)", API_PORT, NOTIFY_SECRET[:4])
+    except Exception as e:
+        logger.error("API server start failed: %s", e)
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+#  MAIN
+# ══════════════════════════════════════════════════════════════════════════════
+def main():
+    global _app_ref
+    init_db()
+
+    app = Application.builder().token(BOT_TOKEN).build()
+    _app_ref = app
+
+    # Handlerlar
+    app.add_handler(CommandHandler("start", cmd_start))
+    app.add_handler(CallbackQueryHandler(cb_ack_log, pattern=r"^ack_log$"))
+    app.add_handler(CallbackQueryHandler(cb))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, reply_menu_handler))
+
+    # 2-daqiqalik alert flush (job_queue)
+    jq = app.job_queue
+    jq.run_repeating(flush_alerts, interval=120, first=10, name="alert_flush")
+    logger.info("Alert flush job: har 120 soniyada ishlaydi")
+
+    # HTTP API server
+    start_api_server()
+
+    # Ishga tushirish
+    if WEBHOOK_URL:
+        hook_url = WEBHOOK_URL.rstrip("/") + "/webhook"
+        logger.info("Webhook mode: %s", hook_url)
+        app.run_webhook(
+            listen="0.0.0.0",
+            port=PORT,
+            url_path="/webhook",
+            webhook_url=hook_url,
+        )
+    else:
+        logger.info("Polling mode ...")
+        app.run_polling(drop_pending_updates=True)
+
+
+if __name__ == "__main__":
+    main()

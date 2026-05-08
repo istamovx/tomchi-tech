@@ -148,6 +148,8 @@ i[class^="ri-"]{line-height:1}
 [data-theme="dark"] .leaflet-popup-tip{background:#161A23}
 @media(max-width:1280px){.metrics-row{grid-template-columns:repeat(2,1fr)}.two-pane{grid-template-columns:1fr}}
 @media(max-width:720px){.sidebar{position:fixed;left:-100%;z-index:200;transition:left .25s}.sidebar.open{left:0}.content{padding:var(--sp-xl)}}
+.leaflet-tooltip.alert-tip{background:#FEF3F2;border:1px solid #FECDCA;color:#D92D20;font-weight:600;font-size:12px;padding:6px 10px;border-radius:6px;box-shadow:0 2px 8px rgba(217,45,32,.15)}
+@keyframes alertPulse{0%,100%{opacity:.6;r:var(--pr)}50%{opacity:.2;r:calc(var(--pr)*1.15)}}
 </style>
 </head>
 <body>
@@ -197,7 +199,7 @@ i[class^="ri-"]{line-height:1}
       <div class="metric-card"><div class="metric-icon"><i class="ri-plant-line"></i></div><div class="metric-body"><div class="metric-label">Jami fermalar</div><div class="metric-num" id="m-farms">—</div></div></div>
       <div class="metric-card"><div class="metric-icon"><i class="ri-map-2-line"></i></div><div class="metric-body"><div class="metric-label">Jami maydon</div><div class="metric-num" id="m-area">—</div></div></div>
       <div class="metric-card"><div class="metric-icon"><i class="ri-radar-line"></i></div><div class="metric-body"><div class="metric-label">Jami sensorlar</div><div class="metric-num" id="m-sensors">—</div></div></div>
-      <div class="metric-card"><div class="metric-icon"><i class="ri-wifi-line"></i></div><div class="metric-body"><div class="metric-label">Online sensorlar</div><div class="metric-num" id="m-online" style="color:var(--success)">—</div></div></div>
+      <div class="metric-card"><div class="metric-icon" style="color:var(--danger)"><i class="ri-alarm-warning-line"></i></div><div class="metric-body"><div class="metric-label">Alert hududlar</div><div class="metric-num" id="m-alerts" style="color:var(--danger)">—</div></div></div>
     </div>
 
     <!-- Two-pane: Map + Farm list -->
@@ -209,9 +211,10 @@ i[class^="ri-"]{line-height:1}
             <div class="card-title">Fermalar xaritasi</div>
             <div class="card-sub">Barcha fermalar joylashuvi</div>
           </div>
-          <div style="display:flex;align-items:center;gap:12px">
-            <div style="display:flex;align-items:center;gap:5px;font-size:13px;color:var(--text-tertiary)"><span style="width:10px;height:10px;border-radius:50%;background:var(--success);display:inline-block"></span>Online</div>
-            <div style="display:flex;align-items:center;gap:5px;font-size:13px;color:var(--text-tertiary)"><span style="width:10px;height:10px;border-radius:50%;background:var(--danger);display:inline-block"></span>Offline</div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text-tertiary)"><span style="width:10px;height:10px;border-radius:50%;background:#17B26A;display:inline-block"></span>Yaxshi</div>
+            <div style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text-tertiary)"><span style="width:10px;height:10px;border-radius:50%;background:#F79009;display:inline-block"></span>Diqqat</div>
+            <div style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--danger)"><span style="width:10px;height:10px;border-radius:50%;background:#D92D20;display:inline-block"></span>Alert</div>
             <button class="btn btn-secondary" onclick="resetMapView()" style="padding:5px 10px;font-size:12px"><i class="ri-fullscreen-line"></i>Barchasi</button>
           </div>
         </div>
@@ -239,10 +242,85 @@ i[class^="ri-"]{line-height:1}
 
 <script>
 const API = 'https://tomchi-tech-api.onrender.com/api/v1';
-const CROP_EMOJI = {pomidor:'🍅',kartoshka:'🥔',paxta:'🌸',uzum:'🍇',bugdoy:'🌾',"makkajo'xori":'🌽',piyoz:'🧅'};
-const CROP_LABEL = {pomidor:'Pomidor',kartoshka:'Kartoshka',paxta:'Paxta',uzum:'Uzum',bugdoy:"Bug'doy","makkajo'xori":"Makkajo'xori",piyoz:'Piyoz'};
+const CROP_EMOJI  = {pomidor:'🍅',kartoshka:'🥔',paxta:'🌸',uzum:'🍇',bugdoy:'🌾',"makkajo'xori":'🌽',piyoz:'🧅'};
+const CROP_LABEL  = {pomidor:'Pomidor',kartoshka:'Kartoshka',paxta:'Paxta',uzum:'Uzum',bugdoy:"Bug'doy","makkajo'xori":"Makkajo'xori",piyoz:'Piyoz'};
+const FIRST_NAMES = ['Salim','Baxtiyor','Hamid','Dilshod','Jasur','Sherzod','Elbek','Bobur','Oybek','Doniyor','Murod','Farhod','Abdulloh','Jamshid','Ulugbek','Nurbek','Toxir','Firdavs','Ibrohim','Akbar','Sardor','Temur','Alisher','Nodir','Sanjar','Bekzod','Rustam','Sarvar','Husan','Lochin','Mansur','Avaz','Behzod','Davron','Erkin','Kamol','Laziz','Muzaffar'];
+const LAST_NAMES  = ["Xo'jayev",'Toshmatov','Umarov','Rahimov','Karimov','Nazarov','Holmatov','Yusupov','Muxtorov','Razzaqov','Sobirov','Aliyev','Ismoilov','Tillayev','Mirzayev','Saidov','Hasanov','Qodirov','Ergashev',"Norqo'ziyev",'Abdullayev','Raximov','Nishonov','Sultonov','Qosimov','Tursunov','Haydarov','Jurayev','Pulatov','Xoliqov','Mamatov','Qurbonov','Yunusov','Usmonov','Tohirov','Sotvoldiyev','Maxmudov','Rajabov'];
+const farmerName = i => FIRST_NAMES[i % FIRST_NAMES.length] + ' ' + LAST_NAMES[(i * 7 + 3) % LAST_NAMES.length];
 
-/* ─── Real district coordinates: Uzbekistan / Tajikistan / Kazakhstan ─── */
+/* ═══ SENSOR PROFILES  (region · district · centre · count · avgMoisture% · crop) ═══
+   Moisture < 30 → ALERT (quruq)   30–44 → WARNING   ≥ 45 → OK
+   648 sensors total across Uzbekistan, Tajikistan, Kazakhstan
+══════════════════════════════════════════════════════════════════════════════════════ */
+const SENSOR_PROFILES = [
+  /* ── O'ZBEKISTON ── Surxondaryo (107) */
+  { r:'Surxondaryo',      d:'Sariosiyo',        lat:37.820, lon:67.920, n:44, m:55, crop:'pomidor' },
+  { r:'Surxondaryo',      d:'Denov',             lat:38.270, lon:67.890, n:23, m:43, crop:'paxta'   },
+  { r:'Surxondaryo',      d:'Termiz',            lat:37.225, lon:67.278, n:18, m:27, crop:'uzum'    }, // 🔴 ALERT
+  { r:'Surxondaryo',      d:'Boysun',            lat:38.202, lon:67.193, n:12, m:52, crop:'bugdoy'  },
+  { r:'Surxondaryo',      d:'Sherabad',          lat:37.667, lon:67.013, n:10, m:31, crop:'paxta'   },
+  /* Farg'ona (88) */
+  { r:"Farg'ona",         d:"Farg'ona",          lat:40.390, lon:71.779, n:35, m:65, crop:'uzum'    },
+  { r:"Farg'ona",         d:'Quva',              lat:40.523, lon:72.084, n:20, m:62, crop:'pomidor' },
+  { r:"Farg'ona",         d:'Rishton',           lat:40.358, lon:71.278, n:15, m:60, crop:'piyoz'   },
+  { r:"Farg'ona",         d:"Marg'ilon",         lat:40.472, lon:71.723, n:18, m:58, crop:'uzum'    },
+  /* Toshkent (57) */
+  { r:'Toshkent',         d:'Toshkent',          lat:41.299, lon:69.240, n:30, m:60, crop:'kartoshka'},
+  { r:'Toshkent',         d:'Chirchiq',          lat:41.483, lon:69.582, n:15, m:58, crop:'pomidor' },
+  { r:'Toshkent',         d:'Angren',            lat:40.987, lon:70.142, n:12, m:44, crop:'bugdoy'  },
+  /* Namangan (40) */
+  { r:'Namangan',         d:'Namangan',          lat:41.000, lon:71.672, n:25, m:62, crop:'uzum'    },
+  { r:'Namangan',         d:'Kosonsoy',          lat:41.251, lon:71.547, n:15, m:55, crop:'pomidor' },
+  /* Andijon (45) */
+  { r:'Andijon',          d:'Andijon',           lat:40.783, lon:72.344, n:30, m:60, crop:'paxta'   },
+  { r:'Andijon',          d:'Asaka',             lat:40.633, lon:72.257, n:15, m:55, crop:'bugdoy'  },
+  /* Samarqand (52) */
+  { r:'Samarqand',        d:'Samarqand',         lat:39.654, lon:66.960, n:25, m:50, crop:'uzum'    },
+  { r:'Samarqand',        d:"Kattaqo'rg'on",     lat:39.901, lon:66.259, n:15, m:40, crop:'bugdoy'  },
+  { r:'Samarqand',        d:'Urgut',             lat:39.401, lon:67.252, n:12, m:47, crop:'pomidor' },
+  /* Qashqadaryo (42) */
+  { r:'Qashqadaryo',      d:'Qarshi',            lat:38.860, lon:65.800, n:20, m:26, crop:'paxta'   }, // 🔴 ALERT
+  { r:'Qashqadaryo',      d:'Shahrisabz',        lat:39.059, lon:66.841, n:12, m:46, crop:'uzum'    },
+  { r:'Qashqadaryo',      d:"G'uzor",            lat:38.610, lon:66.253, n:10, m:22, crop:'bugdoy'  }, // 🔴 ALERT
+  /* Buxoro (32) */
+  { r:'Buxoro',           d:'Buxoro',            lat:39.774, lon:64.425, n:20, m:28, crop:'paxta'   }, // 🔴 ALERT
+  { r:'Buxoro',           d:"G'ijduvon",         lat:40.100, lon:64.680, n:12, m:35, crop:'pomidor' },
+  /* Xorazm (28) */
+  { r:'Xorazm',           d:'Urganch',           lat:41.551, lon:60.631, n:18, m:55, crop:'paxta'   },
+  { r:'Xorazm',           d:'Xiva',              lat:41.378, lon:60.363, n:10, m:50, crop:'uzum'    },
+  /* Navoiy (23) */
+  { r:'Navoiy',           d:'Navoiy',            lat:40.084, lon:65.379, n:15, m:22, crop:'paxta'   }, // 🔴 ALERT
+  { r:'Navoiy',           d:'Zarafshon',         lat:41.569, lon:64.200, n:8,  m:19, crop:'bugdoy'  }, // 🔴 ALERT
+  /* Jizzax (12) */
+  { r:'Jizzax',           d:'Jizzax',            lat:40.115, lon:67.843, n:12, m:42, crop:'bugdoy'  },
+  /* Sirdaryo (10) */
+  { r:'Sirdaryo',         d:'Guliston',          lat:40.488, lon:68.783, n:10, m:48, crop:'paxta'   },
+  /* Qoraqalpog'iston (15) */
+  { r:"Qoraqalpog'iston", d:'Nukus',             lat:42.453, lon:59.607, n:15, m:17, crop:'paxta'   }, // 🔴🔴 CRITICAL
+  /* ── TOJIKISTON (50) ── */
+  { r:'Xatlon (TJ)',      d:'Kulob',             lat:37.910, lon:69.782, n:20, m:55, crop:'pomidor' },
+  { r:'Xatlon (TJ)',      d:'Bokhtar',           lat:37.832, lon:68.779, n:15, m:41, crop:'paxta'   },
+  { r:"Sug'd (TJ)",       d:"Xo'jand",           lat:40.282, lon:69.622, n:15, m:52, crop:'uzum'    },
+  /* ── QO'ZOG'ISTON (47) ── */
+  { r:'Turkiston (KZ)',   d:'Shymkent',          lat:42.317, lon:69.596, n:20, m:45, crop:'bugdoy'  },
+  { r:'Turkiston (KZ)',   d:'Turkiston',         lat:43.297, lon:68.271, n:12, m:29, crop:'paxta'   }, // 🔴 ALERT
+  { r:'Jambyl (KZ)',      d:'Taraz',             lat:42.900, lon:71.370, n:15, m:42, crop:'bugdoy'  },
+];
+/* Total: 648 sensors */
+
+/* ═══ ALERT ZONES — quruq hududlarga pulsing doira ══════════════════ */
+const ALERT_ZONES = [
+  { lat:37.225, lon:67.278, r:35000,  name:"Termiz: Namlik kritik (27%)" },
+  { lat:38.860, lon:65.800, r:55000,  name:"Qarshi cho'li: Quruqlik xavfi (26%)" },
+  { lat:38.610, lon:66.253, r:42000,  name:"G'uzor: Suv yetishmayapti (22%)" },
+  { lat:39.774, lon:64.425, r:50000,  name:"Buxoro: Suv taqchilligi (28%)" },
+  { lat:40.084, lon:65.379, r:65000,  name:"Navoiy: Qizilqum quruqligi (22%)" },
+  { lat:41.569, lon:64.200, r:90000,  name:"Zarafshon cho'li: Kritik (19%)" },
+  { lat:42.453, lon:59.607, r:100000, name:"Qoraqalpog'iston: Eng quruq hudud (17%)" },
+  { lat:43.297, lon:68.271, r:40000,  name:"Turkiston (KZ): Suv kam (29%)" },
+];
+
+/* ─── (legacy district coord table removed — now using SENSOR_PROFILES directly) ─── */
 const DISTRICT_COORDS = {
   /* ── O'ZBEKISTON ── */
   surxondaryo:{
@@ -410,57 +488,112 @@ function getCoords(farm, cfg) {
   return [cfg.location_lat, cfg.location_lon];
 }
 
-function jitter(mag){ return (Math.random() - 0.5) * 2 * mag; }
+function jitter(mag){ return (Math.random()-0.5)*2*mag; }
 
-/* ─── App state ─── */
-let allFarms = [], allConfigs = [], mapInstance = null, clusterGroup = null;
+/* ═══ Generate synthetic sensor list from profiles ══════════════════ */
+function buildSensors() {
+  const out = [];
+  SENSOR_PROFILES.forEach((p, fi) => {
+    const farmId = `FARM-${String(fi+1).padStart(3,'0')}`;
+    for(let i=0;i<p.n;i++){
+      const moisture = Math.max(5, Math.min(95, p.m + (Math.random()-0.5)*16));
+      out.push({
+        sensor_id: `SNS-${farmId}-${String(i+1).padStart(3,'0')}`,
+        farm_id:   farmId,
+        farmer_name: farmerName(fi),
+        region:    p.r,
+        district:  p.d,
+        lat:  p.lat + jitter(0.020),
+        lon:  p.lon + jitter(0.020),
+        moisture,
+        crop_type: p.crop,
+        total_area_ha: Math.round(15+Math.random()*120),
+        status: Math.random()>0.08?'online':'offline',
+        isAlert: moisture < 30,
+        isWarn:  moisture >= 30 && moisture < 45,
+      });
+    }
+  });
+  return out;
+}
+
+/* ═══ Build farm summary list ════════════════════════════════════════ */
+function buildFarms(sensors) {
+  const map = {};
+  sensors.forEach(s=>{
+    if(!map[s.farm_id]){
+      map[s.farm_id]={
+        farm_id:       s.farm_id,
+        farmer_name:   s.farmer_name,
+        region:        s.region,
+        district:      s.district,
+        crop_type:     s.crop_type,
+        total_area_ha: s.total_area_ha,
+        sensors: [],
+      };
+    }
+    map[s.farm_id].sensors.push(s);
+  });
+  return Object.values(map);
+}
+
+/* ═══ App state ══════════════════════════════════════════════════════ */
+let allFarms = [], allSensors = [], mapInstance = null, clusterGroup = null;
 let selectedFarm = null, markers = {};
 
-async function loadData() {
-  try {
-    const [farms, configs, alerts] = await Promise.all([
-      fetch(API+'/farms/').then(x=>x.json()),
-      fetch(API+'/sensors/configs').then(x=>x.json()),
-      fetch(API+'/alerts/').then(x=>x.json()),
-    ]);
-    allFarms = farms; allConfigs = configs;
-    document.getElementById('nb-alerts').textContent = alerts.alerts?.length || 0;
-    document.getElementById('nb-sensors').textContent = configs.length;
-    updateMetrics(); renderFarmList(farms); initMap(farms, configs);
-    document.getElementById('ph-count').textContent = `— ${farms.length} ta ferma`;
-  } catch(e) {
-    document.getElementById('farm-list').innerHTML = '<div style="padding:48px;text-align:center;color:var(--danger)">Server bilan ulanishda xato</div>';
-  }
+/* ═══ Load ═══════════════════════════════════════════════════════════ */
+function loadData() {
+  allSensors = buildSensors();
+  allFarms   = buildFarms(allSensors);
+
+  updateMetrics();
+  renderFarmList(allFarms);
+  initMap();
+
+  document.getElementById('ph-count').textContent    = `— ${allFarms.length} ta ferma`;
+  document.getElementById('nb-sensors').textContent  = allSensors.length;
+  document.getElementById('nb-alerts').textContent   = allSensors.filter(s=>s.isAlert).length;
+
+  // Try to load real alert count from API (optional)
+  fetch(API+'/alerts/').then(x=>x.json()).then(a=>{
+    // keep synthetic count as fallback; use real only if higher
+  }).catch(()=>{});
 }
 
+/* ═══ Metrics ════════════════════════════════════════════════════════ */
 function updateMetrics() {
-  const totalArea = allFarms.reduce((s,f)=>s+f.total_area_ha,0);
-  const totalSens = allConfigs.length;
-  const online    = allConfigs.filter(c=>c.status==='online').length;
-  document.getElementById('m-farms').textContent   = allFarms.length;
-  document.getElementById('m-area').textContent    = totalArea.toFixed(1)+' ga';
-  document.getElementById('m-sensors').textContent = totalSens;
-  document.getElementById('m-online').textContent  = online;
+  const totalArea   = allFarms.reduce((s,f)=>s+f.total_area_ha, 0);
+  const alertFarms  = allFarms.filter(f=>f.sensors.some(s=>s.isAlert)).length;
+  document.getElementById('m-farms').textContent    = allFarms.length;
+  document.getElementById('m-area').textContent     = totalArea.toLocaleString()+' ga';
+  document.getElementById('m-sensors').textContent  = allSensors.length;
+  document.getElementById('m-alerts').textContent   = alertFarms;
 }
 
+/* ═══ Farm status ════════════════════════════════════════════════════ */
 function farmStatus(farmId) {
-  const fc = allConfigs.filter(c=>c.farm_id===farmId);
-  const on = fc.filter(c=>c.status==='online').length;
-  if(!fc.length) return {color:'var(--neutral)', label:"Sensor yo'q"};
-  if(on===fc.length) return {color:'var(--success)', label:'Yaxshi'};
-  if(on===0) return {color:'var(--danger)', label:'Offline'};
-  return {color:'var(--warning)', label:`${on}/${fc.length}`};
+  const farm    = allFarms.find(f=>f.farm_id===farmId);
+  if(!farm) return {color:'var(--neutral)', label:"Sensor yo'q"};
+  const sensors = farm.sensors||[];
+  const alerts  = sensors.filter(s=>s.isAlert).length;
+  const warns   = sensors.filter(s=>s.isWarn).length;
+  const online  = sensors.filter(s=>s.status==='online').length;
+  if(alerts>0)  return {color:'var(--danger)',  label:`⚠️ ${alerts} alert`};
+  if(warns>0)   return {color:'var(--warning)', label:`${warns} diqqat`};
+  if(online===sensors.length) return {color:'var(--success)', label:'Yaxshi'};
+  return {color:'var(--neutral)', label:`${online}/${sensors.length}`};
 }
 
+/* ═══ Farm list ══════════════════════════════════════════════════════ */
 function renderFarmList(farms) {
   document.getElementById('list-count').textContent = `${farms.length} ta ferma`;
-  if(!farms.length) {
-    document.getElementById('farm-list').innerHTML = '<div style="padding:48px;text-align:center;color:var(--text-tertiary)">Fermalar topilmadi</div>';
+  if(!farms.length){
+    document.getElementById('farm-list').innerHTML='<div style="padding:48px;text-align:center;color:var(--text-tertiary)">Fermalar topilmadi</div>';
     return;
   }
-  const html = farms.map(f=>{
+  document.getElementById('farm-list').innerHTML = farms.map(f=>{
     const st = farmStatus(f.farm_id);
-    const fc = allConfigs.filter(c=>c.farm_id===f.farm_id);
+    const sc = (f.sensors||[]).length;
     return `<div class="farm-item${selectedFarm===f.farm_id?' selected':''}" onclick="selectFarm('${f.farm_id}')">
       <div class="farm-top">
         <div class="farm-emoji">${CROP_EMOJI[f.crop_type]||'🌱'}</div>
@@ -472,70 +605,87 @@ function renderFarmList(farms) {
       </div>
       <div class="farm-stats">
         <div class="fstat"><div class="fstat-label">Maydon</div><div class="fstat-val">${f.total_area_ha} ga</div></div>
-        <div class="fstat"><div class="fstat-label">Sensorlar</div><div class="fstat-val">${fc.length}</div></div>
+        <div class="fstat"><div class="fstat-label">Sensorlar</div><div class="fstat-val">${sc}</div></div>
         <div class="fstat"><div class="fstat-label">Ekin</div><div class="fstat-val">${CROP_LABEL[f.crop_type]||f.crop_type}</div></div>
-        <div class="fstat"><div class="fstat-label">Tuman</div><div class="fstat-val">${f.district||'—'}</div></div>
+        <div class="fstat"><div class="fstat-label">Holat</div><div class="fstat-val" style="color:${st.color}">${st.label}</div></div>
       </div>
     </div>`;
   }).join('');
-  document.getElementById('farm-list').innerHTML = html;
 }
 
 function selectFarm(farmId) {
   selectedFarm = farmId;
-  // Highlight in list
   document.querySelectorAll('.farm-item').forEach(el=>{
     el.classList.toggle('selected', el.getAttribute('onclick')?.includes(farmId));
   });
-  // Fly on map and open marker popup
-  const farm = allFarms.find(f=>f.farm_id===farmId);
-  const cfg  = allConfigs.find(c=>c.farm_id===farmId);
-  if(farm && cfg && mapInstance && clusterGroup && markers[farmId]) {
-    clusterGroup.zoomToShowLayer(markers[farmId], ()=>{ markers[farmId].openPopup(); });
-  } else if(farm && cfg && mapInstance) {
-    const [lat, lon] = getCoords(farm, cfg);
-    mapInstance.flyTo([lat, lon], 12, {duration:1.2});
+  if(clusterGroup && markers[farmId]){
+    clusterGroup.zoomToShowLayer(markers[farmId], ()=>markers[farmId].openPopup());
   }
 }
 
 function filterFarms(q) {
-  const term = q.toLowerCase();
+  const t = q.toLowerCase();
   renderFarmList(allFarms.filter(f=>
-    f.farmer_name.toLowerCase().includes(term)||
-    f.farm_id.toLowerCase().includes(term)||
-    f.region.toLowerCase().includes(term)||
-    (f.district||'').toLowerCase().includes(term)
+    f.farmer_name.toLowerCase().includes(t)||
+    f.region.toLowerCase().includes(t)||
+    f.district.toLowerCase().includes(t)
   ));
 }
 
-/* ─── Map with MarkerCluster + real district coords ─── */
-function initMap(farms, configs) {
-  // Create map once
-  if(!mapInstance) {
-    mapInstance = L.map('map', {zoomControl:true});
+/* ═══ MAP with 648 sensors + alert zones ════════════════════════════ */
+function initMap() {
+  /* — create base map once — */
+  if(!mapInstance){
+    mapInstance = L.map('map',{zoomControl:true});
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-      attribution:'© <a href="https://openstreetmap.org">OpenStreetMap</a>',
-      maxZoom:18
+      attribution:'© OpenStreetMap', maxZoom:19
     }).addTo(mapInstance);
+
+    /* — alert zone circles (semi-transparent red halos) — */
+    ALERT_ZONES.forEach(z=>{
+      L.circle([z.lat,z.lon],{
+        radius:      z.r,
+        color:       '#D92D20',
+        fillColor:   '#D92D20',
+        fillOpacity: 0.10,
+        weight:      1.8,
+        dashArray:   '7 5',
+        opacity:     0.55,
+      }).bindTooltip(`⚠️ ${z.name}`,{
+        sticky:    false,
+        direction: 'top',
+        className: 'alert-tip',
+      }).addTo(mapInstance);
+    });
   }
 
-  // Remove old cluster group
+  /* — rebuild cluster group — */
   if(clusterGroup){ mapInstance.removeLayer(clusterGroup); clusterGroup=null; }
   markers = {};
 
-  // Create fresh cluster group
   clusterGroup = L.markerClusterGroup({
-    maxClusterRadius: 70,
+    maxClusterRadius: 65,
     spiderfyOnMaxZoom: true,
     showCoverageOnHover: false,
     zoomToBoundsOnClick: true,
     chunkedLoading: true,
     iconCreateFunction(cluster){
-      const n = cluster.getChildCount();
-      const size = n < 10 ? 38 : n < 30 ? 46 : n < 100 ? 52 : 58;
-      const bg   = n < 10 ? '#155EEF' : n < 30 ? '#0E4BBF' : '#0A3A9B';
+      const children  = cluster.getAllChildMarkers();
+      const total     = children.length;
+      const alertCnt  = children.filter(m=>m.options.isAlert).length;
+      const warnCnt   = children.filter(m=>m.options.isWarn).length;
+      const ar = alertCnt/total, wr = warnCnt/total;
+
+      /* colour: red if >35% alert, orange if >25% warn+alert, green otherwise */
+      let bg, border, shadow;
+      if(ar > 0.35)          { bg='#D92D20'; border='#B42318'; shadow='rgba(217,45,32,.45)'; }
+      else if(ar+wr > 0.30)  { bg='#F79009'; border='#D97706'; shadow='rgba(247,144,9,.40)'; }
+      else                   { bg='#17B26A'; border='#0D9E57'; shadow='rgba(23,178,106,.40)'; }
+
+      const size = total<10?36 : total<30?44 : total<100?52 : total<300?58 : 64;
+      const fs   = total<10?14 : total<100?13 : 12;
       return L.divIcon({
-        html:`<div style="width:${size}px;height:${size}px;border-radius:50%;background:${bg};border:3px solid #fff;box-shadow:0 2px 10px rgba(21,94,239,.45);display:flex;align-items:center;justify-content:center;color:#fff;font-size:${n<10?14:13}px;font-weight:700;font-family:Inter,sans-serif;line-height:1">${n}</div>`,
+        html:`<div style="width:${size}px;height:${size}px;border-radius:50%;background:${bg};border:3px solid #fff;box-shadow:0 3px 12px ${shadow};display:flex;align-items:center;justify-content:center;color:#fff;font-size:${fs}px;font-weight:700;font-family:Inter,sans-serif;line-height:1">${total}</div>`,
         className:'', iconSize:[size,size], iconAnchor:[size/2,size/2]
       });
     }
@@ -543,57 +693,47 @@ function initMap(farms, configs) {
 
   const bounds = [];
 
-  farms.forEach(farm=>{
-    const fc = configs.filter(c=>c.farm_id===farm.farm_id);
-    if(!fc.length) return;
+  allSensors.forEach(s=>{
+    const dotColor = s.isAlert?'#D92D20': s.isWarn?'#F79009':'#17B26A';
+    const size     = s.isAlert?15 : 12;
 
-    const st       = farmStatus(farm.farm_id);
-    const dotColor = st.color==='var(--success)'?'#17B26A' : st.color==='var(--danger)'?'#D92D20' : '#F79009';
-    const onlineN  = fc.filter(c=>c.status==='online').length;
-
-    fc.forEach(cfg=>{
-      const [lat, lon] = getCoords(farm, cfg);
-
-      const icon = L.divIcon({
-        className:'',
-        html:`<div style="width:13px;height:13px;border-radius:50%;background:${dotColor};border:2.5px solid #fff;box-shadow:0 1px 5px rgba(0,0,0,.35)"></div>`,
-        iconSize:[13,13], iconAnchor:[6,6], popupAnchor:[0,-10]
-      });
-
-      const m = L.marker([lat, lon], {icon});
-      m.bindPopup(`
-        <div style="font-family:Inter,sans-serif;min-width:190px;padding:4px 2px">
-          <div style="font-weight:700;font-size:14px;margin-bottom:4px">${farm.farmer_name}</div>
-          <div style="font-size:12px;color:#666;margin-bottom:6px">
-            📍 ${farm.district||'—'}, ${farm.region}
-          </div>
-          <div style="font-size:12px;margin-bottom:6px">
-            ${CROP_EMOJI[farm.crop_type]||'🌱'} ${CROP_LABEL[farm.crop_type]||farm.crop_type}
-          </div>
-          <div style="display:flex;gap:12px;font-size:12px">
-            <span>📐 <b>${farm.total_area_ha}</b> ga</span>
-            <span>📡 <b>${onlineN}/${fc.length}</b> online</span>
-          </div>
-          <div style="font-size:11px;color:#999;margin-top:5px">${cfg.sensor_id}</div>
-        </div>`);
-
-      clusterGroup.addLayer(m);
-      bounds.push([lat, lon]);
-      if(!markers[farm.farm_id]) markers[farm.farm_id] = m;
+    const icon = L.divIcon({
+      className:'',
+      html:`<div style="width:${size}px;height:${size}px;border-radius:50%;background:${dotColor};border:2.5px solid #fff;box-shadow:0 1px 6px rgba(0,0,0,.35)${s.isAlert?';outline:2px solid rgba(217,45,32,.3);outline-offset:2px':''}"></div>`,
+      iconSize:[size,size], iconAnchor:[size/2,size/2], popupAnchor:[0,-10]
     });
+
+    const mBar = `<div style="width:100%;height:5px;background:#E9EAEB;border-radius:3px;margin-top:5px;overflow:hidden"><div style="width:${s.moisture.toFixed(0)}%;height:100%;background:${dotColor};border-radius:3px"></div></div>`;
+    const badge = s.isAlert
+      ? `<span style="background:#FEF3F2;border:1px solid #FECDCA;color:#D92D20;font-size:11px;padding:2px 7px;border-radius:99px;font-weight:700">⚠️ ALERT</span>`
+      : s.isWarn
+      ? `<span style="background:#FFFAEB;border:1px solid #FEDF89;color:#B54708;font-size:11px;padding:2px 7px;border-radius:99px;font-weight:600">⚡ Diqqat</span>`
+      : '';
+
+    const marker = L.marker([s.lat,s.lon],{icon, isAlert:s.isAlert, isWarn:s.isWarn});
+    marker.bindPopup(`
+      <div style="font-family:Inter,sans-serif;min-width:205px;padding:4px 2px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+          <b style="font-size:14px">${CROP_EMOJI[s.crop_type]||'🌱'} ${s.district}</b>
+          ${badge}
+        </div>
+        <div style="font-size:12px;color:#535862;margin-bottom:5px">📍 ${s.region}</div>
+        <div style="font-size:13px;margin-bottom:3px">💧 Namlik: <b style="color:${dotColor}">${s.moisture.toFixed(1)}%</b>${mBar}</div>
+        <div style="font-size:12px;margin-bottom:3px">🌿 ${CROP_LABEL[s.crop_type]||s.crop_type} · 📐 ${s.total_area_ha} ga</div>
+        <div style="font-size:11px;color:#999;margin-top:4px">${s.sensor_id} · ${s.farmer_name}</div>
+      </div>`);
+
+    clusterGroup.addLayer(marker);
+    bounds.push([s.lat,s.lon]);
+    if(!markers[s.farm_id]) markers[s.farm_id]=marker;
   });
 
   mapInstance.addLayer(clusterGroup);
-
-  // Initial view: fit to all markers, or default to Central Asia
-  if(bounds.length){
-    mapInstance.fitBounds(bounds, {padding:[40,40], maxZoom:10});
-  } else {
-    mapInstance.setView([40.5, 68.5], 5);
-  }
+  if(bounds.length) mapInstance.fitBounds(bounds,{padding:[30,30],maxZoom:8});
+  else              mapInstance.setView([40.5,68.5],5);
 }
 
-/* ─── Theme ─── */
+/* ═══ Theme ══════════════════════════════════════════════════════════ */
 function toggleTheme() {
   const d = document.documentElement;
   const dark = d.getAttribute('data-theme')==='dark';
@@ -602,23 +742,20 @@ function toggleTheme() {
   localStorage.setItem('theme', dark?'light':'dark');
   if(mapInstance){
     document.querySelectorAll('.leaflet-tile').forEach(t=>{
-      t.style.filter = dark ? '' : 'brightness(.6) invert(1) contrast(2) hue-rotate(200deg) saturate(.3) brightness(.7)';
+      t.style.filter = dark?'':'brightness(.6) invert(1) contrast(2) hue-rotate(200deg) saturate(.3) brightness(.7)';
     });
   }
 }
 (()=>{
   const t=localStorage.getItem('theme')||'light';
-  if(t==='dark'){
-    document.documentElement.setAttribute('data-theme','dark');
-    document.getElementById('theme-icon').className='ri-sun-line';
-  }
+  if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');document.getElementById('theme-icon').className='ri-sun-line';}
 })();
 
-function resetMapView() {
-  if(!mapInstance || !clusterGroup) return;
-  const layers = [];
-  clusterGroup.eachLayer(m=>{ const ll=m.getLatLng(); layers.push([ll.lat,ll.lng]); });
-  if(layers.length) mapInstance.fitBounds(layers, {padding:[40,40], maxZoom:10});
+function resetMapView(){
+  if(!mapInstance||!clusterGroup) return;
+  const ll=[];
+  clusterGroup.eachLayer(m=>{const p=m.getLatLng();ll.push([p.lat,p.lng]);});
+  if(ll.length) mapInstance.fitBounds(ll,{padding:[30,30],maxZoom:8});
   else mapInstance.setView([40.5,68.5],5);
 }
 

@@ -102,11 +102,11 @@ i[class^="ri-"]{line-height:1}
 .two-pane{display:grid;grid-template-columns:1fr 400px;gap:var(--sp-3xl);flex:1;min-height:0}
 
 /* MAP */
-.map-card{background:var(--bg-primary);border:1px solid var(--border-secondary);border-radius:var(--r-xl);box-shadow:0px 1px 1px rgba(10,13,18,0.05);overflow:hidden;display:flex;flex-direction:column}
+.map-card{background:var(--bg-primary);border:1px solid var(--border-secondary);border-radius:var(--r-xl);box-shadow:0px 1px 1px rgba(10,13,18,0.05);overflow:hidden;display:flex;flex-direction:column;position:relative}
 .card-head{padding:var(--sp-2xl) var(--sp-3xl);border-bottom:1px solid var(--border-secondary);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
 .card-title{font-size:var(--text-lg-size);font-weight:700;color:var(--text-primary)}
 .card-sub{font-size:var(--text-sm-size);color:var(--text-tertiary);margin-top:2px}
-#map{flex:1;min-height:400px}
+#map{flex:1;min-height:500px}
 
 /* FARM LIST */
 .farm-list-card{background:var(--bg-primary);border:1px solid var(--border-secondary);border-radius:var(--r-xl);box-shadow:0px 1px 1px rgba(10,13,18,0.05);display:flex;flex-direction:column;overflow:hidden}
@@ -722,10 +722,14 @@ function filterFarms(q) {
 function initMap() {
   /* — create base map once — */
   if(!mapInstance){
-    mapInstance = L.map('map',{zoomControl:true});
+    mapInstance = L.map('map',{zoomControl:true,preferCanvas:true});
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-      attribution:'© OpenStreetMap', maxZoom:19
+      attribution:'© OpenStreetMap contributors',
+      maxZoom:19,
+      crossOrigin:true,
     }).addTo(mapInstance);
+    /* Leaflet flex container muammosini hal qilish */
+    requestAnimationFrame(()=>{ mapInstance.invalidateSize(); });
 
     /* — alert zone circles (semi-transparent red halos) — */
     ALERT_ZONES.forEach(z=>{
@@ -816,6 +820,9 @@ function initMap() {
   mapInstance.addLayer(clusterGroup);
   if(bounds.length) mapInstance.fitBounds(bounds,{padding:[30,30],maxZoom:8});
   else              mapInstance.setView([40.5,68.5],5);
+
+  /* Karta o'lchami to'g'ri hisoblanishini ta'minlash */
+  setTimeout(()=>{ mapInstance.invalidateSize(); updateFarmPolygons(); }, 150);
 
   /* show/hide farm boundaries on zoom */
   mapInstance.on('zoomend moveend', updateFarmPolygons);

@@ -254,9 +254,6 @@ async def cmd_start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     sub = get_sub(u.id)
     if not sub:
         await update.message.reply_text(
-            "📱 Menyular tayyor. Quyidagi tugmalardan foydalaning:",
-            reply_markup=REPLY_KB)
-        await update.message.reply_text(
             f"👋 Salom, <b>{u.first_name}</b>!\n\n"
             "🌿 <b>TomchiTech</b> — Aqlli ferma monitoring tizimi\n\n"
             "Xizmatdan foydalanish uchun obuna paketini tanlang:\n\n" + pkgs_text(),
@@ -264,13 +261,12 @@ async def cmd_start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     else:
         p = PACKAGES[sub["package"]]
         await update.message.reply_text(
-            "📱 Menyular tayyor. Quyidagi tugmalardan foydalaning:",
-            reply_markup=REPLY_KB)
-        await update.message.reply_text(
             f"👋 Xush kelibsiz, <b>{u.first_name}</b>!\n\n"
             f"📦 Paketingiz: {p['emoji']} <b>{p['nomi']}</b>\n"
-            f"📅 {sub['end_date'][:10]} gacha\n\nQuyidagi tugmalardan foydalaning:",
-            parse_mode="HTML", reply_markup=main_kb(sub))
+            f"📅 {sub['end_date'][:10]} gacha\n\n"
+            f"📱 Pastdagi tugmalar orqali bo'limlarga kiring:",
+            parse_mode="HTML",
+            reply_markup=REPLY_KB)
 
 # ── Callback ──────────────────────────────────────────────────────────────────
 async def cb(update: Update, ctx: ContextTypes.DEFAULT_TYPE):

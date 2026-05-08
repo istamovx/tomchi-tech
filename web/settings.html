@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8"/>
+<script>if(sessionStorage.getItem('tomchi_auth')!=='1'){window.location.replace('login.html');}</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Tomchi Tech — Sozlamalar</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
+<style>
+:root{
+  --bg-page:#F5F5F5;--bg-primary:#FFFFFF;--bg-primary-alt:#FAFAFA;--bg-secondary:#F9FAFB;
+  --text-primary:#181D27;--text-secondary:#414651;--text-tertiary:#535862;
+  --text-placeholder:#717680;--border-primary:#D5D7DA;--border-secondary:#E9EAEB;
+  --brand:#155EEF;--brand-hover:#1248C7;--border-brand:#2970FF;--border-brand-alt:#155EEF;
+  --success:#17B26A;--success-bg:#ECFDF3;--success-border:#ABEFC6;
+  --warning:#F79009;--warning-bg:#FFFAEB;--warning-border:#FEDF89;
+  --danger:#D92D20;--danger-bg:#FEF3F2;--danger-border:#FECDCA;
+  --neutral:#717680;--neutral-bg:#F9FAFB;
+  --utility-gray-50:#FAFAFA;--utility-gray-200:#E9EAEB;--utility-gray-700:#414651;
+  --brand-50:#EFF4FF;--brand-100:#D1E0FF;
+  --shadow-xs:0px 1px 2px rgba(10,13,18,0.05);
+  --shadow-sm:0px 1px 3px rgba(10,13,18,0.08),0px 1px 2px rgba(10,13,18,0.04);
+  --shadow-icon:0px 1px 2px rgba(10,13,18,0.05);
+  --shadow-skeu-border:inset 0 0 0 1px rgba(10,13,18,.18),inset 0 -2px 0 rgba(10,13,18,.05);
+  --sp-xxs:2px;--sp-xs:4px;--sp-sm:6px;--sp-md:8px;--sp-lg:12px;
+  --sp-xl:16px;--sp-2xl:20px;--sp-3xl:24px;--sp-4xl:32px;
+  --r-xs:4px;--r-sm:6px;--r-md:8px;--r-lg:10px;--r-xl:12px;--r-full:9999px;
+  --text-xs-size:12px;--text-xs-lh:18px;--text-sm-size:14px;--text-sm-lh:20px;
+  --text-md-size:16px;--text-md-lh:24px;--text-lg-size:18px;--text-lg-lh:28px;
+  --text-xl-size:20px;--text-xl-lh:30px;
+  --display-xs-size:24px;--display-xs-lh:32px;
+  --sidebar-w:280px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg-page);color:var(--text-primary);height:100vh;display:flex;overflow:hidden;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+i[class^="ri-"]{line-height:1}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border-secondary);border-radius:99px}
+
+/* ── Sidebar ─────────────────────────────────────────────────── */
+.sidebar{width:var(--sidebar-w);background:var(--bg-primary);border-right:1px solid var(--border-secondary);height:100vh;display:flex;flex-direction:column;flex-shrink:0;z-index:100}
+.sb-header{display:flex;align-items:center;gap:var(--sp-md);padding:var(--sp-3xl) var(--sp-2xl);border-bottom:1px solid var(--border-secondary);height:80px}
+.sb-logomark{width:32px;height:32px;border-radius:var(--r-md);background:linear-gradient(180deg,#2970FF 0%,#155EEF 100%);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;flex-shrink:0;border:.2px solid rgba(10,13,18,.12);box-shadow:0 1px 1px rgba(10,13,18,.13),0 1px 3px rgba(10,13,18,.1)}
+.sb-logoname{font-size:var(--text-md-size);font-weight:700;color:var(--text-primary)}
+.sb-nav{flex:1;overflow-y:auto;padding:var(--sp-xl) var(--sp-xl) 0}
+.nav-item{display:flex;align-items:center;gap:var(--sp-md);padding:var(--sp-md) var(--sp-lg);border-radius:var(--r-sm);cursor:pointer;color:var(--text-secondary);font-size:var(--text-md-size);font-weight:500;line-height:var(--text-md-lh);transition:background .12s;width:100%;margin:1px 0;text-align:left}
+.nav-item:hover{background:var(--bg-secondary)}.nav-item.active{background:var(--bg-secondary);color:var(--text-primary)}
+.nav-icon{font-size:18px;width:20px;height:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.nav-badge{margin-left:auto;font-size:var(--text-xs-size);font-weight:500;padding:var(--sp-xxs) var(--sp-md);border-radius:var(--r-full);background:var(--utility-gray-50);border:1px solid var(--utility-gray-200);color:var(--utility-gray-700)}
+.nav-badge.alert{background:var(--danger-bg);border-color:var(--danger-border);color:var(--danger)}
+.sb-footer{border-top:1px solid var(--border-secondary);padding:var(--sp-xl);display:flex;flex-direction:column;gap:var(--sp-xs)}
+.sb-account{background:var(--bg-primary-alt);border:1px solid var(--border-secondary);border-radius:var(--r-xl);padding:var(--sp-lg);display:flex;align-items:center;gap:var(--sp-md);cursor:pointer;margin-top:var(--sp-md);transition:background .12s}
+.sb-account:hover{background:var(--bg-secondary)}
+.av-wrap{width:40px;height:40px;border-radius:var(--r-full);background:#E0E0E0;border:1px solid rgba(0,0,0,.08);position:relative;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--text-secondary)}
+.av-online{position:absolute;bottom:-1px;right:-1px;width:10px;height:10px;border-radius:var(--r-full);background:var(--success);border:1.5px solid var(--bg-primary)}
+.av-name{font-size:var(--text-md-size);font-weight:600;color:var(--text-primary)}
+.av-role{font-size:var(--text-sm-size);color:var(--text-tertiary)}
+
+/* ── Main ────────────────────────────────────────────────────── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.page-header{background:var(--bg-primary);border-bottom:1px solid var(--border-secondary);padding:0 var(--sp-4xl);height:80px;display:flex;align-items:center;gap:var(--sp-lg);flex-shrink:0}
+.ph-title{font-size:var(--text-xl-size);font-weight:700;flex:1}
+.ph-btn{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:var(--r-sm);color:var(--text-secondary);font-size:18px;transition:background .12s}
+.ph-btn:hover{background:var(--bg-secondary)}
+.ph-divider{width:1px;height:24px;background:var(--border-secondary);margin:0 4px}
+.btn{display:inline-flex;align-items:center;gap:6px;font-family:inherit;font-size:var(--text-sm-size);font-weight:600;padding:8px 14px;border-radius:var(--r-md);cursor:pointer;transition:all .15s;white-space:nowrap}
+.btn i{font-size:16px}
+.btn-secondary{background:var(--bg-primary);border:1px solid var(--border-primary);color:var(--text-secondary);box-shadow:var(--shadow-xs)}
+.btn-secondary:hover{background:var(--bg-secondary)}
+.btn-primary{background:var(--brand);border:1px solid var(--border-brand-alt);color:#fff;box-shadow:var(--shadow-xs),inset 0 0 0 1px rgba(255,255,255,.12),inset 0 -2px 0 rgba(10,13,18,.08)}
+.btn-primary:hover{background:var(--brand-hover)}
+.btn-danger{background:var(--danger);border:1px solid #B42318;color:#fff}
+.btn-sm{padding:6px 10px;font-size:var(--text-xs-size)}
+.content{flex:1;overflow-y:auto;padding:var(--sp-3xl) var(--sp-4xl)}
+
+/* ── Tabs ────────────────────────────────────────────────────── */
+.stabs{display:flex;gap:0;border-bottom:1px solid var(--border-secondary);margin-bottom:var(--sp-3xl)}
+.stab{padding:12px var(--sp-2xl);font-size:var(--text-sm-size);font-weight:600;color:var(--text-tertiary);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;display:flex;align-items:center;gap:6px}
+.stab:hover{color:var(--text-secondary)}
+.stab.active{color:var(--brand);border-bottom-color:var(--brand)}
+.stab i{font-size:16px}
+.tab-panel{display:none}.tab-panel.active{display:block}
+
+/* ── Section header ──────────────────────────────────────────── */
+.sec-head{margin-bottom:var(--sp-xl)}
+.sec-title{font-size:var(--text-lg-size);font-weight:700;color:var(--text-primary)}
+.sec-sub{font-size:var(--text-sm-size);color:var(--text-tertiary);margin-top:4px}
+.sec-grid{display:flex;flex-direction:column;gap:var(--sp-xl)}
+
+/* ── Integration Card ────────────────────────────────────────── */
+.int-card{background:var(--bg-primary);border:1px solid var(--border-secondary);border-radius:var(--r-xl);box-shadow:var(--shadow-xs);overflow:hidden;transition:border-color .15s}
+.int-card.enabled{border-color:var(--success-border)}
+.int-head{display:flex;align-items:center;gap:var(--sp-xl);padding:var(--sp-2xl) var(--sp-3xl);cursor:pointer}
+.int-icon{width:44px;height:44px;border-radius:var(--r-lg);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;border:1px solid rgba(0,0,0,.06)}
+.int-meta{flex:1;min-width:0}
+.int-name{font-size:var(--text-md-size);font-weight:700;color:var(--text-primary)}
+.int-desc{font-size:var(--text-sm-size);color:var(--text-tertiary);margin-top:2px}
+.int-docs{font-size:var(--text-xs-size);color:var(--brand);margin-top:4px;display:inline-flex;align-items:center;gap:3px}
+.int-right{display:flex;align-items:center;gap:var(--sp-lg);flex-shrink:0}
+.status-dot{width:8px;height:8px;border-radius:var(--r-full);background:var(--border-secondary);flex-shrink:0}
+.status-dot.on{background:var(--success);box-shadow:0 0 0 3px var(--success-bg)}
+.status-dot.partial{background:var(--warning);box-shadow:0 0 0 3px var(--warning-bg)}
+.int-badge-chip{font-size:11px;font-weight:600;padding:3px 8px;border-radius:var(--r-full)}
+.int-badge-chip.off{background:var(--utility-gray-50);color:var(--text-tertiary);border:1px solid var(--utility-gray-200)}
+.int-badge-chip.on{background:var(--success-bg);color:var(--success);border:1px solid var(--success-border)}
+.int-badge-chip.test{background:var(--warning-bg);color:var(--warning);border:1px solid var(--warning-border)}
+
+/* Toggle switch */
+.toggle{position:relative;display:inline-block;width:44px;height:24px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-track{position:absolute;inset:0;background:var(--border-primary);border-radius:var(--r-full);transition:.2s;cursor:pointer}
+.toggle-track::before{content:'';position:absolute;width:18px;height:18px;border-radius:var(--r-full);background:#fff;left:3px;top:3px;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.toggle input:checked + .toggle-track{background:var(--brand)}
+.toggle input:checked + .toggle-track::before{transform:translateX(20px)}
+
+/* Int body (expandable) */
+.int-body{border-top:1px solid var(--border-secondary);padding:var(--sp-3xl);background:var(--bg-primary-alt)}
+.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-xl) var(--sp-3xl);margin-bottom:var(--sp-2xl)}
+.field-grid.cols1{grid-template-columns:1fr}
+.field-group{display:flex;flex-direction:column;gap:var(--sp-xs)}
+.field-group.span2{grid-column:span 2}
+.field-label{font-size:var(--text-sm-size);font-weight:600;color:var(--text-secondary)}
+.field-hint{font-size:var(--text-xs-size);color:var(--text-tertiary);margin-top:2px}
+.field-input{display:flex;align-items:center;background:var(--bg-primary);border:1px solid var(--border-secondary);border-radius:var(--r-md);padding:8px 12px;gap:8px;transition:border-color .15s,box-shadow .15s;box-shadow:var(--shadow-xs)}
+.field-input:focus-within{border-color:var(--border-brand);box-shadow:0 0 0 4px rgba(41,112,255,.06)}
+.field-input i{color:var(--text-placeholder);font-size:15px;flex-shrink:0}
+.field-input input,.field-input select{border:none;outline:none;background:transparent;font-family:inherit;font-size:var(--text-sm-size);color:var(--text-primary);width:100%}
+.field-input input::placeholder{color:var(--text-placeholder)}
+.field-input select{cursor:pointer}
+.field-input.mono input{font-family:'Courier New',monospace;font-size:13px;letter-spacing:.03em}
+.show-btn{color:var(--text-tertiary);font-size:15px;cursor:pointer;flex-shrink:0;transition:color .12s}
+.show-btn:hover{color:var(--text-secondary)}
+.int-actions{display:flex;align-items:center;gap:var(--sp-md);padding-top:var(--sp-xl);border-top:1px solid var(--border-secondary)}
+.int-actions .spacer{flex:1}
+.test-result{font-size:var(--text-xs-size);font-weight:600;padding:4px 10px;border-radius:var(--r-full);display:none}
+.test-result.ok{background:var(--success-bg);color:var(--success);border:1px solid var(--success-border);display:flex;align-items:center;gap:4px}
+.test-result.err{background:var(--danger-bg);color:var(--danger);border:1px solid var(--danger-border);display:flex;align-items:center;gap:4px}
+
+/* ── General settings ────────────────────────────────────────── */
+.setting-card{background:var(--bg-primary);border:1px solid var(--border-secondary);border-radius:var(--r-xl);box-shadow:var(--shadow-xs);margin-bottom:var(--sp-xl)}
+.setting-card-head{padding:var(--sp-2xl) var(--sp-3xl);border-bottom:1px solid var(--border-secondary);display:flex;align-items:center;gap:var(--sp-lg)}
+.setting-card-icon{width:36px;height:36px;border-radius:var(--r-md);background:var(--bg-secondary);border:1px solid var(--border-primary);display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--text-secondary)}
+.setting-card-title{font-size:var(--text-md-size);font-weight:700}
+.setting-card-sub{font-size:var(--text-sm-size);color:var(--text-tertiary);margin-top:2px}
+.setting-card-body{padding:var(--sp-3xl)}
+
+/* ── Status overview ─────────────────────────────────────────── */
+.status-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--sp-xl);margin-bottom:var(--sp-3xl)}
+.status-item{background:var(--bg-primary);border:1px solid var(--border-secondary);border-radius:var(--r-xl);padding:var(--sp-xl);display:flex;align-items:center;gap:var(--sp-md);box-shadow:var(--shadow-xs)}
+.status-item-icon{width:36px;height:36px;border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.status-item-label{font-size:var(--text-xs-size);color:var(--text-tertiary);font-weight:500}
+.status-item-val{font-size:var(--text-sm-size);font-weight:700;color:var(--text-primary)}
+
+/* ── Dark mode ───────────────────────────────────────────────── */
+[data-theme="dark"]{
+  --bg-page:#0C0E12;--bg-primary:#161A23;--bg-primary-alt:#1C2130;--bg-secondary:#1E2436;
+  --border-primary:#2E3448;--border-secondary:#242A3A;
+  --text-primary:#F0F2F5;--text-secondary:#BCC2CE;--text-tertiary:#8B92A0;
+  --text-placeholder:#636B78;
+  --utility-gray-50:#1C2130;--utility-gray-200:#2E3448;--utility-gray-700:#BCC2CE;
+  --brand-50:#0D1528;--brand-100:#152040;
+  --shadow-xs:0 1px 2px rgba(0,0,0,.4);
+  --shadow-icon:0 1px 2px rgba(0,0,0,.5);
+  --shadow-skeu-border:inset 0 0 0 1px rgba(255,255,255,.06),inset 0 -2px 0 rgba(0,0,0,.2);
+}
+[data-theme="dark"] .nav-item.active{background:#1E2436;color:#F0F2F5}
+[data-theme="dark"] .int-body{background:#1A1F2D}
+[data-theme="dark"] .int-card.enabled{border-color:#1E4D35}
+[data-theme="dark"] .field-input{background:#1C2130;border-color:#2E3448}
+[data-theme="dark"] .sb-account{background:#1C2130;border-color:#2E3448}
+[data-theme="dark"] .toggle-track{background:#3A4254}
+
+/* Sidebar backdrop */
+.sidebar-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.48);z-index:150;backdrop-filter:blur(2px)}
+.sidebar-backdrop.show{display:block}
+[data-theme="dark"] .sidebar-backdrop{background:rgba(0,0,0,.65)}
+
+@media(max-width:1280px){.status-grid{grid-template-columns:repeat(2,1fr)}.field-grid{grid-template-columns:1fr}}
+@media(max-width:900px){.sidebar{position:fixed;left:-100%;z-index:200;transition:left .25s}.sidebar.open{left:0}.content{padding:var(--sp-xl)}.ph-menu-btn{display:flex!important}}
+@media(max-width:600px){.status-grid{grid-template-columns:1fr 1fr}.field-grid.span2{grid-column:span 1}.page-header{padding:0 var(--sp-xl)}}
+</style>
+</head>
+<body>
+
+<div class="sidebar-backdrop" id="sb-backdrop" onclick="toggleSidebar()"></div>
+
+<nav class="sidebar" id="sidebar">
+  <div class="sb-header">
+    <div class="sb-logomark"><i class="ri-leaf-line"></i></div>
+    <span class="sb-logoname">Tomchi Tech</span>
+  </div>
+  <div class="sb-nav">
+    <a class="nav-item" href="dashboard.html"><span class="nav-icon"><i class="ri-dashboard-3-line"></i></span>Dashboard</a>
+    <a class="nav-item" href="sensors.html"><span class="nav-icon"><i class="ri-radar-line"></i></span>Sensorlar<span class="nav-badge" id="nb-sensors">—</span></a>
+    <a class="nav-item" href="farms.html"><span class="nav-icon"><i class="ri-plant-line"></i></span>Fermalar</a>
+    <a class="nav-item" href="recommendations.html"><span class="nav-icon"><i class="ri-lightbulb-line"></i></span>Tavsiyalar</a>
+    <a class="nav-item" href="alerts.html"><span class="nav-icon"><i class="ri-notification-3-line"></i></span>Alertlar<span class="nav-badge alert" id="nb-alerts">0</span></a>
+    <a class="nav-item" href="reports.html"><span class="nav-icon"><i class="ri-bar-chart-2-line"></i></span>Hisobotlar</a>
+    <a class="nav-item" href="clients.html"><span class="nav-icon"><i class="ri-group-line"></i></span>Mijozlar</a>
+  </div>
+  <div class="sb-footer">
+    <a class="nav-item footer-item active" href="settings.html"><span class="nav-icon"><i class="ri-settings-3-line"></i></span>Sozlamalar</a>
+    <button class="nav-item footer-item"><span class="nav-icon"><i class="ri-question-line"></i></span>Yordam</button>
+    <div class="sb-account">
+      <div class="av-wrap">X<div class="av-online"></div></div>
+      <div style="flex:1;min-width:0"><div class="av-name">Xurshid Istamov</div><div class="av-role">Agrotexnik · Admin</div></div>
+      <button class="ph-btn" onclick="toggleTheme()" title="Mavzu"><i class="ri-moon-line" id="theme-icon"></i></button>
+    </div>
+  </div>
+</nav>
+
+<div class="main">
+  <div class="page-header">
+    <button class="ph-btn ph-menu-btn" onclick="toggleSidebar()" style="display:none;margin-right:4px"><i class="ri-menu-line"></i></button>
+    <div class="ph-title">Sozlamalar</div>
+    <div class="ph-divider"></div>
+    <button class="ph-btn" onclick="exportConfig()" title="Konfigni eksport qilish"><i class="ri-download-2-line"></i></button>
+    <button class="ph-btn" id="import-btn" title="Konfigni import qilish"><i class="ri-upload-2-line"></i></button>
+    <input type="file" id="import-input" accept=".json" style="display:none" onchange="importConfig(this)"/>
+    <button class="btn btn-primary" onclick="saveAll()"><i class="ri-save-line"></i>Hammasini saqlash</button>
+  </div>
+
+  <div class="content">
+
+    <!-- Integration status overview -->
+    <div class="status-grid" id="status-overview"></div>
+
+    <!-- Tab bar -->
+    <div class="stabs">
+      <button class="stab active" onclick="switchTab('general',this)"><i class="ri-settings-3-line"></i>Umumiy</button>
+      <button class="stab" onclick="switchTab('gov',this)"><i class="ri-government-line"></i>Davlat tizimlari</button>
+      <button class="stab" onclick="switchTab('payment',this)"><i class="ri-bank-card-line"></i>To'lov tizimlari</button>
+      <button class="stab" onclick="switchTab('bot',this)"><i class="ri-telegram-line"></i>Bot & API</button>
+    </div>
+
+    <!-- ── GENERAL ─────────────────────────────────────────────── -->
+    <div id="tab-general" class="tab-panel active">
+
+      <div class="setting-card">
+        <div class="setting-card-head">
+          <div class="setting-card-icon"><i class="ri-server-line"></i></div>
+          <div><div class="setting-card-title">Asosiy API</div><div class="setting-card-sub">Backend server manzili va autentifikatsiya kaliti</div></div>
+        </div>
+        <div class="setting-card-body">
+          <div class="field-grid cols1">
+            <div class="field-group">
+              <span class="field-label">API Base URL</span>
+              <div class="field-input mono">
+                <i class="ri-global-line"></i>
+                <input type="text" id="api-base" placeholder="https://tomchi-tech-api.onrender.com/api/v1"/>
+              </div>
+            </div>
+            <div class="field-group">
+              <span class="field-label">API Key (ixtiyoriy)</span>
+              <div class="field-input mono">
+                <i class="ri-key-2-line"></i>
+                <input type="password" id="api-key" placeholder="tk_live_••••••••"/>
+                <span class="show-btn" onclick="toggleVisible(this)"><i class="ri-eye-line"></i></span>
+              </div>
+              <span class="field-hint">X-API-Key header orqali yuboriladi</span>
+            </div>
+          </div>
+          <div class="int-actions">
+            <div class="test-result" id="test-api"></div>
+            <div class="spacer"></div>
+            <button class="btn btn-secondary btn-sm" onclick="testApi()"><i class="ri-flashlight-line"></i>Ulanishni tekshir</button>
+            <button class="btn btn-primary" onclick="saveSection('api')"><i class="ri-save-line"></i>Saqlash</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="setting-card">
+        <div class="setting-card-head">
+          <div class="setting-card-icon"><i class="ri-shield-keyhole-line"></i></div>
+          <div><div class="setting-card-title">Sessiya va Xavfsizlik</div><div class="setting-card-sub">Autentifikatsiya va kirish sozlamalari</div></div>
+        </div>
+        <div class="setting-card-body">
+          <div class="field-grid">
+            <div class="field-group">
+              <span class="field-label">Sessiya vaqti</span>
+              <div class="field-input">
+                <i class="ri-time-line"></i>
+                <select id="session-timeout">
+                  <option value="30">30 daqiqa</option>
+                  <option value="60" selected>1 soat</option>
+                  <option value="480">8 soat</option>
+                  <option value="1440">1 kun</option>
+                </select>
+              </div>
+            </div>
+            <div class="field-group">
+              <span class="field-label">Interfeys tili</span>
+              <div class="field-input">
+                <i class="ri-translate-2"></i>
+                <select id="ui-lang">
+                  <option value="uz" selected>O'zbek</option>
+                  <option value="ru">Русский</option>
+                  <option value="en">English</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="int-actions">
+            <div class="spacer"></div>
+            <button class="btn btn-primary" onclick="saveSection('security')"><i class="ri-save-line"></i>Saqlash</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /tab-general -->
+
+    <!-- ── GOV ────────────────────────────────────────────────── -->
+    <div id="tab-gov" class="tab-panel">
+      <div class="sec-head">
+        <div class="sec-title">Davlat tizimlar integratsiyasi</div>
+        <div class="sec-sub">O'zbekiston davlat axborot tizimlari bilan ulanish. Kalitlarni tegishli tashkilotlardan oling.</div>
+      </div>
+      <div class="sec-grid" id="gov-cards"></div>
+    </div>
+
+    <!-- ── PAYMENT ─────────────────────────────────────────────── -->
+    <div id="tab-payment" class="tab-panel">
+      <div class="sec-head">
+        <div class="sec-title">To'lov tizimlari</div>
+        <div class="sec-sub">Obuna va xizmat haqlarini qabul qilish uchun to'lov provayderlarini ulang. Test rejimida real pul olinmaydi.</div>
+      </div>
+      <div class="sec-grid" id="payment-cards"></div>
+    </div>
+
+    <!-- ── BOT ────────────────────────────────────────────────── -->
+    <div id="tab-bot" class="tab-panel">
+
+      <div class="setting-card">
+        <div class="setting-card-head">
+          <div class="setting-card-icon" style="color:#27A7E7"><i class="ri-telegram-line"></i></div>
+          <div><div class="setting-card-title">Telegram Bot</div><div class="setting-card-sub">Bot sozlamalari va alert API konfiguratsiyasi</div></div>
+        </div>
+        <div class="setting-card-body">
+          <div class="field-grid">
+            <div class="field-group span2">
+              <span class="field-label">Bot Token</span>
+              <div class="field-input mono">
+                <i class="ri-robot-line"></i>
+                <input type="password" id="bot-token" placeholder="1234567890:AAEhBOwweRNFgloC57tgon6..."/>
+                <span class="show-btn" onclick="toggleVisible(this)"><i class="ri-eye-line"></i></span>
+              </div>
+              <span class="field-hint">@BotFather dan olinadi</span>
+            </div>
+            <div class="field-group">
+              <span class="field-label">Webhook URL (ixtiyoriy)</span>
+              <div class="field-input mono">
+                <i class="ri-global-line"></i>
+                <input type="text" id="bot-webhook" placeholder="https://your-domain.com/webhook"/>
+              </div>
+              <span class="field-hint">Bo'sh qoldirilsa — polling rejimi</span>
+            </div>
+            <div class="field-group">
+              <span class="field-label">Alert API porti</span>
+              <div class="field-input">
+                <i class="ri-radio-line"></i>
+                <input type="number" id="bot-port" placeholder="8787" min="1024" max="65535"/>
+              </div>
+              <span class="field-hint">Dashboard → Bot alert xabarlari</span>
+            </div>
+            <div class="field-group span2">
+              <span class="field-label">Alert API Secret</span>
+              <div class="field-input mono">
+                <i class="ri-lock-password-line"></i>
+                <input type="password" id="bot-secret" placeholder="change-this-to-random-secret"/>
+                <span class="show-btn" onclick="toggleVisible(this)"><i class="ri-eye-line"></i></span>
+              </div>
+              <span class="field-hint">Dashboard POST /alert so'rovida X-Secret header qiymati</span>
+            </div>
+          </div>
+          <div class="int-actions">
+            <div class="test-result" id="test-bot"></div>
+            <div class="spacer"></div>
+            <button class="btn btn-secondary btn-sm" onclick="testBot()"><i class="ri-flashlight-line"></i>Test yuborish</button>
+            <button class="btn btn-primary" onclick="saveSection('bot')"><i class="ri-save-line"></i>Saqlash</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="setting-card">
+        <div class="setting-card-head">
+          <div class="setting-card-icon"><i class="ri-alarm-warning-line"></i></div>
+          <div><div class="setting-card-title">Alert sozlamalari</div><div class="setting-card-sub">Bot orqali yuboriluvchi bildirishnomalar konfiguratsiyasi</div></div>
+        </div>
+        <div class="setting-card-body">
+          <div class="field-grid">
+            <div class="field-group">
+              <span class="field-label">Buffer vaqti</span>
+              <div class="field-input">
+                <i class="ri-time-line"></i>
+                <select id="alert-buffer">
+                  <option value="60">1 daqiqa</option>
+                  <option value="120" selected>2 daqiqa</option>
+                  <option value="300">5 daqiqa</option>
+                  <option value="600">10 daqiqa</option>
+                </select>
+              </div>
+              <span class="field-hint">Alertlar yig'ilib bir xabarda yuboriladi</span>
+            </div>
+            <div class="field-group">
+              <span class="field-label">Minimum daraja</span>
+              <div class="field-input">
+                <i class="ri-filter-3-line"></i>
+                <select id="alert-min-sev">
+                  <option value="warning">Diqqat va yuqori</option>
+                  <option value="error">Xato va yuqori</option>
+                  <option value="critical">Faqat kritik</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="int-actions">
+            <div class="spacer"></div>
+            <button class="btn btn-primary" onclick="saveSection('alerts')"><i class="ri-save-line"></i>Saqlash</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /tab-bot -->
+
+  </div><!-- /content -->
+</div>
+
+<script>
+/* ── Integration definitions ─────────────────────────────────── */
+const INTEGRATIONS = {
+  gov: [
+    {
+      id: 'myid', name: 'MyID', section: 'gov',
+      desc: "my.gov.uz — Biometrik identifikatsiya (PINFL, pasport)",
+      docs: 'https://developers.myid.uz',
+      color: '#00A8E0', bg: '#E6F6FD', icon: 'ri-fingerprint-line',
+      badge: 'OAuth2',
+      fields: [
+        { key: 'clientId',     label: 'Client ID',     type: 'text',     ph: 'myid_client_xxxxxxxx',  icon: 'ri-id-card-line' },
+        { key: 'clientSecret', label: 'Client Secret', type: 'password', ph: '••••••••',               icon: 'ri-key-2-line', secret: true },
+        { key: 'sandbox',      label: 'Rejim',         type: 'select',   options: [{v:'true',l:'Sandbox (test)'},{v:'false',l:'Production (ishlab turgan)'}] },
+      ]
+    },
+    {
+      id: 'egov', name: 'E-hukumat', section: 'gov',
+      desc: 'egov.uz — Davlat xizmatlari portali, yuridik shaxslar',
+      docs: 'https://api.egov.uz/docs',
+      color: '#1A6CA8', bg: '#E8F1F8', icon: 'ri-government-line',
+      badge: 'API Key',
+      fields: [
+        { key: 'apiKey', label: 'API Key', type: 'password', ph: 'egov_key_xxxxxxxx', icon: 'ri-key-2-line', secret: true },
+        { key: 'base',   label: 'Base URL', type: 'text',    ph: 'https://api.egov.uz/v1', icon: 'ri-global-line' },
+      ]
+    },
+    {
+      id: 'kadastr', name: 'Yer Kadastr', section: 'gov',
+      desc: 'kadastr.uz — Yer uchastkalar registri, GIS koordinatalar',
+      docs: 'https://api.kadastr.uz/docs',
+      color: '#2A9D3F', bg: '#EBF7ED', icon: 'ri-map-2-line',
+      badge: 'Bearer',
+      fields: [
+        { key: 'token', label: 'Bearer Token', type: 'password', ph: 'eyJhbGciOiJSUzI1NiIsI...', icon: 'ri-key-2-line', secret: true, mono: true },
+        { key: 'base',  label: 'Base URL',     type: 'text',    ph: 'https://api.kadastr.uz/v1', icon: 'ri-global-line' },
+      ]
+    },
+    {
+      id: 'agro', name: 'Agro vazirligi', section: 'gov',
+      desc: "agro.uz — Qishloq xo'jaligi vazirligi: fermalar, normativlar",
+      docs: 'https://api.agro.uz/docs',
+      color: '#3A7D44', bg: '#EBF5EC', icon: 'ri-plant-line',
+      badge: 'Bearer',
+      fields: [
+        { key: 'token', label: 'Bearer Token', type: 'password', ph: 'eyJhbGciOiJSUzI1NiIsI...', icon: 'ri-key-2-line', secret: true, mono: true },
+        { key: 'base',  label: 'Base URL',     type: 'text',    ph: 'https://api.agro.uz/v1', icon: 'ri-global-line' },
+      ]
+    },
+    {
+      id: 'soliq', name: "Soliq qo'mitasi", section: 'gov',
+      desc: 'soliq.uz — Soliq to\'lovchilar tekshiruvi, INN (STIR)',
+      docs: 'https://api.soliq.uz/docs',
+      color: '#D63D2F', bg: '#FDECEA', icon: 'ri-receipt-line',
+      badge: 'Bearer',
+      fields: [
+        { key: 'tin',   label: 'INN (STIR)',  type: 'text',    ph: '123456789',    icon: 'ri-building-2-line', mono: true },
+        { key: 'token', label: 'API Token',   type: 'password', ph: '••••••••',    icon: 'ri-key-2-line', secret: true },
+      ]
+    },
+  ],
+  payment: [
+    {
+      id: 'payme', name: 'Payme', section: 'payment',
+      desc: "payme.uz — O'zbekistondagi #1 to'lov tizimi. UzCard, Humo, Visa, Mastercard",
+      docs: 'https://developer.help.paycom.uz',
+      color: '#00ADEE', bg: '#E5F6FD', icon: 'ri-bank-card-line',
+      badge: 'Merchant',
+      fields: [
+        { key: 'merchantId', label: 'Merchant ID',  type: 'text',     ph: '639805e3f27d1af6dd...', icon: 'ri-store-2-line', mono: true },
+        { key: 'key',        label: 'Secret Key',   type: 'password', ph: 'PaycomTestKey',         icon: 'ri-key-2-line', secret: true },
+        { key: 'testMode',   label: 'Rejim',        type: 'select',   options: [{v:'true',l:'Test (sandbox)'},{v:'false',l:'Production'}] },
+      ]
+    },
+    {
+      id: 'click', name: 'Click', section: 'payment',
+      desc: 'click.uz — Ikkinchi katta to\'lov tizimi. Prepare/Complete webhook',
+      docs: 'https://docs.click.uz',
+      color: '#F3821A', bg: '#FEF3E8', icon: 'ri-cursor-line',
+      badge: 'Merchant',
+      fields: [
+        { key: 'merchantId', label: 'Merchant ID', type: 'text',     ph: '12345',  icon: 'ri-store-2-line', mono: true },
+        { key: 'serviceId',  label: 'Service ID',  type: 'text',     ph: '98765',  icon: 'ri-service-line', mono: true },
+        { key: 'secretKey',  label: 'Secret Key',  type: 'password', ph: '••••••••', icon: 'ri-key-2-line', secret: true },
+        { key: 'testMode',   label: 'Rejim',       type: 'select',   options: [{v:'true',l:'Test'},{v:'false',l:'Production'}] },
+      ]
+    },
+    {
+      id: 'uzum', name: 'Uzum Bank', section: 'payment',
+      desc: 'uzumbank.uz — Yangi avlod to\'lov tizimi. BNPL va kartalar',
+      docs: 'https://developers.uzumbank.uz',
+      color: '#8C33CC', bg: '#F4EBF9', icon: 'ri-shopping-bag-3-line',
+      badge: 'Bearer',
+      fields: [
+        { key: 'shopId',   label: 'Shop ID',    type: 'text',     ph: 'shop_xxxxxxxx',         icon: 'ri-store-2-line', mono: true },
+        { key: 'token',    label: 'API Token',  type: 'password', ph: 'eyJhbGciOiJSUzI1...',  icon: 'ri-key-2-line', secret: true, mono: true },
+        { key: 'testMode', label: 'Rejim',      type: 'select',   options: [{v:'true',l:'Sandbox'},{v:'false',l:'Production'}] },
+      ]
+    },
+  ],
+};
+
+/* ── Config management ───────────────────────────────────────── */
+const LS_KEY = 'tomchi_cfg_v1';
+function loadCfg() {
+  try { return JSON.parse(localStorage.getItem(LS_KEY) || '{}'); } catch { return {}; }
+}
+function saveCfg(cfg) { localStorage.setItem(LS_KEY, JSON.stringify(cfg)); }
+function getCfgSection(id) { return loadCfg()[id] || {}; }
+function setCfgSection(id, data) {
+  const cfg = loadCfg(); cfg[id] = { ...(cfg[id]||{}), ...data }; saveCfg(cfg);
+}
+
+/* ── Render integration cards ────────────────────────────────── */
+function renderCards(list, containerId) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  list.forEach(int => {
+    const saved = getCfgSection(int.id);
+    const enabled = !!saved.enabled;
+    const card = document.createElement('div');
+    card.className = `int-card${enabled ? ' enabled' : ''}`;
+    card.id = `card-${int.id}`;
+
+    const hasCreds = int.fields.filter(f=>f.type!=='select').every(f => !!saved[f.key]);
+    const dotClass = enabled && hasCreds ? 'on' : enabled ? 'partial' : '';
+    const badgeClass = enabled && hasCreds ? 'on' : enabled ? 'test' : 'off';
+    const badgeText = enabled && hasCreds ? 'Faol' : enabled ? "Test rejim" : 'Nofaol';
+
+    const fieldsHtml = int.fields.map(f => {
+      if (f.type === 'select') {
+        const opts = f.options.map(o =>
+          `<option value="${o.v}"${(saved[f.key]||f.options[0].v)===o.v?' selected':''}>${o.l}</option>`
+        ).join('');
+        return `<div class="field-group">
+          <span class="field-label">${f.label}</span>
+          <div class="field-input"><i class="ri-toggle-line"></i><select id="${int.id}-${f.key}">${opts}</select></div>
+        </div>`;
+      }
+      return `<div class="field-group">
+        <span class="field-label">${f.label}</span>
+        <div class="field-input${f.mono?' mono':''}">
+          <i class="${f.icon||'ri-edit-line'}"></i>
+          <input type="${f.type}" id="${int.id}-${f.key}"
+            value="${f.type==='password'?'':(saved[f.key]||'')}"
+            data-saved="${f.type==='password'?'1':'0'}"
+            placeholder="${f.ph||''}"/>
+          ${f.secret ? `<span class="show-btn" onclick="toggleVisible(this)"><i class="ri-eye-line"></i></span>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+
+    card.innerHTML = `
+      <div class="int-head" onclick="toggleCard('${int.id}')">
+        <div class="int-icon" style="background:${int.bg};color:${int.color}"><i class="${int.icon}"></i></div>
+        <div class="int-meta">
+          <div class="int-name">${int.name}</div>
+          <div class="int-desc">${int.desc}</div>
+          <a class="int-docs" href="${int.docs}" target="_blank" onclick="event.stopPropagation()">
+            <i class="ri-external-link-line"></i>Docs
+          </a>
+        </div>
+        <div class="int-right">
+          <div class="status-dot ${dotClass}"></div>
+          <span class="int-badge-chip ${badgeClass}" id="badge-${int.id}">${badgeText}</span>
+          <label class="toggle" onclick="event.stopPropagation()">
+            <input type="checkbox" id="toggle-${int.id}" ${enabled?'checked':''} onchange="onToggle('${int.id}',this)"/>
+            <span class="toggle-track"></span>
+          </label>
+        </div>
+      </div>
+      <div class="int-body" id="body-${int.id}" style="display:${enabled?'block':'none'}">
+        <div class="field-grid">${fieldsHtml}</div>
+        <div class="int-actions">
+          <div class="test-result" id="test-${int.id}"></div>
+          <div class="spacer"></div>
+          <button class="btn btn-secondary btn-sm" onclick="testIntegration('${int.id}')">
+            <i class="ri-flashlight-line"></i>Ulanishni tekshir
+          </button>
+          <button class="btn btn-primary" onclick="saveIntegration('${int.id}')">
+            <i class="ri-save-line"></i>Saqlash
+          </button>
+        </div>
+      </div>`;
+    container.appendChild(card);
+  });
+}
+
+/* ── Toggle card expand ──────────────────────────────────────── */
+function toggleCard(id) {
+  const body = document.getElementById(`body-${id}`);
+  body.style.display = body.style.display === 'none' ? 'block' : 'none';
+}
+
+/* ── Toggle enable/disable ───────────────────────────────────── */
+function onToggle(id, cb) {
+  const enabled = cb.checked;
+  const card = document.getElementById(`card-${id}`);
+  card.classList.toggle('enabled', enabled);
+  document.getElementById(`body-${id}`).style.display = enabled ? 'block' : 'none';
+  setCfgSection(id, { enabled });
+  updateBadge(id);
+}
+
+/* ── Save integration ────────────────────────────────────────── */
+function saveIntegration(id) {
+  const allInts = [...INTEGRATIONS.gov, ...INTEGRATIONS.payment];
+  const int = allInts.find(i => i.id === id);
+  if (!int) return;
+  const data = { enabled: document.getElementById(`toggle-${id}`).checked };
+  int.fields.forEach(f => {
+    const el = document.getElementById(`${id}-${f.key}`);
+    if (!el) return;
+    const val = el.value.trim();
+    if (f.type === 'password' && !val && el.dataset.saved === '1') return; // unchanged
+    if (val) data[f.key] = val;
+    else if (f.type !== 'password') data[f.key] = val;
+  });
+  setCfgSection(id, data);
+  updateBadge(id);
+  showSavedToast(`${int.name} saqlandi ✓`);
+}
+
+/* ── Update badge after save ─────────────────────────────────── */
+function updateBadge(id) {
+  const saved = getCfgSection(id);
+  const allInts = [...INTEGRATIONS.gov, ...INTEGRATIONS.payment];
+  const int = allInts.find(i => i.id === id);
+  const hasCreds = int ? int.fields.filter(f=>f.type!=='select').every(f=>!!saved[f.key]) : false;
+  const badge = document.getElementById(`badge-${id}`);
+  const dot   = document.querySelector(`#card-${id} .status-dot`);
+  if (!badge) return;
+  if (saved.enabled && hasCreds) {
+    badge.className='int-badge-chip on'; badge.textContent='Faol';
+    dot.className='status-dot on';
+  } else if (saved.enabled) {
+    badge.className='int-badge-chip test'; badge.textContent='Test rejim';
+    dot.className='status-dot partial';
+  } else {
+    badge.className='int-badge-chip off'; badge.textContent='Nofaol';
+    dot.className='status-dot';
+  }
+  renderStatusOverview();
+}
+
+/* ── Test integration ────────────────────────────────────────── */
+async function testIntegration(id) {
+  const el = document.getElementById(`test-${id}`);
+  el.className = 'test-result'; el.textContent = ''; el.style.display='none';
+  const saved = getCfgSection(id);
+  if (!saved.enabled) {
+    showTestResult(el, false, "Avval integratsiyani yoqing"); return;
+  }
+  // Simulate connection test (real test requires backend proxy due to CORS)
+  showTestResult(el, null, "Tekshirilmoqda...");
+  await new Promise(r => setTimeout(r, 800));
+  const allInts = [...INTEGRATIONS.gov, ...INTEGRATIONS.payment];
+  const int = allInts.find(i => i.id === id);
+  const hasCreds = int ? int.fields.filter(f=>f.type!=='select').every(f=>!!saved[f.key]) : false;
+  if (hasCreds) {
+    showTestResult(el, true, "Kalitlar to'liq ✓ (live test backend orqali)");
+  } else {
+    showTestResult(el, false, "Kalitlar to'liq emas — barcha maydonlarni to'ldiring");
+  }
+}
+
+function showTestResult(el, ok, msg) {
+  if (ok === null) {
+    el.className='test-result'; el.innerHTML=`<i class="ri-loader-4-line"></i> ${msg}`;
+    el.style.cssText='display:flex;align-items:center;gap:4px;font-size:12px;color:var(--text-tertiary)';
+    return;
+  }
+  el.className = `test-result ${ok?'ok':'err'}`;
+  el.innerHTML = `<i class="ri-${ok?'check':'close'}-circle-line"></i> ${msg}`;
+}
+
+/* ── Save section ────────────────────────────────────────────── */
+function saveSection(section) {
+  if (section === 'api') {
+    setCfgSection('api', {
+      base: document.getElementById('api-base').value.trim() || 'https://tomchi-tech-api.onrender.com/api/v1',
+      key:  document.getElementById('api-key').value.trim(),
+    });
+    showSavedToast('Asosiy API saqlandi ✓');
+  } else if (section === 'bot') {
+    setCfgSection('bot', {
+      token:         document.getElementById('bot-token').value.trim(),
+      webhookUrl:    document.getElementById('bot-webhook').value.trim(),
+      alertsApiPort: document.getElementById('bot-port').value.trim() || '8787',
+      alertsSecret:  document.getElementById('bot-secret').value.trim(),
+    });
+    showSavedToast('Bot sozlamalari saqlandi ✓');
+  } else if (section === 'alerts') {
+    setCfgSection('alertCfg', {
+      bufferSec: document.getElementById('alert-buffer').value,
+      minSev:    document.getElementById('alert-min-sev').value,
+    });
+    showSavedToast('Alert sozlamalari saqlandi ✓');
+  } else if (section === 'security') {
+    setCfgSection('security', {
+      sessionTimeout: document.getElementById('session-timeout').value,
+      lang:           document.getElementById('ui-lang').value,
+    });
+    showSavedToast('Xavfsizlik sozlamalari saqlandi ✓');
+  }
+}
+
+function saveAll() {
+  saveSection('api');
+  saveSection('bot');
+  saveSection('alerts');
+  saveSection('security');
+  [...INTEGRATIONS.gov, ...INTEGRATIONS.payment].forEach(i => saveIntegration(i.id));
+  showSavedToast('Barcha sozlamalar saqlandi ✓');
+}
+
+/* ── API test ────────────────────────────────────────────────── */
+async function testApi() {
+  const el = document.getElementById('test-api');
+  showTestResult(el, null, 'Ulanilmoqda...');
+  try {
+    const base = document.getElementById('api-base').value.trim() || 'https://tomchi-tech-api.onrender.com/api/v1';
+    const r = await fetch(base + '/health', { signal: AbortSignal.timeout(5000) });
+    if (r.ok) showTestResult(el, true, `Ulandi — ${base}`);
+    else       showTestResult(el, false, `Server ${r.status} qaytardi`);
+  } catch (e) {
+    showTestResult(el, false, 'Ulanib bo\'lmadi — URL ni tekshiring');
+  }
+}
+
+async function testBot() {
+  const el = document.getElementById('test-bot');
+  showTestResult(el, null, "Tekshirilmoqda...");
+  await new Promise(r=>setTimeout(r,600));
+  const token = document.getElementById('bot-token').value.trim();
+  if (!token) { showTestResult(el, false, 'Bot token kiritilmagan'); return; }
+  showTestResult(el, true, 'Token kiritilgan ✓ (live test bot ishga tushirilganda)');
+}
+
+/* ── Status overview ─────────────────────────────────────────── */
+function renderStatusOverview() {
+  const cfg = loadCfg();
+  const items = [
+    { id:'api',     label:'Asosiy API',    icon:'ri-server-line',       color:'#155EEF', check: ()=>!!(cfg.api?.base) },
+    { id:'gov',     label:'Davlat tizim',  icon:'ri-government-line',   color:'#2A9D3F', check: ()=>INTEGRATIONS.gov.some(i=>(cfg[i.id]||{}).enabled) },
+    { id:'payment', label:"To'lov",        icon:'ri-bank-card-line',    color:'#F3821A', check: ()=>INTEGRATIONS.payment.some(i=>(cfg[i.id]||{}).enabled) },
+    { id:'bot',     label:'Telegram Bot',  icon:'ri-telegram-line',     color:'#27A7E7', check: ()=>!!(cfg.bot?.token) },
+  ];
+  document.getElementById('status-overview').innerHTML = items.map(item => {
+    const ok = item.check();
+    return `<div class="status-item">
+      <div class="status-item-icon" style="background:${item.color}18;color:${item.color}"><i class="${item.icon}"></i></div>
+      <div>
+        <div class="status-item-label">${item.label}</div>
+        <div class="status-item-val" style="color:${ok?'var(--success)':'var(--text-tertiary)'}">
+          ${ok ? '✓ Ulangan' : '— Sozlanmagan'}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ── Load saved values into general fields ───────────────────── */
+function loadGeneralFields() {
+  const cfg = loadCfg();
+  if (cfg.api?.base) document.getElementById('api-base').value = cfg.api.base;
+  if (cfg.bot?.webhookUrl) document.getElementById('bot-webhook').value = cfg.bot.webhookUrl;
+  if (cfg.bot?.alertsApiPort) document.getElementById('bot-port').value = cfg.bot.alertsApiPort;
+  if (cfg.alertCfg?.bufferSec) document.getElementById('alert-buffer').value = cfg.alertCfg.bufferSec;
+  if (cfg.alertCfg?.minSev) document.getElementById('alert-min-sev').value = cfg.alertCfg.minSev;
+  if (cfg.security?.sessionTimeout) document.getElementById('session-timeout').value = cfg.security.sessionTimeout;
+  if (cfg.security?.lang) document.getElementById('ui-lang').value = cfg.security.lang;
+}
+
+/* ── Tab switching ───────────────────────────────────────────── */
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.stab').forEach(b=>b.classList.remove('active'));
+  document.getElementById(`tab-${id}`).classList.add('active');
+  btn.classList.add('active');
+}
+
+/* ── Export / Import config ──────────────────────────────────── */
+function exportConfig() {
+  const cfg = loadCfg();
+  // Remove passwords for safety — user must re-enter
+  const safe = JSON.parse(JSON.stringify(cfg));
+  ['myid','egov','kadastr','agro','soliq','payme','click','uzum','bot'].forEach(k=>{
+    if (safe[k]) {
+      ['clientSecret','key','token','secretKey','apiKey','alertsSecret'].forEach(f=>{
+        if (safe[k][f]) safe[k][f] = '***REMOVED***';
+      });
+    }
+  });
+  const blob = new Blob([JSON.stringify(safe, null, 2)], {type:'application/json'});
+  const a = document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download = `tomchi-config-${new Date().toISOString().slice(0,10)}.json`; a.click();
+}
+
+function importConfig(input) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const cfg = JSON.parse(e.target.result);
+      saveCfg(cfg);
+      location.reload();
+    } catch { showSavedToast('JSON fayl noto\'g\'ri ✗', true); }
+  };
+  reader.readAsText(file);
+}
+
+/* ── Show/hide password ──────────────────────────────────────── */
+function toggleVisible(btn) {
+  const inp = btn.closest('.field-input').querySelector('input');
+  if (!inp) return;
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  btn.innerHTML = inp.type === 'password' ? '<i class="ri-eye-line"></i>' : '<i class="ri-eye-off-line"></i>';
+}
+
+/* ── Toast notification ──────────────────────────────────────── */
+let _toastTimer;
+function showSavedToast(msg, err=false) {
+  let t = document.getElementById('toast-msg');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'toast-msg';
+    t.style.cssText = 'position:fixed;bottom:24px;right:24px;padding:10px 18px;border-radius:8px;font-size:14px;font-weight:600;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.15);transition:opacity .25s;display:flex;align-items:center;gap:8px';
+    document.body.appendChild(t);
+  }
+  t.style.background = err ? 'var(--danger)' : 'var(--success)';
+  t.style.color = '#fff';
+  t.innerHTML = `<i class="ri-${err?'error':'check'}-warning-line"></i>${msg}`;
+  t.style.opacity = '1';
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(()=>{ t.style.opacity='0'; }, 2800);
+}
+
+/* ── Sidebar ─────────────────────────────────────────────────── */
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sb-backdrop').classList.toggle('show');
+}
+window.addEventListener('resize',()=>{
+  if(window.innerWidth>900){
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sb-backdrop').classList.remove('show');
+  }
+});
+
+/* ── Theme ───────────────────────────────────────────────────── */
+function toggleTheme() {
+  const dark = document.documentElement.getAttribute('data-theme')==='dark';
+  document.documentElement.setAttribute('data-theme', dark?'light':'dark');
+  document.getElementById('theme-icon').className = dark?'ri-moon-line':'ri-sun-line';
+  localStorage.setItem('theme', dark?'light':'dark');
+}
+(()=>{
+  const t = localStorage.getItem('theme')||'light';
+  if(t==='dark'){
+    document.documentElement.setAttribute('data-theme','dark');
+    document.getElementById('theme-icon').className='ri-sun-line';
+  }
+})();
+
+/* ── Import btn ──────────────────────────────────────────────── */
+document.getElementById('import-btn').onclick = () => document.getElementById('import-input').click();
+
+/* ── Init ────────────────────────────────────────────────────── */
+renderCards(INTEGRATIONS.gov,     'gov-cards');
+renderCards(INTEGRATIONS.payment, 'payment-cards');
+loadGeneralFields();
+renderStatusOverview();
+
+// Sidebar badge data
+fetch('https://tomchi-tech-api.onrender.com/api/v1/alerts/').then(r=>r.json()).then(d=>{
+  const n = (d.alerts||[]).length;
+  document.getElementById('nb-alerts').textContent = n;
+  if(n>0) document.getElementById('nb-alerts').classList.add('alert');
+}).catch(()=>{});
+fetch('https://tomchi-tech-api.onrender.com/api/v1/sensors/configs').then(r=>r.json()).then(d=>{
+  document.getElementById('nb-sensors').textContent = d.length||'—';
+}).catch(()=>{});
+</script>
+</body>
+</html>

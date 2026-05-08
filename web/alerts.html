@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Tomchi Tech — Alertlar</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
+<style>
+:root{
+  --bg-page:#F5F5F5;--bg-primary:#FFFFFF;--bg-primary-alt:#FAFAFA;--bg-secondary:#F9FAFB;
+  --text-primary:#181D27;--text-secondary:#414651;--text-tertiary:#535862;
+  --text-placeholder:#717680;--text-quaternary:#717680;--text-disabled:#A4A7AE;
+  --border-primary:#D5D7DA;--border-secondary:#E9EAEB;--border-tertiary:#F5F5F5;
+  --border-brand:#2970FF;--border-brand-alt:#155EEF;
+  --brand:#155EEF;--brand-hover:#1248C7;
+  --success:#17B26A;--success-bg:#ECFDF3;--success-border:#ABEFC6;
+  --warning:#F79009;--warning-bg:#FFFAEB;--warning-border:#FEDF89;
+  --danger:#D92D20;--danger-bg:#FEF3F2;--danger-border:#FECDCA;
+  --neutral:#717680;--neutral-bg:#F9FAFB;
+  --utility-gray-50:#FAFAFA;--utility-gray-200:#E9EAEB;--utility-gray-700:#414651;
+  --brand-50:#EFF4FF;--brand-100:#D1E0FF;
+  --shadow-xs:0px 1px 2px rgba(10,13,18,0.05);
+  --shadow-sm:0px 1px 3px rgba(10,13,18,0.08),0px 1px 2px rgba(10,13,18,0.04);
+  --shadow-md:0px 4px 8px rgba(10,13,18,0.08),0px 2px 4px rgba(10,13,18,0.04);
+  --sp-xxs:2px;--sp-xs:4px;--sp-sm:6px;--sp-md:8px;--sp-lg:12px;
+  --sp-xl:16px;--sp-2xl:20px;--sp-3xl:24px;--sp-4xl:32px;
+  --r-xs:4px;--r-sm:6px;--r-md:8px;--r-lg:10px;--r-xl:12px;--r-2xl:16px;--r-full:9999px;
+  --text-xs-size:12px;--text-xs-lh:18px;--text-sm-size:14px;--text-sm-lh:20px;
+  --text-md-size:16px;--text-md-lh:24px;--text-lg-size:18px;--text-lg-lh:28px;
+  --sidebar-w:280px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:16px;}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg-page);color:var(--text-primary);height:100vh;display:flex;overflow:hidden;-webkit-font-smoothing:antialiased;}
+a{text-decoration:none;color:inherit;}
+button{font-family:inherit;cursor:pointer;border:none;background:none;}
+i[class^="ri-"]{line-height:1;}
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border-secondary);border-radius:99px;}
+
+/* ── Sidebar ── */
+.sidebar{width:var(--sidebar-w);background:var(--bg-primary);border-right:1px solid var(--border-secondary);height:100vh;display:flex;flex-direction:column;flex-shrink:0;z-index:100;overflow:hidden;}
+.sb-header{display:flex;flex-direction:column;gap:var(--sp-lg);padding:var(--sp-3xl) var(--sp-2xl) var(--sp-xl);border-bottom:1px solid var(--border-secondary);}
+.sb-logo{display:flex;align-items:center;gap:var(--sp-md);}
+.sb-logomark{width:32px;height:32px;border-radius:var(--r-md);background:linear-gradient(180deg,#2970FF 0%,#155EEF 100%);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;flex-shrink:0;box-shadow:0 1px 3px rgba(10,13,18,.2);}
+.sb-logoname{font-size:var(--text-md-size);font-weight:700;color:var(--text-primary);}
+.sb-nav{flex:1;overflow-y:auto;padding:var(--sp-lg) var(--sp-xl);}
+.nav-item{display:flex;align-items:center;gap:var(--sp-md);padding:var(--sp-md) var(--sp-lg);border-radius:var(--r-sm);cursor:pointer;color:var(--text-secondary);font-size:var(--text-md-size);font-weight:500;line-height:var(--text-md-lh);transition:background .12s;width:100%;margin:1px 0;text-align:left;}
+.nav-item:hover{background:var(--bg-secondary);}
+.nav-item.active{background:var(--bg-secondary);color:var(--text-primary);}
+.nav-icon{font-size:18px;width:20px;height:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.nav-badge{margin-left:auto;font-size:var(--text-xs-size);font-weight:500;padding:var(--sp-xxs) var(--sp-md);border-radius:var(--r-full);background:var(--utility-gray-50);border:1px solid var(--utility-gray-200);color:var(--utility-gray-700);}
+.nav-badge.alert{background:var(--danger-bg);border-color:var(--danger-border);color:var(--danger);}
+.sb-group-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);padding:var(--sp-lg) var(--sp-lg) var(--sp-xs);margin-top:var(--sp-md);}
+.sb-drop-list{padding-left:var(--sp-lg);border-left:2px solid var(--border-secondary);margin:2px 0 2px var(--sp-xl);}
+.sb-arr{margin-left:auto;font-size:17px;transition:transform .2s;flex-shrink:0;}
+.sb-footer{border-top:1px solid var(--border-secondary);padding:var(--sp-xl);display:flex;flex-direction:column;gap:var(--sp-xs);}
+.sb-account{background:var(--bg-primary-alt);border:1px solid var(--border-secondary);border-radius:var(--r-xl);padding:var(--sp-lg);display:flex;align-items:center;gap:var(--sp-md);cursor:pointer;margin-top:var(--sp-md);}
+.av-wrap{width:32px;height:32px;border-radius:50%;background:var(--brand-50);border:1px solid var(--brand-100);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--brand);flex-shrink:0;position:relative;}
+.av-online{position:absolute;bottom:0;right:0;width:8px;height:8px;background:var(--success);border:1.5px solid var(--bg-primary);border-radius:50%;}
+.av-name{font-size:var(--text-sm-size);font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.av-role{font-size:var(--text-xs-size);color:var(--text-tertiary);}
+
+/* ── Layout ── */
+.app-layout{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;}
+.main-content{flex:1;overflow-y:auto;padding:var(--sp-3xl);}
+.page-header{height:64px;border-bottom:1px solid var(--border-secondary);background:var(--bg-primary);display:flex;align-items:center;gap:var(--sp-xl);padding:0 var(--sp-3xl);flex-shrink:0;}
+.ph-title{font-size:var(--text-md-size);font-weight:700;color:var(--text-primary);}
+.ph-subtitle{font-size:var(--text-sm-size);color:var(--text-tertiary);}
+.ph-btn{width:36px;height:36px;border-radius:var(--r-md);border:1px solid var(--border-secondary);background:var(--bg-primary);color:var(--text-secondary);display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:var(--shadow-xs);transition:background .12s;}
+.ph-btn:hover{background:var(--bg-secondary);}
+.ph-divider{width:1px;height:28px;background:var(--border-secondary);}
+
+/* ── Stats ── */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--sp-xl);margin-bottom:var(--sp-3xl);}
+.stat-card{background:var(--bg-primary);border:1px solid var(--border-secondary);border-radius:var(--r-xl);padding:var(--sp-2xl);box-shadow:var(--shadow-xs);}
+.stat-label{font-size:var(--text-sm-size);color:var(--text-tertiary);margin-bottom:var(--sp-md);}
+.stat-num{font-size:28px;font-weight:700;color:var(--text-primary);line-height:1;}
+.stat-sub{font-size:var(--text-xs-size);color:var(--text-tertiary);margin-top:var(--sp-xs);}
+.stat-icon{width:40px;height:40px;border-radius:var(--r-lg);display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:var(--sp-lg);}
+
+/* ── Filters ── */
+.filter-row{display:flex;align-items:center;gap:var(--sp-md);margin-bottom:var(--sp-3xl);flex-wrap:wrap;}
+.filter-tab{padding:var(--sp-sm) var(--sp-xl);border-radius:var(--r-full);border:1px solid var(--border-secondary);background:var(--bg-primary);font-size:var(--text-sm-size);font-weight:500;color:var(--text-secondary);cursor:pointer;transition:all .12s;}
+.filter-tab:hover{background:var(--bg-secondary);}
+.filter-tab.active{background:var(--brand);color:#fff;border-color:var(--brand);}
+.filter-tab .ft-count{display:inline-block;background:rgba(255,255,255,.25);border-radius:var(--r-full);padding:0 6px;font-size:11px;margin-left:4px;}
+.filter-tab:not(.active) .ft-count{background:var(--utility-gray-200);color:var(--utility-gray-700);}
+.filter-spacer{flex:1;}
+.sort-select{padding:var(--sp-sm) var(--sp-lg);border:1px solid var(--border-secondary);border-radius:var(--r-md);font-family:inherit;font-size:var(--text-sm-size);color:var(--text-secondary);background:var(--bg-primary);cursor:pointer;}
+
+/* ── Section header ── */
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--sp-xl);}
+.section-title{font-size:var(--text-lg-size);font-weight:700;color:var(--text-primary);}
+.section-count{font-size:var(--text-sm-size);color:var(--text-tertiary);}
+
+/* ── Alert cards ── */
+.alert-list{display:flex;flex-direction:column;gap:var(--sp-md);}
+.alert-card{background:var(--bg-primary);border:1px solid var(--border-secondary);border-radius:var(--r-xl);padding:var(--sp-2xl);box-shadow:var(--shadow-xs);display:flex;gap:var(--sp-xl);transition:box-shadow .15s;}
+.alert-card:hover{box-shadow:var(--shadow-md);}
+.alert-card.crit{border-left:4px solid var(--danger);background:linear-gradient(90deg,var(--danger-bg)0%,var(--bg-primary) 18%);}
+.alert-card.warn-card{border-left:4px solid var(--warning);background:linear-gradient(90deg,var(--warning-bg)0%,var(--bg-primary) 18%);}
+.alert-icon-wrap{width:48px;height:48px;border-radius:var(--r-lg);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
+.alert-icon-wrap.crit{background:var(--danger-bg);color:var(--danger);}
+.alert-icon-wrap.warn{background:var(--warning-bg);color:var(--warning);}
+.alert-icon-wrap.info{background:var(--brand-50);color:var(--brand);}
+.alert-body{flex:1;min-width:0;}
+.alert-title{font-size:var(--text-md-size);font-weight:700;color:var(--text-primary);margin-bottom:4px;}
+.alert-desc{font-size:var(--text-sm-size);color:var(--text-secondary);margin-bottom:var(--sp-md);line-height:1.5;}
+.alert-meta{display:flex;align-items:center;gap:var(--sp-lg);flex-wrap:wrap;}
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:var(--text-xs-size);font-weight:600;padding:3px 9px;border-radius:var(--r-full);border:1px solid transparent;}
+.badge.err{background:var(--danger-bg);border-color:var(--danger-border);color:var(--danger);}
+.badge.warn{background:var(--warning-bg);border-color:var(--warning-border);color:#B54708;}
+.badge.info{background:var(--brand-50);border-color:var(--brand-100);color:var(--brand);}
+.meta-chip{font-size:var(--text-xs-size);color:var(--text-tertiary);display:flex;align-items:center;gap:4px;}
+.alert-time{font-size:var(--text-xs-size);color:var(--text-tertiary);margin-left:auto;white-space:nowrap;flex-shrink:0;align-self:flex-start;}
+.alert-actions{display:flex;gap:var(--sp-sm);margin-top:var(--sp-lg);}
+.btn-sm{padding:6px 14px;border-radius:var(--r-md);font-size:var(--text-sm-size);font-weight:600;display:flex;align-items:center;gap:6px;}
+.btn-danger{background:var(--danger);color:#fff;border:1px solid var(--danger);}
+.btn-danger:hover{background:#B42318;}
+.btn-outline{background:var(--bg-primary);color:var(--text-secondary);border:1px solid var(--border-secondary);}
+.btn-outline:hover{background:var(--bg-secondary);}
+
+/* ── Pulse animation for critical ── */
+@keyframes pulse-red{0%,100%{box-shadow:0 0 0 0 rgba(217,45,32,.4);}50%{box-shadow:0 0 0 8px rgba(217,45,32,0);}}
+.pulse{animation:pulse-red 2s infinite;}
+
+.empty-state{text-align:center;padding:64px 24px;color:var(--text-tertiary);}
+.empty-state i{font-size:48px;color:var(--success);display:block;margin-bottom:12px;}
+.empty-state h3{font-size:var(--text-lg-size);font-weight:600;margin-bottom:8px;color:var(--text-secondary);}
+
+/* ── Dark mode ── */
+[data-theme="dark"] body{background:#0C0E12;}
+[data-theme="dark"] .sidebar{background:#10131C;}
+[data-theme="dark"] .sb-header,[data-theme="dark"] .sb-footer{border-color:#2E3448;}
+[data-theme="dark"] .sb-account{background:#1C2130;border-color:#2E3448;}
+[data-theme="dark"] .nav-item:hover,[data-theme="dark"] .nav-item.active{background:#1E2436;}
+[data-theme="dark"] .page-header{background:#10131C;border-color:#2E3448;}
+[data-theme="dark"] .ph-title{color:#F0F2F5;}
+[data-theme="dark"] .ph-btn{background:#161A23;border-color:#2E3448;color:#C1C8D1;}
+[data-theme="dark"] .stat-card{background:#161A23;border-color:#2E3448;}
+[data-theme="dark"] .stat-num,[data-theme="dark"] .section-title,[data-theme="dark"] .alert-title{color:#F0F2F5;}
+[data-theme="dark"] .alert-card{background:#161A23;border-color:#2E3448;}
+[data-theme="dark"] .alert-card.crit{background:linear-gradient(90deg,rgba(217,45,32,.08)0%,#161A23 18%);}
+[data-theme="dark"] .alert-card.warn-card{background:linear-gradient(90deg,rgba(247,144,9,.08)0%,#161A23 18%);}
+[data-theme="dark"] .filter-tab:not(.active){background:#161A23;border-color:#2E3448;color:#C1C8D1;}
+[data-theme="dark"] .sort-select{background:#161A23;border-color:#2E3448;color:#C1C8D1;}
+[data-theme="dark"] .btn-outline{background:#1C2130;border-color:#2E3448;color:#C1C8D1;}
+[data-theme="dark"] .sb-group-label{color:#636B78;}
+[data-theme="dark"] .sb-drop-list{border-color:#2E3448;}
+
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(max-width:900px){
+  :root{--sidebar-w:240px;}
+  .sidebar{position:fixed;left:-100%;z-index:200;transition:left .25s;}
+  .sidebar.open{left:0;}
+  .stats-row{grid-template-columns:repeat(2,1fr);}
+  .alert-card{flex-direction:column;}
+}
+</style>
+</head>
+<body>
+
+<!-- ── Sidebar ── -->
+<nav class="sidebar" id="sidebar">
+  <div class="sb-header">
+    <div class="sb-logo">
+      <div class="sb-logomark"><i class="ri-leaf-line"></i></div>
+      <span class="sb-logoname">Tomchi Tech</span>
+    </div>
+  </div>
+  <div class="sb-nav">
+    <a class="nav-item" href="dashboard.html"><span class="nav-icon"><i class="ri-dashboard-3-line"></i></span>Dashboard</a>
+    <a class="nav-item" href="sensors.html"><span class="nav-icon"><i class="ri-radar-line"></i></span>Sensorlar<span class="nav-badge" id="nb-sensors">—</span></a>
+    <a class="nav-item" href="farms.html"><span class="nav-icon"><i class="ri-plant-line"></i></span>Fermalar</a>
+    <a class="nav-item" href="recommendations.html"><span class="nav-icon"><i class="ri-lightbulb-line"></i></span>Tavsiyalar</a>
+    <a class="nav-item active" href="alerts.html"><span class="nav-icon"><i class="ri-notification-3-line"></i></span>Alertlar<span class="nav-badge alert" id="nb-alerts">0</span></a>
+    <a class="nav-item" href="reports.html"><span class="nav-icon"><i class="ri-bar-chart-2-line"></i></span>Hisobotlar</a>
+    <div class="sb-group-label">Tezkor kirish</div>
+    <button class="nav-item" onclick="toggleSbDrop(this)">
+      <span class="nav-icon"><i class="ri-radio-button-line"></i></span>
+      Sensorlar ro'yxati
+      <i class="ri-arrow-down-s-line sb-arr" id="sb-arr"></i>
+    </button>
+    <div class="sb-drop-list" id="quick-nav" style="display:none"></div>
+  </div>
+  <div class="sb-footer">
+    <button class="nav-item"><span class="nav-icon"><i class="ri-settings-3-line"></i></span>Sozlamalar</button>
+    <button class="nav-item"><span class="nav-icon"><i class="ri-question-line"></i></span>Yordam</button>
+    <div class="sb-account">
+      <div class="av-wrap">X<div class="av-online"></div></div>
+      <div style="flex:1;min-width:0">
+        <div class="av-name">Xurshid Istamov</div>
+        <div class="av-role">Agrotexnik · Admin</div>
+      </div>
+      <i class="ri-more-2-fill" style="color:var(--text-tertiary);font-size:16px;flex-shrink:0"></i>
+    </div>
+  </div>
+</nav>
+
+<!-- ── Main ── -->
+<div class="app-layout">
+  <header class="page-header">
+    <button class="ph-btn" onclick="document.getElementById('sidebar').classList.toggle('open')" id="menu-btn" style="display:none"><i class="ri-menu-line"></i></button>
+    <div style="flex:1">
+      <span class="ph-title">Alertlar</span>
+      <span class="ph-subtitle" style="margin-left:8px">— faol ogohlantirishlar va muammolar</span>
+    </div>
+    <button class="ph-btn" onclick="loadData()" title="Yangilash"><i class="ri-refresh-line" id="refresh-icon"></i></button>
+    <div class="ph-divider"></div>
+    <button class="ph-btn" id="theme-btn" onclick="toggleTheme()" title="Mavzu">
+      <i class="ri-moon-line" id="theme-icon" style="font-size:17px"></i>
+    </button>
+  </header>
+
+  <div class="main-content">
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-icon" style="background:var(--danger-bg);color:var(--danger)"><i class="ri-alarm-warning-line"></i></div>
+        <div class="stat-label">Jami alertlar</div>
+        <div class="stat-num" id="st-total" style="color:var(--danger)">—</div>
+        <div class="stat-sub" id="st-total-sub">Faol ogohlantirishlar</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:var(--danger-bg);color:var(--danger)"><i class="ri-error-warning-line"></i></div>
+        <div class="stat-label">Kritik</div>
+        <div class="stat-num" id="st-crit" style="color:var(--danger)">—</div>
+        <div class="stat-sub">Darhol muolaja kerak</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:var(--warning-bg);color:var(--warning)"><i class="ri-alert-line"></i></div>
+        <div class="stat-label">Diqqat</div>
+        <div class="stat-num" id="st-warn" style="color:var(--warning)">—</div>
+        <div class="stat-sub">Kuzatuvda</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:var(--success-bg);color:var(--success)"><i class="ri-shield-check-line"></i></div>
+        <div class="stat-label">Onlayn sensorlar</div>
+        <div class="stat-num" id="st-online" style="color:var(--success)">—</div>
+        <div class="stat-sub">Faol ishlayapti</div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-row">
+      <button class="filter-tab active" onclick="setFilter('all',this)">
+        Barchasi <span class="ft-count" id="fc-all">0</span>
+      </button>
+      <button class="filter-tab" onclick="setFilter('critical',this)">
+        🔴 Kritik <span class="ft-count" id="fc-crit">0</span>
+      </button>
+      <button class="filter-tab" onclick="setFilter('error',this)">
+        🟠 Xato <span class="ft-count" id="fc-err">0</span>
+      </button>
+      <button class="filter-tab" onclick="setFilter('warning',this)">
+        🟡 Diqqat <span class="ft-count" id="fc-warn">0</span>
+      </button>
+      <div class="filter-spacer"></div>
+      <select class="sort-select" onchange="setSortOrder(this.value)">
+        <option value="time_desc">Eng yangi</option>
+        <option value="time_asc">Eng eski</option>
+        <option value="severity">Og'irlik darajasi</option>
+      </select>
+    </div>
+
+    <!-- Section header -->
+    <div class="section-header">
+      <span class="section-title">Faol alertlar</span>
+      <span class="section-count" id="alert-count">Yuklanmoqda…</span>
+    </div>
+
+    <!-- Alert list -->
+    <div class="alert-list" id="alert-list">
+      <div class="alert-card">
+        <div style="padding:48px;text-align:center;width:100%">
+          <i class="ri-loader-4-line" style="font-size:36px;color:var(--brand);animation:spin 1s linear infinite;display:block;margin-bottom:12px"></i>
+          <div style="color:var(--text-tertiary)">Alertlar yuklanmoqda…</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const API = 'https://tomchi-tech-api.vercel.app/api';
+const SEV_MAP = {
+  critical: {cls:'err',  cardCls:'crit',      iconCls:'crit', icon:'ri-alarm-warning-fill', lbl:'Kritik'},
+  error:    {cls:'err',  cardCls:'crit',      iconCls:'crit', icon:'ri-error-warning-fill', lbl:'Xato'},
+  warning:  {cls:'warn', cardCls:'warn-card', iconCls:'warn', icon:'ri-alert-fill',          lbl:'Diqqat'},
+  info:     {cls:'info', cardCls:'',          iconCls:'info', icon:'ri-information-fill',    lbl:'Xabar'},
+};
+const SEV_PRI = {critical:0,error:1,warning:2,info:3};
+
+let _allAlerts = [], _filter = 'all', _sort = 'time_desc';
+
+function toggleSbDrop(btn) {
+  const list = document.getElementById('quick-nav');
+  const arr  = document.getElementById('sb-arr');
+  const open = list.style.display !== 'none';
+  list.style.display = open ? 'none' : 'block';
+  if (arr) arr.style.transform = open ? '' : 'rotate(180deg)';
+}
+
+function setFilter(f, btn) {
+  _filter = f;
+  document.querySelectorAll('.filter-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  renderAlerts();
+}
+function setSortOrder(v) { _sort = v; renderAlerts(); }
+
+function getFiltered() {
+  let arr = _filter === 'all' ? _allAlerts : _allAlerts.filter(a=>a.severity===_filter);
+  if (_sort==='time_desc') arr = [...arr].sort((a,b)=>new Date(b.at)-new Date(a.at));
+  else if(_sort==='time_asc') arr = [...arr].sort((a,b)=>new Date(a.at)-new Date(b.at));
+  else if(_sort==='severity')  arr = [...arr].sort((a,b)=>(SEV_PRI[a.severity]||3)-(SEV_PRI[b.severity]||3));
+  return arr;
+}
+
+function formatTime(dt) {
+  const d = new Date(dt);
+  const now = new Date();
+  const diff = Math.floor((now-d)/1000);
+  if (diff < 60)  return diff + ' soniya oldin';
+  if (diff < 3600) return Math.floor(diff/60) + ' daqiqa oldin';
+  if (diff < 86400) return Math.floor(diff/3600) + ' soat oldin';
+  return d.toLocaleDateString('uz-UZ',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+}
+
+function renderAlerts() {
+  const alerts = getFiltered();
+  document.getElementById('alert-count').textContent = alerts.length + ' ta alert';
+  if (!alerts.length) {
+    document.getElementById('alert-list').innerHTML = `
+      <div class="alert-card">
+        <div class="empty-state" style="width:100%">
+          <i class="ri-checkbox-circle-line"></i>
+          <h3>Alertlar yo'q!</h3>
+          <p>Hamma sensor yaxshi ishlayapti 🎉</p>
+        </div>
+      </div>`;
+    return;
+  }
+  document.getElementById('alert-list').innerHTML = alerts.map(a=>{
+    const s = SEV_MAP[a.severity]||SEV_MAP.warning;
+    const isCrit = a.severity==='critical'||a.severity==='error';
+    return `<div class="alert-card ${s.cardCls}">
+      <div class="alert-icon-wrap ${s.iconCls} ${isCrit?'pulse':''}">
+        <i class="${s.icon}"></i>
+      </div>
+      <div class="alert-body">
+        <div class="alert-title">${a.message}</div>
+        <div class="alert-desc">${a.description||getSeverityDesc(a)}</div>
+        <div class="alert-meta">
+          <span class="badge ${s.cls}"><i class="${s.icon}"></i>${s.lbl}</span>
+          <span class="meta-chip"><i class="ri-radar-line"></i>${a.sensor_id}</span>
+          <span class="meta-chip"><i class="ri-plant-line"></i>${a.farm_id}</span>
+          ${a.value!=null?`<span class="meta-chip"><i class="ri-drop-line"></i>${a.value.toFixed(1)}%</span>`:''}
+          <span class="alert-time"><i class="ri-time-line"></i> ${formatTime(a.at)}</span>
+        </div>
+        <div class="alert-actions">
+          ${isCrit
+            ? `<button class="btn-sm btn-danger"><i class="ri-alarm-warning-line"></i> Darhol muolaja</button>`
+            : `<button class="btn-sm btn-outline"><i class="ri-eye-line"></i> Ko'rib chiqish</button>`}
+          <button class="btn-sm btn-outline"><i class="ri-checkbox-circle-line"></i> Hal qilindi</button>
+          <button class="btn-sm btn-outline"><i class="ri-arrow-right-s-line"></i> Batafsil</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function getSeverityDesc(a) {
+  if (a.severity==='critical') return `Sensor ${a.sensor_id} da namlik kritik darajaga tushib ketdi. Zudlik bilan sug'orish tavsiya etiladi.`;
+  if (a.severity==='warning')  return `Sensor ${a.sensor_id} da namlik pasayish tendensiyasi kuzatilmoqda. Kuzatuv zarur.`;
+  return `${a.sensor_id} sensori da muammo aniqlandi.`;
+}
+
+async function loadData() {
+  const icon = document.getElementById('refresh-icon');
+  icon.style.animation = 'spin 1s linear infinite';
+  try {
+    const [alertsData, configs] = await Promise.all([
+      fetch(`${API}/alerts/`).then(r=>r.json()),
+      fetch(`${API}/sensors/configs`).then(r=>r.json()),
+    ]);
+    _allAlerts = alertsData.alerts||[];
+
+    // Stats
+    const crit = _allAlerts.filter(a=>a.severity==='critical'||a.severity==='error').length;
+    const warn = _allAlerts.filter(a=>a.severity==='warning').length;
+    const online = configs.filter(c=>c.status==='online').length;
+    document.getElementById('st-total').textContent      = _allAlerts.length;
+    document.getElementById('st-total-sub').textContent  = `${configs.length} sensordan`;
+    document.getElementById('st-crit').textContent       = crit;
+    document.getElementById('st-warn').textContent       = warn;
+    document.getElementById('st-online').textContent     = online;
+
+    // Filter counts
+    document.getElementById('fc-all').textContent  = _allAlerts.length;
+    document.getElementById('fc-crit').textContent = _allAlerts.filter(a=>a.severity==='critical').length;
+    document.getElementById('fc-err').textContent  = _allAlerts.filter(a=>a.severity==='error').length;
+    document.getElementById('fc-warn').textContent = warn;
+
+    // Sidebar badges
+    document.getElementById('nb-alerts').textContent  = _allAlerts.length||'0';
+    document.getElementById('nb-sensors').textContent = online;
+
+    // Quick-nav dropdown
+    const sorted = [...configs].sort((a,b)=>{const o=['online','warning','offline'];return o.indexOf(a.status)-o.indexOf(b.status);});
+    document.getElementById('quick-nav').innerHTML = sorted.slice(0,6).map(cfg=>{
+      const color = cfg.status==='offline'?'var(--neutral)':cfg.status==='warning'?'var(--warning)':'var(--success)';
+      return `<button class="nav-item" style="font-size:12px;padding:6px 8px"><span class="nav-icon" style="color:${color};font-size:14px"><i class="ri-radio-button-line"></i></span>${cfg.sensor_id}</button>`;
+    }).join('');
+
+    renderAlerts();
+  } catch(e) {
+    console.error(e);
+    document.getElementById('alert-list').innerHTML = `<div class="alert-card"><div class="empty-state" style="width:100%"><i class="ri-wifi-off-line" style="font-size:40px;color:var(--danger)"></i><h3>API bilan ulanishda xatolik</h3><p style="font-size:13px">${e.message}</p></div></div>`;
+  } finally {
+    icon.style.animation = '';
+  }
+}
+
+function isDark() { return document.documentElement.getAttribute('data-theme')==='dark'; }
+function toggleTheme() {
+  const d = isDark();
+  document.documentElement.setAttribute('data-theme', d?'light':'dark');
+  document.getElementById('theme-icon').className = d?'ri-moon-line':'ri-sun-line';
+  localStorage.setItem('theme', d?'light':'dark');
+}
+(()=>{
+  const t = localStorage.getItem('theme')||'light';
+  if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');document.getElementById('theme-icon').className='ri-sun-line';}
+  if(window.innerWidth<900) document.getElementById('menu-btn').style.display='flex';
+})();
+
+loadData();
+</script>
+</body>
+</html>

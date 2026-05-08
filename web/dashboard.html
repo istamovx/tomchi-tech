@@ -7,7 +7,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
 <style>
 /* ═══════════════════════════════════════════════════════════════
@@ -136,8 +139,10 @@ i[class^="ri-"] { line-height: 1; }
 
 /* Brand / Logo area */
 .sb-header {
-  display: flex; flex-direction: column; gap: var(--sp-2xl);
-  padding: var(--sp-3xl) var(--sp-2xl);
+  display: flex; flex-direction: column; gap: var(--sp-lg);
+  padding: var(--sp-3xl) var(--sp-2xl) var(--sp-3xl);
+  border-bottom: 1px solid var(--border-secondary);
+  /* height = 24+32+24 = 80px — matches .page-header */
 }
 .sb-logo {
   display: flex; align-items: center; gap: var(--sp-md);
@@ -154,24 +159,17 @@ i[class^="ri-"] { line-height: 1; }
   font-size: var(--text-md-size); font-weight: 700;
   line-height: var(--text-md-lh); color: var(--text-primary);
 }
-.sb-search {
-  display: flex; align-items: center; gap: var(--sp-md);
-  background: var(--bg-primary);
-  border: 1px solid var(--border-tertiary);
-  border-radius: var(--r-md);
-  padding: var(--sp-lg) var(--sp-xl);
-  box-shadow: var(--shadow-xs);
-  cursor: text;
+/* Sidebar group label + dropdown */
+.sb-group-label {
+  font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em;
+  color: var(--text-tertiary); padding: var(--sp-lg) var(--sp-lg) var(--sp-xs);
+  margin-top: var(--sp-md);
 }
-.sb-search i { color: var(--text-placeholder); font-size: 18px; flex-shrink: 0; }
-.sb-search span { flex: 1; font-size: var(--text-md-size); color: var(--text-placeholder); }
-.sb-shortcut {
-  border: 1px solid var(--border-secondary);
-  border-radius: var(--r-xs);
-  padding: 1px 4px;
-  font-size: var(--text-xs-size); font-weight: 500;
-  color: var(--text-quaternary); line-height: var(--text-xs-lh);
+.sb-drop-list {
+  padding-left: var(--sp-lg); border-left: 2px solid var(--border-secondary);
+  margin: 2px 0 2px var(--sp-xl);
 }
+.sb-arr { margin-left: auto; font-size: 17px; transition: transform .2s; flex-shrink:0; }
 
 /* Nav items */
 .sb-nav { flex: 1; overflow-y: auto; padding: 0 var(--sp-xl); }
@@ -243,7 +241,7 @@ i[class^="ri-"] { line-height: 1; }
   background: var(--bg-primary);
   border-bottom: 1px solid var(--border-secondary);
   padding: 0 var(--sp-4xl);
-  height: 68px;
+  height: 80px;  /* matches .sb-header: 24+32+24=80px */
   display: flex; align-items: center; gap: var(--sp-lg);
   flex-shrink: 0;
 }
@@ -316,7 +314,7 @@ i[class^="ri-"] { line-height: 1; }
 /* Content scroll area */
 .content {
   flex: 1; overflow-y: auto;
-  padding: var(--sp-3xl) var(--sp-4xl);
+  padding: 48px var(--sp-4xl) var(--sp-3xl);
   display: flex; flex-direction: column; gap: var(--sp-3xl);
 }
 
@@ -646,6 +644,12 @@ i[class^="ri-"] { line-height: 1; }
 .alert-tag.warn { background: var(--warning-bg); color: var(--warning); }
 .alert-time { font-size: 11px; color: var(--text-placeholder); margin-left: auto; display: flex; align-items: center; gap: 3px; }
 
+/* Alert tooltip */
+.leaflet-tooltip.alert-tip {
+  background: #1a0a0a; color: #fca5a5; border: 1px solid #D92D2066;
+  font-size: 12px; font-weight: 600; padding: 5px 10px;
+  border-radius: 6px; font-family: Inter, sans-serif; white-space: nowrap;
+}
 /* Map card */
 .map-wrap {
   flex: 1; min-height: 220px; position: relative;
@@ -694,14 +698,14 @@ i[class^="ri-"] { line-height: 1; }
 /* ── Live banner ──────────────────────────────────────────────── */
 .live-bar {
   background: var(--bg-page);
-  padding: 5px var(--sp-4xl) 8px;
+  padding: 16px var(--sp-4xl);
   display: flex; align-items: center; gap: 8px;
   flex-shrink: 0; border-bottom: 1px solid var(--border-tertiary);
 }
 .live-dot { width: 8px; height: 8px; border-radius: var(--r-full); background: var(--success); animation: pulse 2s infinite; }
 @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.8)} }
-.live-txt  { font-size: var(--text-xs-size); color: var(--text-tertiary); font-weight: 500; flex: 1; }
-.live-time { font-size: var(--text-xs-size); color: var(--text-placeholder); }
+.live-txt  { font-size: 16px; color: var(--text-tertiary); font-weight: 500; flex: 1; }
+.live-time { font-size: 16px; color: var(--text-placeholder); }
 
 /* ═══════════════════════════════════════════════════════════════
    DARK MODE  (Blue tokens adapted)
@@ -736,7 +740,8 @@ i[class^="ri-"] { line-height: 1; }
   --shadow-icon: 0 1px 2px rgba(0,0,0,.5);
   --shadow-skeu-border: inset 0 0 0 1px rgba(255,255,255,0.06), inset 0 -2px 0 rgba(0,0,0,.2);
 }
-[data-theme="dark"] .sb-search           { background: #1C2130; border-color: #2E3448; }
+[data-theme="dark"] .sb-group-label      { color: #636B78; }
+[data-theme="dark"] .sb-drop-list       { border-color: #2E3448; }
 [data-theme="dark"] .ph-search           { background: #1C2130; border-color: #2E3448; }
 [data-theme="dark"] .btn-secondary       { background: #1C2130; border-color: #2E3448; }
 [data-theme="dark"] .p-tab               { background: #1C2130; border-color: #2E3448; color: #8B92A0; }
@@ -780,17 +785,9 @@ i[class^="ri-"] { line-height: 1; }
 <nav class="sidebar" id="sidebar">
 
   <div class="sb-header">
-    <!-- Logo -->
     <div class="sb-logo">
       <div class="sb-logomark"><i class="ri-leaf-line"></i></div>
       <span class="sb-logoname">Tomchi Tech</span>
-    </div>
-
-    <!-- Search -->
-    <div class="sb-search">
-      <i class="ri-search-2-line"></i>
-      <span>Qidirish</span>
-      <span class="sb-shortcut">⌘K</span>
     </div>
   </div>
 
@@ -803,7 +800,7 @@ i[class^="ri-"] { line-height: 1; }
     <a class="nav-item" href="sensors.html">
       <span class="nav-icon"><i class="ri-radar-line"></i></span>
       Sensorlar
-      <span class="nav-badge" id="nb-sensors">6</span>
+      <span class="nav-badge" id="nb-sensors">—</span>
     </a>
     <a class="nav-item" href="farms.html">
       <span class="nav-icon"><i class="ri-plant-line"></i></span>
@@ -823,8 +820,14 @@ i[class^="ri-"] { line-height: 1; }
       Hisobotlar
     </a>
 
-    <div style="height:12px"></div>
-    <div id="quick-nav"></div>
+    <!-- Sensor dropdown -->
+    <div class="sb-group-label">Tezkor kirish</div>
+    <button class="nav-item" onclick="toggleSbDrop(this)">
+      <span class="nav-icon"><i class="ri-radio-button-line"></i></span>
+      Sensorlar ro'yxati
+      <i class="ri-arrow-down-s-line sb-arr" id="sb-arr"></i>
+    </button>
+    <div class="sb-drop-list" id="quick-nav" style="display:none"></div>
   </div>
 
   <!-- Footer -->
@@ -1140,8 +1143,90 @@ const API = 'https://tomchi-tech-api.onrender.com/api/v1';
 const CROP_EMOJI = { pomidor:'🍅', kartoshka:'🥔', paxta:'🌿', uzum:'🍇', bugdoy:'🌾', "makkajo'xori":'🌽', piyoz:'🧅' };
 const LINE_COLORS = ['#155EEF','#17B26A','#F79009','#7839EE','#D92D20','#0BA5EC'];
 
-let trendChart = null, savingChart = null, map = null, markers = {};
+let trendChart = null, savingChart = null, map = null, clusterGroup = null, markers = {};
 let trendDays = 7, _lastConfigs = [], _lastReadings = [];
+
+// ── Synthetic sensor data (648 sensors across Central Asia) ──────────────
+const FIRST_NAMES = ['Salim','Baxtiyor','Hamid','Dilshod','Jasur','Sherzod','Elbek','Bobur','Oybek','Doniyor','Murod','Farhod','Abdulloh','Jamshid','Ulugbek','Nurbek','Toxir','Firdavs','Ibrohim','Akbar','Sardor','Temur','Alisher','Nodir','Sanjar','Bekzod','Rustam','Sarvar','Husan','Lochin','Mansur','Avaz','Behzod','Davron','Erkin','Kamol','Laziz','Muzaffar'];
+const LAST_NAMES  = ["Xo'jayev",'Toshmatov','Umarov','Rahimov','Karimov','Nazarov','Holmatov','Yusupov','Muxtorov','Razzaqov','Sobirov','Aliyev','Ismoilov','Tillayev','Mirzayev','Saidov','Hasanov','Qodirov','Ergashev',"Norqo'ziyev",'Abdullayev','Raximov','Nishonov','Sultonov','Qosimov','Tursunov','Haydarov','Jurayev','Pulatov','Xoliqov','Mamatov','Qurbonov','Yunusov','Usmonov','Tohirov','Sotvoldiyev','Maxmudov','Rajabov'];
+const farmerNameSyn = i => FIRST_NAMES[i % FIRST_NAMES.length] + ' ' + LAST_NAMES[(i * 7 + 3) % LAST_NAMES.length];
+function jitterSyn(mag){ return (Math.random()-0.5)*2*mag; }
+
+const SENSOR_PROFILES = [
+  { r:'Surxondaryo',      d:'Sariosiyo',  lat:37.820, lon:67.920, n:44, m:55, crop:'pomidor' },
+  { r:'Surxondaryo',      d:'Denov',      lat:38.270, lon:67.890, n:23, m:43, crop:'paxta'   },
+  { r:'Surxondaryo',      d:'Termiz',     lat:37.225, lon:67.278, n:18, m:27, crop:'uzum'    },
+  { r:'Surxondaryo',      d:'Boysun',     lat:38.202, lon:67.193, n:12, m:52, crop:'bugdoy'  },
+  { r:'Surxondaryo',      d:'Sherabad',   lat:37.667, lon:67.013, n:10, m:31, crop:'paxta'   },
+  { r:"Farg'ona",         d:"Farg'ona",   lat:40.390, lon:71.779, n:35, m:65, crop:'uzum'    },
+  { r:"Farg'ona",         d:'Quva',       lat:40.523, lon:72.084, n:20, m:62, crop:'pomidor' },
+  { r:"Farg'ona",         d:'Rishton',    lat:40.358, lon:71.278, n:15, m:60, crop:'piyoz'   },
+  { r:"Farg'ona",         d:"Marg'ilon",  lat:40.472, lon:71.723, n:18, m:58, crop:'uzum'    },
+  { r:'Toshkent',         d:'Toshkent',   lat:41.299, lon:69.240, n:30, m:60, crop:'kartoshka'},
+  { r:'Toshkent',         d:'Chirchiq',   lat:41.483, lon:69.582, n:15, m:58, crop:'pomidor' },
+  { r:'Toshkent',         d:'Angren',     lat:40.987, lon:70.142, n:12, m:44, crop:'bugdoy'  },
+  { r:'Namangan',         d:'Namangan',   lat:41.000, lon:71.672, n:25, m:62, crop:'uzum'    },
+  { r:'Namangan',         d:'Kosonsoy',   lat:41.251, lon:71.547, n:15, m:55, crop:'pomidor' },
+  { r:'Andijon',          d:'Andijon',    lat:40.783, lon:72.344, n:30, m:60, crop:'paxta'   },
+  { r:'Andijon',          d:'Asaka',      lat:40.633, lon:72.257, n:15, m:55, crop:'bugdoy'  },
+  { r:'Samarqand',        d:'Samarqand',  lat:39.654, lon:66.960, n:25, m:50, crop:'uzum'    },
+  { r:'Samarqand',        d:"Kattaqo'rg'on", lat:39.901, lon:66.259, n:15, m:40, crop:'bugdoy' },
+  { r:'Samarqand',        d:'Urgut',      lat:39.401, lon:67.252, n:12, m:47, crop:'pomidor' },
+  { r:'Qashqadaryo',      d:'Qarshi',     lat:38.860, lon:65.800, n:20, m:26, crop:'paxta'   },
+  { r:'Qashqadaryo',      d:'Shahrisabz', lat:39.059, lon:66.841, n:12, m:46, crop:'uzum'    },
+  { r:'Qashqadaryo',      d:"G'uzor",     lat:38.610, lon:66.253, n:10, m:22, crop:'bugdoy'  },
+  { r:'Buxoro',           d:'Buxoro',     lat:39.774, lon:64.425, n:20, m:28, crop:'paxta'   },
+  { r:'Buxoro',           d:"G'ijduvon",  lat:40.100, lon:64.680, n:12, m:35, crop:'pomidor' },
+  { r:'Xorazm',           d:'Urganch',    lat:41.551, lon:60.631, n:18, m:55, crop:'paxta'   },
+  { r:'Xorazm',           d:'Xiva',       lat:41.378, lon:60.363, n:10, m:50, crop:'uzum'    },
+  { r:'Navoiy',           d:'Navoiy',     lat:40.084, lon:65.379, n:15, m:22, crop:'paxta'   },
+  { r:'Navoiy',           d:'Zarafshon',  lat:41.569, lon:64.200, n:8,  m:19, crop:'bugdoy'  },
+  { r:'Jizzax',           d:'Jizzax',     lat:40.115, lon:67.843, n:12, m:42, crop:'bugdoy'  },
+  { r:'Sirdaryo',         d:'Guliston',   lat:40.488, lon:68.783, n:10, m:48, crop:'paxta'   },
+  { r:"Qoraqalpog'iston", d:'Nukus',      lat:42.453, lon:59.607, n:15, m:17, crop:'paxta'   },
+  { r:'Xatlon (TJ)',      d:'Kulob',      lat:37.910, lon:69.782, n:20, m:55, crop:'pomidor' },
+  { r:'Xatlon (TJ)',      d:'Bokhtar',    lat:37.832, lon:68.779, n:15, m:41, crop:'paxta'   },
+  { r:"Sug'd (TJ)",       d:"Xo'jand",   lat:40.282, lon:69.622, n:15, m:52, crop:'uzum'    },
+  { r:'Turkiston (KZ)',   d:'Shymkent',   lat:42.317, lon:69.596, n:20, m:45, crop:'bugdoy'  },
+  { r:'Turkiston (KZ)',   d:'Turkiston',  lat:43.297, lon:68.271, n:12, m:29, crop:'paxta'   },
+  { r:'Jambyl (KZ)',      d:'Taraz',      lat:42.900, lon:71.370, n:15, m:42, crop:'bugdoy'  },
+];
+
+const ALERT_ZONES_MAP = [
+  { lat:37.225, lon:67.278, r:35000,  name:"Termiz: Namlik kritik (27%)" },
+  { lat:38.860, lon:65.800, r:55000,  name:"Qarshi cho'li: Quruqlik xavfi (26%)" },
+  { lat:38.610, lon:66.253, r:42000,  name:"G'uzor: Suv yetishmayapti (22%)" },
+  { lat:39.774, lon:64.425, r:50000,  name:"Buxoro: Suv taqchilligi (28%)" },
+  { lat:40.084, lon:65.379, r:65000,  name:"Navoiy: Qizilqum quruqligi (22%)" },
+  { lat:41.569, lon:64.200, r:90000,  name:"Zarafshon cho'li: Kritik (19%)" },
+  { lat:42.453, lon:59.607, r:100000, name:"Qoraqalpog'iston: Eng quruq hudud (17%)" },
+  { lat:43.297, lon:68.271, r:40000,  name:"Turkiston (KZ): Suv kam (29%)" },
+];
+
+let _syntheticSensors = null;
+function getSyntheticSensors() {
+  if (_syntheticSensors) return _syntheticSensors;
+  const out = [];
+  SENSOR_PROFILES.forEach((p, fi) => {
+    for(let i=0;i<p.n;i++){
+      const moisture = Math.max(5, Math.min(95, p.m + (Math.random()-0.5)*16));
+      out.push({
+        sensor_id: `SNS-FARM-${String(fi+1).padStart(3,'0')}-${String(i+1).padStart(3,'0')}`,
+        farm_id:   `FARM-${String(fi+1).padStart(3,'0')}`,
+        farmer_name: farmerNameSyn(fi),
+        region: p.r, district: p.d,
+        lat:  p.lat + jitterSyn(0.020),
+        lon:  p.lon + jitterSyn(0.020),
+        moisture, crop_type: p.crop,
+        total_area_ha: Math.round(15+Math.random()*120),
+        isAlert: moisture < 30,
+        isWarn:  moisture >= 30 && moisture < 45,
+      });
+    }
+  });
+  _syntheticSensors = out;
+  return out;
+}
 
 // ── Helpers ───────────────────────────────────────────────────
 function sInfo(status, m, thr) {
@@ -1149,6 +1234,14 @@ function sInfo(status, m, thr) {
   if (m < thr - 15)         return { cls:'err',  color:'#D92D20', label:'Darhol!' };
   if (m < thr)              return { cls:'warn', color:'#F79009', label:"Tez sug'or" };
   return                           { cls:'ok',   color:'#17B26A', label:'Yaxshi' };
+}
+
+function toggleSbDrop(btn) {
+  const list = document.getElementById('quick-nav');
+  const arr  = document.getElementById('sb-arr');
+  const open = list.style.display !== 'none';
+  list.style.display = open ? 'none' : 'block';
+  if (arr) arr.style.transform = open ? '' : 'rotate(180deg)';
 }
 
 function switchTab(el, id) {
@@ -1159,49 +1252,97 @@ function switchTab(el, id) {
   });
 }
 
-// ── Map ───────────────────────────────────────────────────────
+// ── Map (648 synthetic sensors + alert zones) ────────────────
 function initMap() {
-  map = L.map('map', { scrollWheelZoom: false, zoomControl: false }).setView([40.8,64.0],5);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-    attribution:'© CartoDB', maxZoom:18
-  }).addTo(map);
-  L.control.zoom({ position:'bottomright' }).addTo(map);
-}
+  if (!map) {
+    map = L.map('map', { scrollWheelZoom: false, zoomControl: true })
+           .setView([40.5, 65.0], 5);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap', maxZoom: 19
+    }).addTo(map);
 
-function updateMarkers(readings, configs) {
-  configs.forEach(cfg => {
-    const r = readings.find(x => x.sensor_id === cfg.sensor_id);
-    const m = r ? r.soil_moisture : 0;
-    const { cls, color } = sInfo(cfg.status, m, cfg.irrigation_threshold);
-    const bgMap = { ok:'#ECFDF3', warn:'#FFFAEB', err:'#FEF3F2', off:'#F9FAFB' };
+    // Alert zone red halos
+    ALERT_ZONES_MAP.forEach(z => {
+      L.circle([z.lat, z.lon], {
+        radius: z.r, color: '#D92D20', fillColor: '#D92D20',
+        fillOpacity: 0.10, weight: 1.8, dashArray: '7 5', opacity: 0.55,
+      }).bindTooltip(`⚠️ ${z.name}`, {
+        sticky: false, direction: 'top', className: 'alert-tip',
+      }).addTo(map);
+    });
+  }
+
+  if (clusterGroup) { map.removeLayer(clusterGroup); clusterGroup = null; }
+  markers = {};
+
+  clusterGroup = L.markerClusterGroup({
+    maxClusterRadius: 65,
+    spiderfyOnMaxZoom: true,
+    showCoverageOnHover: false,
+    zoomToBoundsOnClick: true,
+    chunkedLoading: true,
+    iconCreateFunction(cluster) {
+      const children = cluster.getAllChildMarkers();
+      const total    = children.length;
+      const alertCnt = children.filter(m => m.options.isAlert).length;
+      const warnCnt  = children.filter(m => m.options.isWarn).length;
+      const ar = alertCnt/total, wr = warnCnt/total;
+      let bg, border, shadow;
+      if (ar > 0.35)         { bg='#D92D20'; border='#B42318'; shadow='rgba(217,45,32,.45)'; }
+      else if (ar+wr > 0.30) { bg='#F79009'; border='#D97706'; shadow='rgba(247,144,9,.40)'; }
+      else                   { bg='#17B26A'; border='#0D9E57'; shadow='rgba(23,178,106,.40)'; }
+      const size = total<10?36 : total<30?44 : total<100?52 : total<300?58 : 64;
+      const fs   = total<10?14 : total<100?13 : 12;
+      return L.divIcon({
+        html: `<div style="width:${size}px;height:${size}px;border-radius:50%;background:${bg};border:3px solid #fff;box-shadow:0 3px 12px ${shadow};display:flex;align-items:center;justify-content:center;color:#fff;font-size:${fs}px;font-weight:700;font-family:Inter,sans-serif;line-height:1">${total}</div>`,
+        className: '', iconSize:[size,size], iconAnchor:[size/2,size/2]
+      });
+    }
+  });
+
+  const sensors = getSyntheticSensors();
+  const bounds  = [];
+  sensors.forEach(s => {
+    const dotColor = s.isAlert ? '#D92D20' : s.isWarn ? '#F79009' : '#17B26A';
+    const sz       = s.isAlert ? 15 : 12;
     const icon = L.divIcon({
       className: '',
-      html: `<div style="width:34px;height:34px;background:${bgMap[cls]};border:2px solid ${color};border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;box-shadow:0 2px 6px ${color}44;cursor:pointer">${CROP_EMOJI[cfg.crop_type]||'🌱'}</div>`,
-      iconSize:[34,34], iconAnchor:[17,17],
+      html: `<div style="width:${sz}px;height:${sz}px;border-radius:50%;background:${dotColor};border:2.5px solid #fff;box-shadow:0 1px 6px rgba(0,0,0,.35)${s.isAlert?';outline:2px solid rgba(217,45,32,.3);outline-offset:2px':''}"></div>`,
+      iconSize:[sz,sz], iconAnchor:[sz/2,sz/2], popupAnchor:[0,-10]
     });
-    const popup = `<div style="padding:12px;min-width:160px;font-family:'Inter',sans-serif">
-      <div style="font-size:14px;font-weight:700;margin-bottom:8px;color:#181D27">${cfg.sensor_id} · ${cfg.crop_type}</div>
-      <div style="font-size:13px;color:#535862;margin-bottom:3px"><i class="ri-drop-line"></i> Namlik: <b style="color:${color}">${cfg.status==='offline'?'—':m.toFixed(1)+'%'}</b></div>
-      <div style="font-size:13px;color:#535862;margin-bottom:3px"><i class="ri-temp-hot-line"></i> Harorat: ${r?r.temperature.toFixed(1)+'°C':'—'}</div>
-      <div style="font-size:13px;color:#535862"><i class="ri-map-pin-line"></i> ${cfg.farm_id} · ${cfg.field_area_ha} ga</div>
-    </div>`;
-    if (markers[cfg.sensor_id]) map.removeLayer(markers[cfg.sensor_id]);
-    markers[cfg.sensor_id] = L.marker([cfg.location_lat, cfg.location_lon], { icon })
-      .addTo(map).bindPopup(popup, { maxWidth:200 });
+    const mBar = `<div style="width:100%;height:5px;background:#E9EAEB;border-radius:3px;margin-top:5px;overflow:hidden"><div style="width:${s.moisture.toFixed(0)}%;height:100%;background:${dotColor};border-radius:3px"></div></div>`;
+    const badge = s.isAlert
+      ? `<span style="background:#FEF3F2;border:1px solid #FECDCA;color:#D92D20;font-size:11px;padding:2px 7px;border-radius:99px;font-weight:700">⚠️ ALERT</span>`
+      : s.isWarn
+      ? `<span style="background:#FFFAEB;border:1px solid #FEDF89;color:#B54708;font-size:11px;padding:2px 7px;border-radius:99px;font-weight:600">⚡ Diqqat</span>`
+      : '';
+    const marker = L.marker([s.lat, s.lon], { icon, isAlert: s.isAlert, isWarn: s.isWarn });
+    marker.bindPopup(`
+      <div style="font-family:Inter,sans-serif;min-width:205px;padding:4px 2px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+          <b style="font-size:14px">${CROP_EMOJI[s.crop_type]||'🌱'} ${s.district}</b>${badge}
+        </div>
+        <div style="font-size:12px;color:#535862;margin-bottom:5px">📍 ${s.region}</div>
+        <div style="font-size:13px;margin-bottom:3px">💧 Namlik: <b style="color:${dotColor}">${s.moisture.toFixed(1)}%</b>${mBar}</div>
+        <div style="font-size:12px;margin-bottom:3px">${CROP_EMOJI[s.crop_type]||'🌱'} ${s.crop_type} · 📐 ${s.total_area_ha} ga</div>
+        <div style="font-size:11px;color:#999;margin-top:4px">${s.sensor_id} · ${s.farmer_name}</div>
+      </div>`);
+    clusterGroup.addLayer(marker);
+    bounds.push([s.lat, s.lon]);
+    if (!markers[s.farm_id]) markers[s.farm_id] = marker;
   });
-}
 
-function updateMapOverlay(configs, readings) {
-  const online  = configs.filter(c=>c.status==='online').length;
-  const warning = configs.filter(c=>c.status==='warning').length;
-  const crit    = readings.filter(r=>{
-    const cfg = configs.find(c=>c.sensor_id===r.sensor_id);
-    return cfg && cfg.status!=='offline' && r.soil_moisture < cfg.irrigation_threshold-15;
-  }).length;
-  document.getElementById('mo-online').textContent = online;
-  document.getElementById('mo-warn').textContent   = warning;
-  document.getElementById('mo-crit').textContent   = crit;
-  document.getElementById('map-count').textContent = configs.length + ' sensor';
+  map.addLayer(clusterGroup);
+  if (bounds.length) map.fitBounds(bounds, { padding:[30,30], maxZoom:8 });
+
+  // Update map overlay with synthetic counts
+  const alertCnt = sensors.filter(s => s.isAlert).length;
+  const warnCnt  = sensors.filter(s => s.isWarn).length;
+  const okCnt    = sensors.length - alertCnt - warnCnt;
+  document.getElementById('mo-online').textContent = okCnt;
+  document.getElementById('mo-warn').textContent   = warnCnt;
+  document.getElementById('mo-crit').textContent   = alertCnt;
+  document.getElementById('map-count').textContent = sensors.length + ' sensor';
 }
 
 // ── Trend chart ───────────────────────────────────────────────
@@ -1493,8 +1634,6 @@ async function fetchAll() {
     renderAlerts(alerts);
     initSavingChart(recs);
     initTrendChart(configs, readings);
-    updateMarkers(readings, configs);
-    updateMapOverlay(configs, readings);
     renderQuickNav(configs, readings);
 
     const now = new Date();

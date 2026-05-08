@@ -41,3 +41,12 @@ coverage.xml
 # Database
 *.db
 *.sqlite3
+
+# Node / React Native
+node_modules/
+mobile/node_modules/
+mobile/.expo/
+mobile/android/build/
+mobile/ios/build/
+*.lock
+package-lock.json

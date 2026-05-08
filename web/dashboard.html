@@ -523,9 +523,9 @@ i[class^="ri-"] { line-height: 1; }
 .pag-btn:hover { background: var(--bg-secondary); }
 
 /* ═══════════════════════════════════════════════════════════════
-   TWO-COLUMN BOTTOM SECTION
+   SECTION GRIDS
 ═══════════════════════════════════════════════════════════════ */
-.bottom-grid {
+.bottom-grid, .top-grid, .mid-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--sp-3xl);
@@ -760,7 +760,7 @@ i[class^="ri-"] { line-height: 1; }
    RESPONSIVE
 ═══════════════════════════════════════════════════════════════ */
 @media (max-width: 1280px) { .metrics-row { grid-template-columns: repeat(2,1fr); } }
-@media (max-width: 1100px) { .bottom-grid { grid-template-columns: 1fr; } }
+@media (max-width: 1100px) { .bottom-grid, .top-grid, .mid-grid { grid-template-columns: 1fr; } }
 @media (max-width: 900px)  {
   :root { --sidebar-w: 240px; }
   .col-battery { display: none; }
@@ -958,82 +958,121 @@ i[class^="ri-"] { line-height: 1; }
       </div>
     </div>
 
-    <!-- ── Trend chart ───────────────────────────────────── -->
-    <div class="chart-card">
-      <div class="chart-card-head">
-        <div class="cc-left">
-          <div class="cc-title-row">
-            <span class="cc-big-num" id="cc-main-num">—</span>
-            <span class="metric-change up" id="cc-change" style="margin-top:6px">
-              <i class="ri-arrow-up-right-line"></i> Tejash
-            </span>
+    <!-- ── Row 1: Sensorlar xaritasi | Suv tejash tahlili ─ -->
+    <div class="top-grid">
+
+      <!-- Sensorlar xaritasi -->
+      <div class="card" style="min-height:400px">
+        <div class="card-head">
+          <div class="card-title">
+            <div class="card-icon"><i class="ri-map-2-line"></i></div>
+            Sensorlar xaritasi
           </div>
-          <div class="cc-title">Namlik trendi · sensorlar bo'yicha</div>
+          <span style="font-size:13px;color:var(--text-tertiary)" id="map-count">— sensor</span>
         </div>
-        <div class="cc-right">
-          <div class="chart-legend" id="trend-legend"></div>
-          <div class="period-row">
-            <button class="p-tab active" onclick="setPeriod(7,this)">7 kun</button>
-            <button class="p-tab" onclick="setPeriod(14,this)">14 kun</button>
-            <button class="p-tab" onclick="setPeriod(30,this)">30 kun</button>
+        <div class="map-wrap" style="margin:0 var(--sp-3xl) var(--sp-3xl);flex:1;min-height:320px">
+          <div class="map-overlay">
+            <div class="mo-chip">
+              <div class="mo-dot" style="background:#17B26A"></div>
+              <span class="mo-txt">Online</span>
+              <span class="mo-val" id="mo-online" style="color:#067647">—</span>
+            </div>
+            <div class="mo-chip">
+              <div class="mo-dot" style="background:#F79009"></div>
+              <span class="mo-txt">Diqqat</span>
+              <span class="mo-val" id="mo-warn" style="color:#B54708">—</span>
+            </div>
+            <div class="mo-chip">
+              <div class="mo-dot" style="background:#D92D20"></div>
+              <span class="mo-txt">Kritik</span>
+              <span class="mo-val" id="mo-crit" style="color:var(--danger)">—</span>
+            </div>
+          </div>
+          <div id="map"></div>
+        </div>
+      </div>
+
+      <!-- Suv tejash tahlili -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">
+            <div class="card-icon"><i class="ri-water-percent-line"></i></div>
+            Suv tejash tahlili
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="period-row">
+              <button class="p-tab active" onclick="setPeriod(7,this)">7 kun</button>
+              <button class="p-tab" onclick="setPeriod(14,this)">14 kun</button>
+              <button class="p-tab" onclick="setPeriod(30,this)">30 kun</button>
+            </div>
+            <button class="btn btn-secondary" style="font-size:12px;padding:5px 10px">
+              <i class="ri-download-2-line"></i> Hisobot
+            </button>
+          </div>
+        </div>
+        <div class="card-body" style="max-height:none;overflow:visible">
+          <!-- Saving summary block -->
+          <div class="saving-block">
+            <div>
+              <div class="saving-num" id="total-saving">—</div>
+              <div class="saving-label">O'rtacha suv tejash · an'anaviy usulga nisbatan</div>
+            </div>
+            <i class="ri-water-percent-line saving-icon"></i>
+          </div>
+          <!-- Namlik trendi -->
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+            <div style="display:flex;align-items:center;gap:10px">
+              <span class="cc-big-num" id="cc-main-num" style="font-size:22px">—</span>
+              <span class="metric-change up" id="cc-change" style="font-size:12px">
+                <i class="ri-arrow-up-right-line"></i> Tejash
+              </span>
+            </div>
+            <div class="chart-legend" id="trend-legend"></div>
+          </div>
+          <div style="font-size:12px;color:var(--text-tertiary);margin-bottom:10px">Namlik trendi · sensorlar bo'yicha</div>
+          <div style="height:195px;position:relative">
+            <canvas id="trendChart"></canvas>
+          </div>
+          <div style="height:var(--sp-xl)"></div>
+          <!-- Suv tejash bar chart -->
+          <div style="height:130px;position:relative">
+            <canvas id="savingChart"></canvas>
           </div>
         </div>
       </div>
-      <div class="chart-body">
-        <div class="chart-wrap"><canvas id="trendChart"></canvas></div>
-      </div>
+
     </div>
 
-    <!-- ── Sensor Table ──────────────────────────────────── -->
-    <div>
-      <div class="section-header">
-        <div>
-          <div class="sec-title">Barcha sensorlar</div>
-          <div class="sec-sub" id="sensor-count">Yuklanmoqda...</div>
+    <!-- ── Row 2: Fermalar va alertlar | Sug'orish tavsiyalari -->
+    <div class="mid-grid">
+
+      <!-- Fermalar va alertlar -->
+      <div class="card">
+        <div style="padding:var(--sp-xl) var(--sp-3xl) 0">
+          <div class="card-title" style="font-size:var(--text-md-size)">
+            <div class="card-icon"><i class="ri-community-line"></i></div>
+            Fermalar va alertlar
+          </div>
         </div>
-        <div style="display:flex;gap:8px">
-          <button class="btn btn-secondary"><i class="ri-filter-line"></i> Filter</button>
-          <button class="btn btn-secondary"><i class="ri-download-2-line"></i> Eksport</button>
+        <div class="card-tabs">
+          <button class="card-tab active" onclick="switchTab(this,'farms-tab')">
+            <i class="ri-plant-line"></i> Fermalar
+          </button>
+          <button class="card-tab" onclick="switchTab(this,'alerts-tab')">
+            <i class="ri-alarm-warning-line"></i> Alertlar
+            <span class="card-tab-count" id="tab-alert-count">0</span>
+          </button>
+        </div>
+        <div class="card-body" id="farms-tab">
+          <div class="skel" style="height:48px;margin-bottom:8px"></div>
+          <div class="skel" style="height:48px"></div>
+        </div>
+        <div class="card-body" id="alerts-tab" style="display:none">
+          <div class="skel" style="height:60px"></div>
         </div>
       </div>
 
-      <div class="table-card">
-        <!-- Table header -->
-        <div class="table-header">
-          <div class="table-header-cell col-sensor">Sensor / Ekin</div>
-          <div class="table-header-cell col-farm">Ferma</div>
-          <div class="table-header-cell col-moisture">Namlik</div>
-          <div class="table-header-cell col-temp">Harorat</div>
-          <div class="table-header-cell col-battery">Batareya</div>
-          <div class="table-header-cell col-status">Holat</div>
-          <div class="table-header-cell col-action"></div>
-        </div>
-
-        <!-- Table body -->
-        <div id="sensor-table-body">
-          <div style="padding:40px;text-align:center">
-            <div class="skel" style="height:44px;margin-bottom:8px"></div>
-            <div class="skel" style="height:44px;margin-bottom:8px"></div>
-            <div class="skel" style="height:44px;margin-bottom:8px"></div>
-            <div class="skel" style="height:44px"></div>
-          </div>
-        </div>
-
-        <!-- Pagination -->
-        <div class="table-footer">
-          <span class="pag-info" id="pag-info">— sensor</span>
-          <div class="pag-btns">
-            <button class="pag-btn"><i class="ri-arrow-left-s-line"></i> Oldingi</button>
-            <button class="pag-btn">Keyingi <i class="ri-arrow-right-s-line"></i></button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── Bottom 2-col grid ─────────────────────────────── -->
-    <div class="bottom-grid">
-
-      <!-- Recommendations -->
+      <!-- Sug'orish tavsiyalari -->
       <div class="card">
         <div class="card-head">
           <div class="card-title">
@@ -1050,91 +1089,46 @@ i[class^="ri-"] { line-height: 1; }
         </div>
       </div>
 
-      <!-- Map + Farms/Alerts -->
-      <div style="display:flex;flex-direction:column;gap:var(--sp-3xl)">
+    </div>
 
-        <!-- Map card -->
-        <div class="card" style="min-height:280px">
-          <div class="card-head">
-            <div class="card-title">
-              <div class="card-icon"><i class="ri-map-2-line"></i></div>
-              Sensorlar xaritasi
-            </div>
-            <span style="font-size:13px;color:var(--text-tertiary)" id="map-count">6 sensor</span>
-          </div>
-          <div class="map-wrap">
-            <div class="map-overlay">
-              <div class="mo-chip">
-                <div class="mo-dot" style="background:#17B26A"></div>
-                <span class="mo-txt">Online</span>
-                <span class="mo-val" id="mo-online" style="color:#067647">—</span>
-              </div>
-              <div class="mo-chip">
-                <div class="mo-dot" style="background:#F79009"></div>
-                <span class="mo-txt">Diqqat</span>
-                <span class="mo-val" id="mo-warn" style="color:#B54708">—</span>
-              </div>
-              <div class="mo-chip">
-                <div class="mo-dot" style="background:#D92D20"></div>
-                <span class="mo-txt">Kritik</span>
-                <span class="mo-val" id="mo-crit" style="color:var(--danger)">—</span>
-              </div>
-            </div>
-            <div id="map"></div>
+    <!-- ── Row 3: Barcha sensorlar ─────────────────────────── -->
+    <div>
+      <div class="section-header">
+        <div>
+          <div class="sec-title">Barcha sensorlar</div>
+          <div class="sec-sub" id="sensor-count">Yuklanmoqda...</div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-secondary"><i class="ri-filter-line"></i> Filter</button>
+          <button class="btn btn-secondary"><i class="ri-download-2-line"></i> Eksport</button>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <div class="table-header">
+          <div class="table-header-cell col-sensor">Sensor / Ekin</div>
+          <div class="table-header-cell col-farm">Ferma</div>
+          <div class="table-header-cell col-moisture">Namlik</div>
+          <div class="table-header-cell col-temp">Harorat</div>
+          <div class="table-header-cell col-battery">Batareya</div>
+          <div class="table-header-cell col-status">Holat</div>
+          <div class="table-header-cell col-action"></div>
+        </div>
+        <div id="sensor-table-body">
+          <div style="padding:40px;text-align:center">
+            <div class="skel" style="height:44px;margin-bottom:8px"></div>
+            <div class="skel" style="height:44px;margin-bottom:8px"></div>
+            <div class="skel" style="height:44px;margin-bottom:8px"></div>
+            <div class="skel" style="height:44px"></div>
           </div>
         </div>
-
-        <!-- Farms + Alerts tabbed card -->
-        <div class="card">
-          <div style="padding: var(--sp-xl) var(--sp-3xl) 0">
-            <div class="card-title" style="font-size:var(--text-md-size)">
-              <div class="card-icon"><i class="ri-community-line"></i></div>
-              Fermalar va alertlar
-            </div>
-          </div>
-          <div class="card-tabs">
-            <button class="card-tab active" onclick="switchTab(this,'farms-tab')">
-              <i class="ri-plant-line"></i> Fermalar
-            </button>
-            <button class="card-tab" onclick="switchTab(this,'alerts-tab')">
-              <i class="ri-alarm-warning-line"></i> Alertlar
-              <span class="card-tab-count" id="tab-alert-count">0</span>
-            </button>
-          </div>
-          <div class="card-body" id="farms-tab">
-            <div class="skel" style="height:48px;margin-bottom:8px"></div>
-            <div class="skel" style="height:48px"></div>
-          </div>
-          <div class="card-body" id="alerts-tab" style="display:none">
-            <div class="skel" style="height:60px"></div>
+        <div class="table-footer">
+          <span class="pag-info" id="pag-info">— sensor</span>
+          <div class="pag-btns">
+            <button class="pag-btn"><i class="ri-arrow-left-s-line"></i> Oldingi</button>
+            <button class="pag-btn">Keyingi <i class="ri-arrow-right-s-line"></i></button>
           </div>
         </div>
-
-        <!-- Water saving summary -->
-        <div class="card">
-          <div class="card-head">
-            <div class="card-title">
-              <div class="card-icon"><i class="ri-water-percent-line"></i></div>
-              Suv tejash tahlili
-            </div>
-            <button class="btn btn-secondary" style="font-size:12px;padding:5px 10px">
-              <i class="ri-download-2-line"></i> Hisobot
-            </button>
-          </div>
-          <div class="card-body">
-            <div class="saving-block">
-              <div>
-                <div class="saving-num" id="total-saving">—</div>
-                <div class="saving-label">O'rtacha suv tejash · an'anaviy usulga nisbatan</div>
-              </div>
-              <i class="ri-water-percent-line saving-icon"></i>
-            </div>
-            <div style="height:130px;position:relative">
-              <canvas id="savingChart"></canvas>
-            </div>
-          </div>
-        </div>
-
       </div>
     </div>
 

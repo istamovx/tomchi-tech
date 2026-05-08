@@ -264,9 +264,9 @@ async def cmd_start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
             f"👋 Xush kelibsiz, <b>{u.first_name}</b>!\n\n"
             f"📦 Paketingiz: {p['emoji']} <b>{p['nomi']}</b>\n"
             f"📅 {sub['end_date'][:10]} gacha\n\n"
-            f"📱 Pastdagi tugmalar orqali bo'limlarga kiring:",
-            parse_mode="HTML",
-            reply_markup=REPLY_KB)
+            f"⌨️ Pastdagi tugmalar panelini ochish uchun input maydonidagi "
+            f"klaviatura ikonkasini bosing.",
+            parse_mode="HTML")
 
 # ── Callback ──────────────────────────────────────────────────────────────────
 async def cb(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
@@ -300,8 +300,12 @@ async def cb(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         sub = get_sub(uid); p = PACKAGES[pid]
         await edit(q, ctx,
             f"🎉 <b>Tabriklaymiz!</b>\n\n{p['emoji']} <b>{p['nomi']}</b> paketi faollashtirildi!\n"
-            f"📅 {sub['end_date'][:10]} gacha\n\nEndi TomchiTech xizmatlaridan foydalanishingiz mumkin!",
-            kb=main_kb(sub)); return
+            f"📅 {sub['end_date'][:10]} gacha\n\nEndi TomchiTech xizmatlaridan foydalanishingiz mumkin!")
+        # Birinchi marta obuna bo'lganda persistent klaviatura o'rnatiladi
+        await send(ctx, q.message.chat_id,
+            "⌨️ Tugmalar paneli tayyor! Pastda klaviatura ikonkasini bosib oching.",
+            kb=REPLY_KB)
+        return
 
     if not sub:
         await q.message.reply_text("❌ Bu funksiyadan foydalanish uchun obuna kerak.", reply_markup=pkgs_kb()); return

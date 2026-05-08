@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8"/>
+<script>if(sessionStorage.getItem('tomchi_auth')!=='1'){window.location.replace('login.html');}</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Tomchi Tech — Mijozlar</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.css"/>
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js"></script>
+<style>
+:root{
+  --bg-page:#F5F5F5;--bg-primary:#FFFFFF;--bg-primary-alt:#FAFAFA;--bg-secondary:#F9FAFB;
+  --text-primary:#181D27;--text-secondary:#414651;--text-tertiary:#535862;
+  --text-placeholder:#717680;--text-disabled:#A4A7AE;
+  --border-primary:#D5D7DA;--border-secondary:#E9EAEB;
+  --border-brand:#2970FF;--border-brand-alt:#155EEF;
+  --brand:#155EEF;--brand-hover:#1248C7;
+  --success:#17B26A;--success-bg:#ECFDF3;--success-border:#ABEFC6;
+  --warning:#F79009;--warning-bg:#FFFAEB;--warning-border:#FEDF89;
+  --danger:#D92D20;--danger-bg:#FEF3F2;--danger-border:#FECDCA;
+  --brand-50:#EFF4FF;--brand-100:#D1E0FF;--brand-600:#155EEF;
+  --shadow-xs:0 1px 2px rgba(10,13,18,.05);
+  --shadow-sm:0 1px 3px rgba(10,13,18,.08),0 1px 2px rgba(10,13,18,.04);
+  --shadow-icon:0 1px 2px rgba(10,13,18,.05);
+  --shadow-skeu-border:inset 0 0 0 1px rgba(10,13,18,.18),inset 0 -2px 0 rgba(10,13,18,.05);
+  --sp-xs:4px;--sp-sm:6px;--sp-md:8px;--sp-lg:12px;--sp-xl:16px;--sp-2xl:20px;--sp-3xl:24px;--sp-4xl:32px;
+  --r-xs:4px;--r-sm:6px;--r-md:8px;--r-lg:10px;--r-xl:12px;--r-2xl:16px;--r-full:9999px;
+  --text-xs-size:12px;--text-sm-size:14px;--text-md-size:16px;--text-lg-size:18px;--text-xl-size:20px;--text-xl-lh:30px;
+  --display-xs-size:24px;--display-sm-size:30px;
+  --sidebar-w:280px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg-page);color:var(--text-primary);height:100vh;display:flex;overflow:hidden;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+i[class^="ri-"]{line-height:1}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border-secondary);border-radius:99px}
+
+/* ── Sidebar ── */
+.sidebar{width:var(--sidebar-w);background:var(--bg-primary);border-right:1px solid var(--border-secondary);height:100vh;display:flex;flex-direction:column;flex-shrink:0;z-index:100;overflow:hidden}
+.sb-header{display:flex;flex-direction:column;gap:var(--sp-lg);padding:var(--sp-3xl) var(--sp-2xl);border-bottom:1px solid var(--border-secondary)}
+.sb-logo{display:flex;align-items:center;gap:var(--sp-md)}
+.sb-logomark{width:32px;height:32px;border-radius:var(--r-md);background:linear-gradient(180deg,#2970FF 0%,#155EEF 100%);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;flex-shrink:0;border:.2px solid rgba(10,13,18,.12);box-shadow:0 1px 1px rgba(10,13,18,.13),0 1px 3px rgba(10,13,18,.1)}
+.sb-logoname{font-size:var(--text-md-size);font-weight:700;color:var(--text-primary)}
+.sb-nav{flex:1;overflow-y:auto;padding:var(--sp-xl) var(--sp-xl) 0}
+.sb-group-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);padding:var(--sp-lg) var(--sp-lg) var(--sp-xs);margin-top:var(--sp-md)}
+.nav-item{display:flex;align-items:center;gap:var(--sp-md);padding:var(--sp-md) var(--sp-lg);border-radius:var(--r-md);font-size:var(--text-sm-size);font-weight:500;color:var(--text-secondary);cursor:pointer;transition:background .12s,color .12s;width:100%;text-align:left;line-height:1.4;text-decoration:none}
+.nav-item:hover{background:var(--bg-secondary);color:var(--text-primary)}
+.nav-item.active{background:var(--bg-secondary);color:var(--text-primary);font-weight:600}
+.nav-icon{width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.sb-footer{padding:var(--sp-xl);border-top:1px solid var(--border-secondary)}
+.footer-item{width:100%;margin-bottom:2px}
+.sb-account{display:flex;align-items:center;gap:var(--sp-md);padding:var(--sp-md) var(--sp-lg);margin-top:var(--sp-md)}
+.av-wrap{width:32px;height:32px;border-radius:var(--r-full);background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;position:relative}
+.av-online{width:8px;height:8px;background:var(--success);border:2px solid #fff;border-radius:50%;position:absolute;bottom:0;right:0}
+.av-name{font-size:var(--text-sm-size);font-weight:600;color:var(--text-primary)}
+.av-role{font-size:var(--text-xs-size);color:var(--text-tertiary)}
+
+/* ── Main ── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.page-header{background:var(--bg-primary);border-bottom:1px solid var(--border-secondary);padding:0 var(--sp-4xl);height:80px;display:flex;align-items:center;gap:var(--sp-lg);flex-shrink:0}
+.ph-title{font-size:var(--text-xl-size);font-weight:700;line-height:var(--text-xl-lh);flex:1}
+.ph-subtitle{font-size:var(--text-sm-size);color:var(--text-tertiary);margin-left:6px}
+.ph-search{display:flex;align-items:center;gap:var(--sp-sm);background:var(--bg-secondary);border:1px solid var(--border-secondary);border-radius:var(--r-md);padding:0 var(--sp-lg);height:38px;min-width:240px}
+.ph-search i{color:var(--text-placeholder);font-size:16px}
+.ph-search input{background:none;border:none;outline:none;font-family:inherit;font-size:var(--text-sm-size);color:var(--text-primary);width:100%}
+.ph-search input::placeholder{color:var(--text-placeholder)}
+.ph-btn{width:38px;height:38px;border-radius:var(--r-md);background:var(--bg-primary);border:1px solid var(--border-primary);display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--text-secondary);transition:all .15s;flex-shrink:0;cursor:pointer}
+.ph-btn:hover{background:var(--bg-secondary)}
+.ph-divider{width:1px;height:24px;background:var(--border-secondary)}
+.btn{display:inline-flex;align-items:center;gap:6px;font-family:inherit;font-size:var(--text-sm-size);font-weight:600;padding:8px 14px;border-radius:var(--r-md);cursor:pointer;transition:all .15s;white-space:nowrap}
+.btn i{font-size:16px}
+.btn-secondary{background:var(--bg-primary);border:1px solid var(--border-primary);color:var(--text-secondary);box-shadow:var(--shadow-xs)}
+.btn-secondary:hover{background:var(--bg-secondary)}
+.btn-primary{background:var(--brand);border:1px solid var(--border-brand-alt);color:#fff;box-shadow:var(--shadow-xs),inset 0 0 0 1px rgba(255,255,255,.12),inset 0 -2px 0 rgba(10,13,18,.08)}
+.btn-primary:hover{background:var(--brand-hover)}
+.content{flex:1;overflow-y:auto;padding:var(--sp-3xl) var(--sp-4xl);display:flex;flex-direction:column;gap:var(--sp-3xl)}
+
+/* ── Metrics ── */
+.metrics-row{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--sp-2xl)}
+.metric-card{background:var(--bg-primary);border:1px solid var(--border-secondary);border-radius:var(--r-xl);padding:var(--sp-2xl);display:flex;gap:var(--sp-xl);align-items:flex-start;box-shadow:0 1px 1px rgba(10,13,18,.05);transition:all .15s}
+.metric-card:hover{border-color:var(--border-primary);box-shadow:var(--shadow-sm)}
+.metric-icon{width:40px;height:40px;border-radius:var(--r-md);background:var(--bg-primary);border:1px solid var(--border-primary);box-shadow:var(--shadow-icon),var(--shadow-skeu-border);display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--text-secondary);flex-shrink:0}
+.metric-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:var(--sp-md)}
+.metric-label{font-size:var(--text-sm-size);font-weight:600;color:var(--text-tertiary)}
+.metric-num{font-size:var(--display-sm-size);font-weight:600;color:var(--text-primary)}
+
+/* ── Client table card ── */
+.table-card{background:var(--bg-primary);border:1px solid var(--border-secondary);border-radius:var(--r-xl);box-shadow:0 1px 1px rgba(10,13,18,.05);overflow:hidden;flex:1}
+.tc-head{padding:var(--sp-2xl) var(--sp-3xl);border-bottom:1px solid var(--border-secondary);display:flex;align-items:center;justify-content:space-between;gap:var(--sp-xl)}
+.tc-title{font-size:var(--text-lg-size);font-weight:700}
+.tc-sub{font-size:var(--text-sm-size);color:var(--text-tertiary);margin-top:2px}
+table{width:100%;border-collapse:collapse}
+thead tr{border-bottom:1px solid var(--border-secondary)}
+th{font-size:var(--text-xs-size);font-weight:600;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.4px;padding:var(--sp-lg) var(--sp-xl);text-align:left;white-space:nowrap}
+tbody tr{border-bottom:1px solid var(--border-tertiary);transition:background .1s;cursor:pointer}
+tbody tr:hover{background:var(--bg-secondary)}
+tbody tr:last-child{border-bottom:none}
+td{padding:var(--sp-lg) var(--sp-xl);font-size:var(--text-sm-size);color:var(--text-secondary)}
+td.bold{font-weight:600;color:var(--text-primary)}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:2px 10px;border-radius:var(--r-full);font-size:var(--text-xs-size);font-weight:600}
+.badge-green{background:var(--success-bg);color:var(--success);border:1px solid var(--success-border)}
+.badge-yellow{background:var(--warning-bg);color:var(--warning);border:1px solid var(--warning-border)}
+.badge-red{background:var(--danger-bg);color:var(--danger);border:1px solid var(--danger-border)}
+.badge-gray{background:var(--bg-secondary);color:var(--text-tertiary);border:1px solid var(--border-secondary)}
+.av-sm{width:32px;height:32px;border-radius:50%;background:var(--brand-50);border:1px solid var(--brand-100);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--brand)}
+.client-info{display:flex;align-items:center;gap:10px}
+.client-name{font-weight:600;color:var(--text-primary);font-size:14px}
+.client-id{font-size:12px;color:var(--text-tertiary)}
+.empty-state{padding:64px;text-align:center;color:var(--text-tertiary)}
+.empty-icon{font-size:40px;margin-bottom:var(--sp-xl)}
+.empty-title{font-size:var(--text-lg-size);font-weight:600;color:var(--text-secondary);margin-bottom:var(--sp-md)}
+.empty-sub{font-size:var(--text-sm-size)}
+
+/* ── Filter tabs ── */
+.filter-tabs{display:flex;gap:4px;background:var(--bg-secondary);border:1px solid var(--border-secondary);padding:4px;border-radius:var(--r-lg)}
+.ftab{padding:6px 14px;border-radius:var(--r-md);font-size:var(--text-sm-size);font-weight:500;color:var(--text-tertiary);cursor:pointer;transition:all .15s;border:none;background:none;font-family:inherit}
+.ftab.active{background:var(--bg-primary);color:var(--text-primary);font-weight:600;box-shadow:var(--shadow-xs);border:1px solid var(--border-secondary)}
+
+/* ── Dark mode ── */
+[data-theme="dark"]{--bg-page:#0C0E12;--bg-primary:#161A23;--bg-primary-alt:#1C2130;--bg-secondary:#1E2436;--border-primary:#2E3448;--border-secondary:#242A3A;--border-tertiary:#1A1F2E;--text-primary:#F0F2F5;--text-secondary:#BCC2CE;--text-tertiary:#8B92A0;--text-placeholder:#636B78;--brand-50:#0D1528;--brand-100:#152040;--shadow-xs:0 1px 2px rgba(0,0,0,.4);--shadow-sm:0 1px 3px rgba(0,0,0,.5)}
+
+/* ── Modal ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(10,13,18,.55);backdrop-filter:blur(4px);z-index:500;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .2s}
+.modal-overlay.active{opacity:1;pointer-events:all}
+.modal-card{background:var(--bg-primary);border-radius:16px;box-shadow:0 24px 48px rgba(10,13,18,.18),0 0 0 1px rgba(10,13,18,.06);width:100%;max-width:640px;max-height:92vh;display:flex;flex-direction:column;transform:translateY(16px) scale(.98);transition:transform .22s cubic-bezier(.34,1.56,.64,1),opacity .2s;opacity:0}
+.modal-overlay.active .modal-card{transform:none;opacity:1}
+.modal-head{padding:24px 32px 20px;border-bottom:1px solid var(--border-secondary);display:flex;align-items:flex-start;gap:16px;flex-shrink:0}
+.modal-icon{width:44px;height:44px;border-radius:12px;background:var(--brand-50);border:1px solid var(--brand-100);display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--brand);flex-shrink:0}
+.modal-title{font-size:20px;font-weight:700;color:var(--text-primary)}
+.modal-sub{font-size:14px;color:var(--text-tertiary);margin-top:2px}
+.modal-close{margin-left:auto;background:none;border:none;cursor:pointer;color:var(--text-tertiary);font-size:20px;padding:6px;border-radius:8px;line-height:1;transition:background .15s}
+.modal-close:hover{background:var(--bg-secondary)}
+.modal-body{flex:1;overflow-y:auto;padding:24px 32px}
+.modal-foot{padding:20px 32px;border-top:1px solid var(--border-secondary);display:flex;gap:12px;flex-shrink:0}
+.mg{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.mg .sp2{grid-column:1/-1}
+.fl{display:flex;flex-direction:column;gap:6px}
+.fl label{font-size:14px;font-weight:600;color:var(--text-secondary)}
+.fl label span{color:var(--danger)}
+.fi,.fs,.fta{width:100%;height:44px;padding:0 16px;border:1.5px solid var(--border-primary);border-radius:8px;font-family:inherit;font-size:14px;color:var(--text-primary);background:var(--bg-primary);outline:none;transition:border-color .15s,box-shadow .15s;appearance:none}
+.fta{height:auto;padding:12px 16px;resize:vertical;min-height:80px}
+.fi::placeholder,.fta::placeholder{color:var(--text-placeholder)}
+.fi:focus,.fs:focus,.fta:focus{border-color:var(--border-brand);box-shadow:0 0 0 3px rgba(41,112,255,.1)}
+.fi.err,.fs.err{border-color:var(--danger);box-shadow:0 0 0 3px rgba(217,45,32,.08)}
+.ferr{font-size:12px;color:var(--danger);margin-top:2px;display:none}
+.sw{position:relative}.sw::after{content:'\ea4e';font-family:remixicon;position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--text-placeholder);pointer-events:none;font-size:16px}
+.fs{padding-right:40px}
+.iw{position:relative}.iw .ico{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text-placeholder);font-size:16px;pointer-events:none}
+.iw .fi{padding-left:40px}
+.msec{font-size:11px;font-weight:700;color:var(--text-tertiary);letter-spacing:.6px;text-transform:uppercase;padding:16px 0 12px;border-bottom:1px solid var(--border-secondary);margin-bottom:18px;grid-column:1/-1}
+.mmap{height:220px;border-radius:10px;overflow:hidden;border:1.5px solid var(--border-primary);cursor:crosshair;position:relative}
+.mmhint{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);background:rgba(10,13,18,.65);color:#fff;font-size:11px;font-family:Inter,sans-serif;padding:4px 12px;border-radius:999px;pointer-events:none;white-space:nowrap;z-index:10}
+.cpill{display:flex;gap:8px;margin-top:8px}
+.cpill span{flex:1;background:var(--bg-secondary);border:1px solid var(--border-secondary);border-radius:8px;padding:7px 12px;font-size:12px;color:var(--text-tertiary)}
+.cpill span b{color:var(--text-primary);font-size:13px}
+.pkg-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.pkg-btn{display:flex;flex-direction:column;gap:6px;padding:16px 12px;border:1.5px solid var(--border-secondary);border-radius:12px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--text-secondary);background:var(--bg-primary);transition:all .15s;text-align:center;align-items:center}
+.pkg-btn .pe{font-size:24px;margin-bottom:2px}
+.pkg-btn .pp{font-size:12px;font-weight:400;color:var(--text-tertiary);margin-top:2px}
+.pkg-btn:hover{border-color:var(--border-brand);color:var(--brand);background:var(--brand-50)}
+.pkg-btn.active{border-color:var(--brand);color:var(--brand);background:var(--brand-50);box-shadow:0 0 0 2px rgba(41,112,255,.12)}
+.toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(16px);background:#161A23;color:#fff;padding:14px 24px;border-radius:12px;font-size:14px;font-weight:500;font-family:Inter,sans-serif;box-shadow:0 8px 32px rgba(0,0,0,.3);display:flex;align-items:center;gap:10px;z-index:600;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast i{font-size:18px;color:#17B26A}
+[data-theme="dark"] .modal-card{background:#161A23;border:1px solid #2E3448}
+[data-theme="dark"] .fi,[data-theme="dark"] .fs,[data-theme="dark"] .fta{background:#1C2130;border-color:#2E3448;color:#F0F2F5}
+[data-theme="dark"] .pkg-btn{background:#1C2130;border-color:#2E3448;color:#BCC2CE}
+[data-theme="dark"] .pkg-btn.active{background:#0D1528;border-color:#2970FF}
+.sidebar-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.48);z-index:150;backdrop-filter:blur(2px)}
+.sidebar-backdrop.show{display:block}
+@media(max-width:1280px){.metrics-row{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:900px){.sidebar{position:fixed;left:-100%;z-index:200;transition:left .25s}.sidebar.open{left:0}.content{padding:var(--sp-xl)}.ph-menu-btn{display:flex!important}}
+</style>
+</head>
+<body>
+
+<div class="sidebar-backdrop" id="sb-backdrop" onclick="document.getElementById('sidebar').classList.remove('open');document.getElementById('sb-backdrop').classList.remove('show')"></div>
+
+<nav class="sidebar" id="sidebar">
+  <div class="sb-header">
+    <div class="sb-logo">
+      <div class="sb-logomark"><i class="ri-leaf-line"></i></div>
+      <span class="sb-logoname">Tomchi Tech</span>
+    </div>
+  </div>
+
+  <div class="sb-nav">
+    <div class="sb-group-label">Asosiy</div>
+    <a href="dashboard.html" class="nav-item"><span class="nav-icon"><i class="ri-dashboard-line"></i></span>Dashboard</a>
+    <a href="farms.html" class="nav-item"><span class="nav-icon"><i class="ri-plant-line"></i></span>Fermalar</a>
+    <a href="sensors.html" class="nav-item"><span class="nav-icon"><i class="ri-radar-line"></i></span>Sensorlar</a>
+    <a href="recommendations.html" class="nav-item"><span class="nav-icon"><i class="ri-seedling-line"></i></span>Tafsiyalar</a>
+
+    <div class="sb-group-label">Boshqaruv</div>
+    <a href="alerts.html" class="nav-item"><span class="nav-icon"><i class="ri-alarm-warning-line"></i></span>Ogohlantirishlar</a>
+    <a href="reports.html" class="nav-item"><span class="nav-icon"><i class="ri-bar-chart-2-line"></i></span>Hisobotlar</a>
+    <a href="clients.html" class="nav-item active"><span class="nav-icon"><i class="ri-group-line"></i></span>Mijozlar</a>
+  </div>
+
+  <div class="sb-footer">
+    <button class="nav-item footer-item"><span class="nav-icon"><i class="ri-settings-3-line"></i></span>Sozlamalar</button>
+    <button class="nav-item footer-item" onclick="sessionStorage.clear();window.location.replace('login.html')"><span class="nav-icon"><i class="ri-logout-box-line"></i></span>Chiqish</button>
+    <div class="sb-account">
+      <div class="av-wrap">X<div class="av-online"></div></div>
+      <div style="flex:1;min-width:0"><div class="av-name">Xurshid I.</div><div class="av-role">Admin</div></div>
+      <button class="ph-btn" onclick="toggleTheme()" title="Mavzu"><i class="ri-moon-line" id="theme-icon"></i></button>
+    </div>
+  </div>
+</nav>
+
+<div class="main">
+  <div class="page-header">
+    <button class="ph-btn ph-menu-btn" onclick="document.getElementById('sidebar').classList.toggle('open');document.getElementById('sb-backdrop').classList.toggle('show')" style="display:none;margin-right:4px"><i class="ri-menu-line"></i></button>
+    <div class="ph-title">Mijozlar <span class="ph-subtitle" id="ph-count"></span></div>
+    <div class="ph-search">
+      <i class="ri-search-2-line"></i>
+      <input type="text" placeholder="Ism yoki telefon..." id="search-input" oninput="filterClients(this.value)"/>
+    </div>
+    <div class="ph-divider"></div>
+    <div class="filter-tabs">
+      <button class="ftab active" onclick="setFilter('all',this)">Barchasi</button>
+      <button class="ftab" onclick="setFilter('premium',this)">Premium</button>
+      <button class="ftab" onclick="setFilter('standard',this)">Standart</button>
+      <button class="ftab" onclick="setFilter('basic',this)">Boshlang'ich</button>
+    </div>
+    <div class="ph-divider"></div>
+    <button class="btn btn-primary" onclick="openClientModal()"><i class="ri-user-add-line"></i>Yangi mijoz</button>
+  </div>
+
+  <div class="content">
+    <!-- Metrics -->
+    <div class="metrics-row">
+      <div class="metric-card"><div class="metric-icon"><i class="ri-group-line"></i></div><div class="metric-body"><div class="metric-label">Jami mijozlar</div><div class="metric-num" id="m-total">0</div></div></div>
+      <div class="metric-card"><div class="metric-icon" style="color:#F79009"><i class="ri-vip-crown-line"></i></div><div class="metric-body"><div class="metric-label">Premium</div><div class="metric-num" id="m-premium">0</div></div></div>
+      <div class="metric-card"><div class="metric-icon" style="color:var(--success)"><i class="ri-checkbox-circle-line"></i></div><div class="metric-body"><div class="metric-label">Faol obunalar</div><div class="metric-num" id="m-active">0</div></div></div>
+      <div class="metric-card"><div class="metric-icon" style="color:var(--danger)"><i class="ri-time-line"></i></div><div class="metric-body"><div class="metric-label">Muddati tugayapti</div><div class="metric-num" id="m-expiring">0</div></div></div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-card">
+      <div class="tc-head">
+        <div><div class="tc-title">Mijozlar ro'yxati</div><div class="tc-sub" id="list-sub">Yuklanmoqda...</div></div>
+        <button class="btn btn-secondary"><i class="ri-download-2-line"></i>Eksport</button>
+      </div>
+      <div style="overflow-x:auto">
+        <table id="client-table">
+          <thead>
+            <tr>
+              <th>Mijoz</th>
+              <th>Telefon</th>
+              <th>Hudud</th>
+              <th>Paket</th>
+              <th>Obuna tugashi</th>
+              <th>Fermalar</th>
+              <th>Holat</th>
+            </tr>
+          </thead>
+          <tbody id="client-tbody"></tbody>
+        </table>
+      </div>
+      <div id="empty-state" class="empty-state" style="display:none">
+        <div class="empty-icon">👥</div>
+        <div class="empty-title">Mijozlar topilmadi</div>
+        <div class="empty-sub">Qidiruv shartlarini o'zgartiring yoki yangi mijoz qo'shing</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ YANGI MIJOZ MODAL ═══ -->
+<div class="modal-overlay" id="clientModal" onclick="if(event.target===this)closeClientModal()">
+  <div class="modal-card">
+    <div class="modal-head">
+      <div class="modal-icon"><i class="ri-user-add-line"></i></div>
+      <div>
+        <div class="modal-title">Yangi mijoz qo'shish</div>
+        <div class="modal-sub">Mijoz ma'lumotlari va obuna sozlamalari</div>
+      </div>
+      <button class="modal-close" onclick="closeClientModal()"><i class="ri-close-line"></i></button>
+    </div>
+    <div class="modal-body">
+      <form id="clientForm" novalidate autocomplete="off">
+        <div class="mg">
+
+          <!-- Shaxsiy ma'lumotlar -->
+          <div class="msec">👤 Shaxsiy ma'lumotlar</div>
+
+          <div class="fl">
+            <label>Ism<span>*</span></label>
+            <div class="iw"><i class="ri-user-3-line ico"></i>
+              <input class="fi" id="cf-fname" type="text" placeholder="Ism"/>
+            </div>
+            <div class="ferr" id="cf-fname-e">Ismni kiriting</div>
+          </div>
+
+          <div class="fl">
+            <label>Familiya<span>*</span></label>
+            <div class="iw"><i class="ri-user-3-line ico"></i>
+              <input class="fi" id="cf-lname" type="text" placeholder="Familiya"/>
+            </div>
+            <div class="ferr" id="cf-lname-e">Familiyani kiriting</div>
+          </div>
+
+          <div class="fl">
+            <label>Telefon<span>*</span></label>
+            <div class="iw"><i class="ri-phone-line ico"></i>
+              <input class="fi" id="cf-phone" type="tel" placeholder="+998 90 000 00 00"/>
+            </div>
+            <div class="ferr" id="cf-phone-e">Telefon raqamini kiriting</div>
+          </div>
+
+          <div class="fl">
+            <label>Email</label>
+            <div class="iw"><i class="ri-mail-line ico"></i>
+              <input class="fi" id="cf-email" type="email" placeholder="email@example.com"/>
+            </div>
+          </div>
+
+          <div class="fl">
+            <label>Telegram ID</label>
+            <div class="iw"><i class="ri-telegram-line ico"></i>
+              <input class="fi" id="cf-tg" type="text" placeholder="@username yoki ID"/>
+            </div>
+          </div>
+
+          <div class="fl">
+            <label>Viloyat<span>*</span></label>
+            <div class="sw">
+              <select class="fs" id="cf-region">
+                <option value="">— Tanlang —</option>
+                <option>Toshkent shahri</option><option>Toshkent viloyati</option>
+                <option>Andijon</option><option>Farg'ona</option><option>Namangan</option>
+                <option>Samarqand</option><option>Buxoro</option><option>Navoiy</option>
+                <option>Jizzax</option><option>Sirdaryo</option>
+                <option>Qashqadaryo</option><option>Surxondaryo</option>
+                <option>Xorazm</option><option>Qoraqalpog'iston</option>
+              </select>
+            </div>
+            <div class="ferr" id="cf-region-e">Viloyatni tanlang</div>
+          </div>
+
+          <div class="fl">
+            <label>Tuman</label>
+            <div class="iw"><i class="ri-map-pin-2-line ico"></i>
+              <input class="fi" id="cf-district" type="text" placeholder="Tuman nomi"/>
+            </div>
+          </div>
+
+          <!-- Obuna -->
+          <div class="msec">📦 Obuna turi</div>
+
+          <div class="fl sp2">
+            <label>Paket tanlang<span>*</span></label>
+            <div class="pkg-grid">
+              <button type="button" class="pkg-btn" data-pkg="basic" onclick="selectPkg(this)">
+                <span class="pe">🌱</span>Boshlang'ich
+                <span class="pp">Asosiy funksiyalar</span>
+              </button>
+              <button type="button" class="pkg-btn" data-pkg="standard" onclick="selectPkg(this)">
+                <span class="pe">⭐</span>Standart
+                <span class="pp">Kengaytirilgan imkoniyat</span>
+              </button>
+              <button type="button" class="pkg-btn" data-pkg="premium" onclick="selectPkg(this)">
+                <span class="pe">👑</span>Premium
+                <span class="pp">Barcha funksiyalar</span>
+              </button>
+            </div>
+            <input type="hidden" id="cf-pkg" value=""/>
+            <div class="ferr" id="cf-pkg-e">Paket tanlang</div>
+          </div>
+
+          <div class="fl">
+            <label>Obuna boshlanish sanasi</label>
+            <div class="iw"><i class="ri-calendar-line ico"></i>
+              <input class="fi" id="cf-start" type="date"/>
+            </div>
+          </div>
+
+          <div class="fl">
+            <label>Obuna tugash sanasi</label>
+            <div class="iw"><i class="ri-calendar-check-line ico"></i>
+              <input class="fi" id="cf-end" type="date"/>
+            </div>
+          </div>
+
+          <!-- Joylashuv -->
+          <div class="msec">📍 Fermer xo'jaligi joylashuvi</div>
+
+          <div class="sp2">
+            <div class="mmap" id="clientModalMap">
+              <div class="mmhint" id="cMapHint">Xaritada ferma joylashuvini bosib belgilang</div>
+            </div>
+            <div class="cpill">
+              <span>Lat: <b id="cf-lat">—</b></span>
+              <span>Lon: <b id="cf-lon">—</b></span>
+            </div>
+          </div>
+
+          <!-- Izoh -->
+          <div class="fl sp2">
+            <label>Izoh</label>
+            <textarea class="fta" id="cf-notes" placeholder="Qo'shimcha ma'lumot..."></textarea>
+          </div>
+
+        </div>
+      </form>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" style="flex:1" onclick="closeClientModal()"><i class="ri-close-line"></i>Bekor qilish</button>
+      <button class="btn btn-primary" style="flex:2;min-width:180px" onclick="submitClientForm()"><i class="ri-user-add-line"></i>Mijoz qo'shish</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="c-toast"><i class="ri-checkbox-circle-fill"></i><span id="c-toast-msg">Saqlandi!</span></div>
+
+<script>
+/* ══════════════ DEMO DATA ══════════════ */
+const PACKAGES = {
+  basic:    {emoji:'🌱', label:"Boshlang'ich", cls:'badge-gray'},
+  standard: {emoji:'⭐', label:'Standart',     cls:'badge-yellow'},
+  premium:  {emoji:'👑', label:'Premium',       cls:'badge-green'},
+};
+let clients = [
+  {id:'CLT-001',fname:'Baxtiyor',lname:'Toshmatov',phone:'+998901234567',email:'b.toshmatov@mail.uz',tg:'@baxtiyor_t',region:'Andijon',district:'Asaka',pkg:'premium',start:'2025-01-15',end:'2026-01-15',farms:3,lat:40.637,lon:72.235},
+  {id:'CLT-002',fname:'Hamid',lname:'Umarov',phone:'+998901234568',email:'',tg:'',region:'Farg\'ona',district:'Rishton',pkg:'standard',start:'2025-03-01',end:'2025-12-01',farms:1,lat:40.37,lon:71.77},
+  {id:'CLT-003',fname:'Dilshod',lname:'Rahimov',phone:'+998901234569',email:'d.rahimov@gmail.com',tg:'@dilshod_r',region:'Samarqand',district:'Urgut',pkg:'basic',start:'2025-05-01',end:'2025-08-01',farms:2,lat:39.25,lon:67.01},
+  {id:'CLT-004',fname:'Jasur',lname:'Karimov',phone:'+998901234570',email:'',tg:'@jasur_k',region:'Namangan',district:'Chust',pkg:'premium',start:'2024-11-01',end:'2025-11-01',farms:5,lat:40.99,lon:71.08},
+  {id:'CLT-005',fname:'Sherzod',lname:'Nazarov',phone:'+998901234571',email:'sherzod@mail.uz',tg:'',region:'Buxoro',district:'G\'ijduvon',pkg:'standard',start:'2025-02-01',end:'2025-10-15',farms:2,lat:39.77,lon:64.42},
+];
+let filter='all', searchQ='';
+
+/* ══════════════ RENDER ══════════════ */
+function renderTable(){
+  const now = new Date();
+  const soon = new Date(now); soon.setDate(soon.getDate()+30);
+
+  const filtered = clients.filter(c=>{
+    const matchFilter = filter==='all' || c.pkg===filter;
+    const q = searchQ.toLowerCase();
+    const matchSearch = !q || c.fname.toLowerCase().includes(q) || c.lname.toLowerCase().includes(q) || c.phone.includes(q) || c.region.toLowerCase().includes(q);
+    return matchFilter && matchSearch;
+  });
+
+  const tbody = document.getElementById('client-tbody');
+  const empty = document.getElementById('empty-state');
+
+  if(!filtered.length){
+    tbody.innerHTML=''; empty.style.display='';
+  } else {
+    empty.style.display='none';
+    tbody.innerHTML = filtered.map(c=>{
+      const endDate = new Date(c.end);
+      const expired = endDate < now;
+      const expiring = !expired && endDate <= soon;
+      const pk = PACKAGES[c.pkg];
+      const statusBadge = expired
+        ? '<span class="badge badge-red">Muddati tugagan</span>'
+        : expiring
+        ? '<span class="badge badge-yellow">⚡ Tugayapti</span>'
+        : '<span class="badge badge-green">✓ Faol</span>';
+      return `<tr onclick="showClient('${c.id}')">
+        <td><div class="client-info">
+          <div class="av-sm">${c.fname[0]}${c.lname[0]}</div>
+          <div><div class="client-name">${c.fname} ${c.lname}</div><div class="client-id">${c.id}</div></div>
+        </div></td>
+        <td>${c.phone}</td>
+        <td>${c.region}${c.district?', '+c.district:''}</td>
+        <td><span class="badge ${pk.cls}">${pk.emoji} ${pk.label}</span></td>
+        <td>${c.end}</td>
+        <td>${c.farms} ta</td>
+        <td>${statusBadge}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  /* Metrics */
+  document.getElementById('ph-count').textContent = clients.length + ' ta';
+  document.getElementById('list-sub').textContent = filtered.length + ' ta mijoz ko\'rsatilmoqda';
+  document.getElementById('m-total').textContent = clients.length;
+  document.getElementById('m-premium').textContent = clients.filter(c=>c.pkg==='premium').length;
+  document.getElementById('m-active').textContent = clients.filter(c=>new Date(c.end)>=now).length;
+  document.getElementById('m-expiring').textContent = clients.filter(c=>{ const d=new Date(c.end); return d>=now && d<=soon; }).length;
+}
+
+function filterClients(q){ searchQ=q; renderTable(); }
+function setFilter(f,btn){ filter=f; document.querySelectorAll('.ftab').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); renderTable(); }
+function showClient(id){ const c=clients.find(x=>x.id===id); if(c) alert(`${c.fname} ${c.lname}\n📞 ${c.phone}\n📍 ${c.region}, ${c.district}\n📦 ${PACKAGES[c.pkg].label}\n🗓 ${c.start} → ${c.end}`); }
+
+/* ══════════════ MODAL ══════════════ */
+let cMap=null, cMapMarker=null;
+
+function openClientModal(){
+  document.getElementById('clientModal').classList.add('active');
+  document.body.style.overflow='hidden';
+  /* Default dates */
+  const today = new Date().toISOString().split('T')[0];
+  const nextYear = new Date(Date.now()+365*86400000).toISOString().split('T')[0];
+  document.getElementById('cf-start').value=today;
+  document.getElementById('cf-end').value=nextYear;
+  setTimeout(initClientMap,200);
+}
+function closeClientModal(){
+  document.getElementById('clientModal').classList.remove('active');
+  document.body.style.overflow='';
+}
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeClientModal(); });
+
+function initClientMap(){
+  if(cMap){ cMap.invalidateSize(); return; }
+  cMap=L.map('clientModalMap',{zoomControl:true,attributionControl:false});
+  cMap.setView([40.5,68.5],6);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(cMap);
+  cMap.on('click',function(e){
+    const {lat,lng}=e.latlng;
+    document.getElementById('cf-lat').textContent=lat.toFixed(5);
+    document.getElementById('cf-lon').textContent=lng.toFixed(5);
+    document.getElementById('cMapHint').style.display='none';
+    if(cMapMarker) cMap.removeLayer(cMapMarker);
+    cMapMarker=L.marker([lat,lng],{icon:L.divIcon({className:'',html:'<div style="width:18px;height:18px;border-radius:50%;background:#155EEF;border:3px solid #fff;box-shadow:0 2px 8px rgba(21,94,239,.5)"></div>',iconAnchor:[9,9]})}).addTo(cMap);
+  });
+  setTimeout(()=>cMap.invalidateSize(),200);
+}
+
+function selectPkg(btn){
+  document.querySelectorAll('.pkg-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('cf-pkg').value=btn.dataset.pkg;
+  document.getElementById('cf-pkg-e').style.display='none';
+}
+
+function submitClientForm(){
+  let ok=true;
+  const reqs=[
+    {id:'cf-fname',eid:'cf-fname-e',check:v=>v.trim().length>0},
+    {id:'cf-lname',eid:'cf-lname-e',check:v=>v.trim().length>0},
+    {id:'cf-phone',eid:'cf-phone-e',check:v=>v.trim().length>7},
+    {id:'cf-region',eid:'cf-region-e',check:v=>v!==''},
+  ];
+  reqs.forEach(({id,eid,check})=>{
+    const el=document.getElementById(id);
+    const valid=check(el.value);
+    el.classList.toggle('err',!valid);
+    document.getElementById(eid).style.display=valid?'none':'block';
+    if(!valid) ok=false;
+  });
+  if(!document.getElementById('cf-pkg').value){
+    document.getElementById('cf-pkg-e').style.display='block'; ok=false;
+  }
+  if(!ok) return;
+
+  /* Add to demo list */
+  const newC={
+    id:'CLT-'+ String(clients.length+1).padStart(3,'0'),
+    fname:document.getElementById('cf-fname').value.trim(),
+    lname:document.getElementById('cf-lname').value.trim(),
+    phone:document.getElementById('cf-phone').value.trim(),
+    email:document.getElementById('cf-email').value.trim(),
+    tg:document.getElementById('cf-tg').value.trim(),
+    region:document.getElementById('cf-region').value,
+    district:document.getElementById('cf-district').value.trim(),
+    pkg:document.getElementById('cf-pkg').value,
+    start:document.getElementById('cf-start').value,
+    end:document.getElementById('cf-end').value,
+    farms:0,
+    lat:parseFloat(document.getElementById('cf-lat').textContent)||40.5,
+    lon:parseFloat(document.getElementById('cf-lon').textContent)||68.5,
+  };
+  clients.push(newC);
+  renderTable();
+  closeClientModal();
+  const t=document.getElementById('c-toast');
+  document.getElementById('c-toast-msg').textContent=`✅ ${newC.fname} ${newC.lname} muvaffaqiyatli qo'shildi!`;
+  t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3500);
+  document.getElementById('clientForm').reset();
+  document.querySelectorAll('.pkg-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('cf-pkg').value='';
+  document.getElementById('cf-lat').textContent='—';
+  document.getElementById('cf-lon').textContent='—';
+  if(cMapMarker){ cMap.removeLayer(cMapMarker); cMapMarker=null; }
+  document.getElementById('cMapHint').style.display='';
+}
+
+/* ══════════════ THEME ══════════════ */
+function toggleTheme(){
+  const d=document.documentElement;
+  const dark=d.getAttribute('data-theme')==='dark';
+  d.setAttribute('data-theme',dark?'':'dark');
+  document.getElementById('theme-icon').className=dark?'ri-moon-line':'ri-sun-line';
+  localStorage.setItem('theme',dark?'light':'dark');
+}
+(()=>{
+  const t=localStorage.getItem('theme')||'light';
+  if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');document.getElementById('theme-icon').className='ri-sun-line';}
+})();
+
+renderTable();
+</script>
+</body>
+</html>

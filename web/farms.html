@@ -176,6 +176,7 @@ i[class^="ri-"]{line-height:1}
     <a class="nav-item" href="recommendations.html"><span class="nav-icon"><i class="ri-lightbulb-line"></i></span>Tavsiyalar</a>
     <a class="nav-item" href="alerts.html"><span class="nav-icon"><i class="ri-notification-3-line"></i></span>Alertlar<span class="nav-badge alert" id="nb-alerts">0</span></a>
     <a class="nav-item" href="reports.html"><span class="nav-icon"><i class="ri-bar-chart-2-line"></i></span>Hisobotlar</a>
+    <a class="nav-item" href="clients.html"><span class="nav-icon"><i class="ri-group-line"></i></span>Mijozlar</a>
     <div class="sb-group-label">Tezkor kirish</div>
     <button class="nav-item" onclick="toggleSbDrop(this)">
       <span class="nav-icon"><i class="ri-radio-button-line"></i></span>
@@ -207,7 +208,7 @@ i[class^="ri-"]{line-height:1}
     </div>
     <div class="ph-divider"></div>
     <button class="ph-btn" onclick="loadData()" title="Yangilash"><i class="ri-refresh-line"></i></button>
-    <button class="btn btn-primary"><i class="ri-add-line"></i>Yangi ferma</button>
+    <button class="btn btn-primary" onclick="openModal('farmModal')"><i class="ri-add-line"></i>Yangi ferma</button>
   </div>
 
   <div class="content">
@@ -918,6 +919,306 @@ function resetMapView(){
 
 /* Run after all scripts are ready */
 window.addEventListener('load', loadData);
+</script>
+
+<!-- ═══════════════════════════════════════════════════
+     YANGI FERMA MODAL
+════════════════════════════════════════════════════ -->
+<style>
+/* ── Modal base ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(10,13,18,0.55);backdrop-filter:blur(4px);z-index:500;display:flex;align-items:center;justify-content:center;padding:var(--sp-xl);opacity:0;pointer-events:none;transition:opacity .2s}
+.modal-overlay.active{opacity:1;pointer-events:all}
+.modal-card{background:var(--bg-primary);border-radius:var(--r-2xl);box-shadow:0 24px 48px rgba(10,13,18,.18),0 0 0 1px rgba(10,13,18,.06);width:100%;max-width:600px;max-height:92vh;display:flex;flex-direction:column;transform:translateY(16px) scale(0.98);transition:transform .22s cubic-bezier(.34,1.56,.64,1),opacity .2s;opacity:0}
+.modal-overlay.active .modal-card{transform:none;opacity:1}
+.modal-head{padding:var(--sp-3xl) var(--sp-4xl) var(--sp-2xl);border-bottom:1px solid var(--border-secondary);display:flex;align-items:flex-start;gap:var(--sp-xl);flex-shrink:0}
+.modal-icon{width:44px;height:44px;border-radius:var(--r-xl);background:var(--brand-50);border:1px solid var(--brand-100);display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--brand);flex-shrink:0}
+.modal-title{font-size:var(--text-xl-size);font-weight:700;color:var(--text-primary)}
+.modal-sub{font-size:var(--text-sm-size);color:var(--text-tertiary);margin-top:2px}
+.modal-close{margin-left:auto;background:none;border:none;cursor:pointer;color:var(--text-tertiary);font-size:20px;padding:6px;border-radius:var(--r-md);line-height:1;transition:background .15s}
+.modal-close:hover{background:var(--bg-secondary)}
+.modal-body{flex:1;overflow-y:auto;padding:var(--sp-3xl) var(--sp-4xl)}
+.modal-foot{padding:var(--sp-2xl) var(--sp-4xl);border-top:1px solid var(--border-secondary);display:flex;gap:var(--sp-lg);flex-shrink:0}
+
+/* ── Form fields ── */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-2xl)}
+.form-grid .span2{grid-column:1/-1}
+.field-group{display:flex;flex-direction:column;gap:6px}
+.field-label{font-size:var(--text-sm-size);font-weight:600;color:var(--text-secondary)}
+.field-label span{color:var(--danger);margin-left:2px}
+.field-input,.field-select,.field-textarea{width:100%;height:44px;padding:0 var(--sp-xl);border:1.5px solid var(--border-primary);border-radius:var(--r-md);font-family:inherit;font-size:var(--text-sm-size);color:var(--text-primary);background:var(--bg-primary);outline:none;transition:border-color .15s,box-shadow .15s;appearance:none}
+.field-textarea{height:auto;padding:var(--sp-lg) var(--sp-xl);resize:vertical;min-height:80px}
+.field-input::placeholder,.field-textarea::placeholder{color:var(--text-placeholder)}
+.field-input:focus,.field-select:focus,.field-textarea:focus{border-color:var(--border-brand);box-shadow:0 0 0 3px rgba(41,112,255,.1)}
+.field-input.err,.field-select.err{border-color:var(--danger);box-shadow:0 0 0 3px rgba(217,45,32,.08)}
+.field-hint{font-size:var(--text-xs-size);color:var(--text-tertiary);margin-top:2px}
+.field-err{font-size:var(--text-xs-size);color:var(--danger);margin-top:2px;display:none}
+.field-input.err+.field-err,.field-select.err+.field-err{display:block}
+.select-wrap{position:relative}
+.select-wrap::after{content:'\ea4e';font-family:remixicon;position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--text-placeholder);pointer-events:none;font-size:16px}
+.field-select{padding-right:40px;background-image:none}
+
+/* Input with icon */
+.input-icon-wrap{position:relative}
+.input-icon-wrap .iico{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text-placeholder);font-size:16px;pointer-events:none}
+.input-icon-wrap .field-input{padding-left:40px}
+
+/* ── Section divider ── */
+.form-section{font-size:var(--text-xs-size);font-weight:700;color:var(--text-tertiary);letter-spacing:.6px;text-transform:uppercase;padding:var(--sp-xl) 0 var(--sp-md);border-bottom:1px solid var(--border-secondary);margin-bottom:var(--sp-2xl);grid-column:1/-1}
+
+/* ── Mini map ── */
+.map-picker{height:220px;border-radius:var(--r-lg);overflow:hidden;border:1.5px solid var(--border-primary);cursor:crosshair;position:relative}
+.map-picker-hint{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);background:rgba(10,13,18,.65);color:#fff;font-size:11px;font-family:Inter,sans-serif;padding:4px 12px;border-radius:var(--r-full);pointer-events:none;white-space:nowrap;z-index:10}
+.coord-display{display:flex;gap:var(--sp-md);margin-top:var(--sp-sm)}
+.coord-pill{flex:1;background:var(--bg-secondary);border:1px solid var(--border-secondary);border-radius:var(--r-md);padding:8px 12px;font-size:var(--text-xs-size);color:var(--text-tertiary);font-family:monospace}
+.coord-pill b{color:var(--text-primary);font-size:var(--text-sm-size)}
+
+/* ── Success toast ── */
+.toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(16px);background:#161A23;color:#fff;padding:14px 24px;border-radius:var(--r-xl);font-size:var(--text-sm-size);font-weight:500;font-family:Inter,sans-serif;box-shadow:0 8px 32px rgba(0,0,0,.3);display:flex;align-items:center;gap:10px;z-index:600;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast i{font-size:18px;color:#17B26A}
+
+/* ── Crop selector ── */
+.crop-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--sp-md)}
+.crop-btn{display:flex;flex-direction:column;align-items:center;gap:6px;padding:var(--sp-lg) var(--sp-md);border:1.5px solid var(--border-secondary);border-radius:var(--r-lg);cursor:pointer;font-family:inherit;font-size:var(--text-xs-size);font-weight:600;color:var(--text-secondary);background:var(--bg-primary);transition:all .15s}
+.crop-btn:hover{border-color:var(--border-brand);color:var(--brand);background:var(--brand-50)}
+.crop-btn.active{border-color:var(--brand);color:var(--brand);background:var(--brand-50);box-shadow:0 0 0 2px rgba(41,112,255,.12)}
+.crop-btn .ce{font-size:22px}
+
+[data-theme="dark"] .modal-card{background:#161A23;border:1px solid #2E3448}
+[data-theme="dark"] .field-input,[data-theme="dark"] .field-select,[data-theme="dark"] .field-textarea{background:#1C2130;border-color:#2E3448;color:#F0F2F5}
+[data-theme="dark"] .crop-btn{background:#1C2130;border-color:#2E3448;color:#BCC2CE}
+[data-theme="dark"] .crop-btn.active{background:#0D1528;border-color:#2970FF}
+</style>
+
+<!-- Yangi Ferma Modal -->
+<div class="modal-overlay" id="farmModal" onclick="if(event.target===this)closeModal('farmModal')">
+  <div class="modal-card">
+    <div class="modal-head">
+      <div class="modal-icon"><i class="ri-plant-line"></i></div>
+      <div>
+        <div class="modal-title">Yangi ferma qo'shish</div>
+        <div class="modal-sub">Fermer ma'lumotlari va joy belgilang</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('farmModal')"><i class="ri-close-line"></i></button>
+    </div>
+    <div class="modal-body">
+      <form id="farmForm" novalidate autocomplete="off">
+        <div class="form-grid">
+          <!-- Section: Fermer -->
+          <div class="form-section">👤 Fermer ma'lumotlari</div>
+
+          <div class="field-group">
+            <label class="field-label">Fermer ismi<span>*</span></label>
+            <div class="input-icon-wrap">
+              <i class="ri-user-3-line iico"></i>
+              <input class="field-input" id="ff-name" type="text" placeholder="Ism Familiya"/>
+            </div>
+            <div class="field-err">Iltimos, ismni kiriting</div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Telefon<span>*</span></label>
+            <div class="input-icon-wrap">
+              <i class="ri-phone-line iico"></i>
+              <input class="field-input" id="ff-phone" type="tel" placeholder="+998 90 000 00 00"/>
+            </div>
+            <div class="field-err">Telefon raqami kiriting</div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Viloyat<span>*</span></label>
+            <div class="select-wrap">
+              <select class="field-select" id="ff-region" onchange="updateDistricts('ff-district',this.value)">
+                <option value="">— Tanlang —</option>
+                <option>Toshkent shahri</option><option>Toshkent viloyati</option>
+                <option>Andijon</option><option>Farg'ona</option><option>Namangan</option>
+                <option>Samarqand</option><option>Buxoro</option><option>Navoiy</option>
+                <option>Jizzax</option><option>Sirdaryo</option>
+                <option>Qashqadaryo</option><option>Surxondaryo</option>
+                <option>Xorazm</option><option>Qoraqalpog'iston</option>
+              </select>
+            </div>
+            <div class="field-err">Viloyatni tanlang</div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Tuman</label>
+            <div class="input-icon-wrap">
+              <i class="ri-map-pin-2-line iico"></i>
+              <input class="field-input" id="ff-district" type="text" placeholder="Tuman nomi"/>
+            </div>
+          </div>
+
+          <!-- Section: Ferma -->
+          <div class="form-section">🌾 Ferma ma'lumotlari</div>
+
+          <div class="field-group span2">
+            <label class="field-label">Ekin turi<span>*</span></label>
+            <div class="crop-grid" id="ff-crop-grid">
+              <button type="button" class="crop-btn" data-crop="pomidor" onclick="selectCrop(this)"><span class="ce">🍅</span>Pomidor</button>
+              <button type="button" class="crop-btn" data-crop="kartoshka" onclick="selectCrop(this)"><span class="ce">🥔</span>Kartoshka</button>
+              <button type="button" class="crop-btn" data-crop="paxta" onclick="selectCrop(this)"><span class="ce">🌸</span>Paxta</button>
+              <button type="button" class="crop-btn" data-crop="uzum" onclick="selectCrop(this)"><span class="ce">🍇</span>Uzum</button>
+              <button type="button" class="crop-btn" data-crop="bugdoy" onclick="selectCrop(this)"><span class="ce">🌾</span>Bug'doy</button>
+              <button type="button" class="crop-btn" data-crop="makkajoxori" onclick="selectCrop(this)"><span class="ce">🌽</span>Makkajo'xori</button>
+              <button type="button" class="crop-btn" data-crop="piyoz" onclick="selectCrop(this)"><span class="ce">🧅</span>Piyoz</button>
+              <button type="button" class="crop-btn" data-crop="boshqa" onclick="selectCrop(this)"><span class="ce">🌱</span>Boshqa</button>
+            </div>
+            <input type="hidden" id="ff-crop" value=""/>
+            <div class="field-err" id="ff-crop-err" style="display:none">Ekin turini tanlang</div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Maydon (ga)<span>*</span></label>
+            <div class="input-icon-wrap">
+              <i class="ri-ruler-2-line iico"></i>
+              <input class="field-input" id="ff-area" type="number" min="0.1" step="0.1" placeholder="Masalan: 25"/>
+            </div>
+            <div class="field-err">Maydon hajmini kiriting</div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Sensor soni</label>
+            <div class="input-icon-wrap">
+              <i class="ri-radar-line iico"></i>
+              <input class="field-input" id="ff-sensors" type="number" min="1" max="50" placeholder="1–50" value="1"/>
+            </div>
+          </div>
+
+          <!-- Section: Joylashuv -->
+          <div class="form-section">📍 Ferma joylashuvi</div>
+
+          <div class="span2">
+            <div class="map-picker" id="farmModalMap">
+              <div class="map-picker-hint" id="farmMapHint">Xaritada joylashuvni bosib belgilang</div>
+            </div>
+            <div class="coord-display">
+              <div class="coord-pill">Lat: <b id="ff-lat">—</b></div>
+              <div class="coord-pill">Lon: <b id="ff-lon">—</b></div>
+            </div>
+            <input type="hidden" id="ff-lat-v" value=""/>
+            <input type="hidden" id="ff-lon-v" value=""/>
+          </div>
+
+          <!-- Notes -->
+          <div class="field-group span2">
+            <label class="field-label">Izoh</label>
+            <textarea class="field-textarea" id="ff-notes" placeholder="Qo'shimcha ma'lumot..."></textarea>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" style="flex:1" onclick="closeModal('farmModal')"><i class="ri-close-line"></i>Bekor qilish</button>
+      <button class="btn btn-primary" style="flex:1;min-width:160px" onclick="submitFarmForm()"><i class="ri-save-line"></i>Saqlash</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"><i class="ri-checkbox-circle-fill"></i><span id="toast-msg">Muvaffaqiyatli saqlandi!</span></div>
+
+<script>
+/* ── Modal helpers ── */
+let farmMapPicker = null, farmMapMarker = null;
+
+function openModal(id){
+  document.getElementById(id).classList.add('active');
+  document.body.style.overflow='hidden';
+  if(id==='farmModal') initFarmModalMap();
+}
+function closeModal(id){
+  document.getElementById(id).classList.remove('active');
+  document.body.style.overflow='';
+}
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') document.querySelectorAll('.modal-overlay.active').forEach(m=>m.classList.remove('active')); });
+
+/* ── Mini map for farm modal ── */
+function initFarmModalMap(){
+  if(farmMapPicker) { farmMapPicker.invalidateSize(); return; }
+  farmMapPicker = L.map('farmModalMap',{zoomControl:true,attributionControl:false});
+  farmMapPicker.setView([40.5,68.5],6);
+  L.tileLayer('https://cdn.jsdelivr.net/gh/nicktindall/leaflet-extra-markers@latest/{z}/{x}/{y}.png',{maxZoom:19}).addTo(farmMapPicker);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(farmMapPicker);
+  farmMapPicker.on('click', function(e){
+    const {lat,lng} = e.latlng;
+    document.getElementById('ff-lat').textContent = lat.toFixed(5);
+    document.getElementById('ff-lon').textContent = lng.toFixed(5);
+    document.getElementById('ff-lat-v').value = lat;
+    document.getElementById('ff-lon-v').value = lng;
+    document.getElementById('farmMapHint').style.display='none';
+    if(farmMapMarker) farmMapPicker.removeLayer(farmMapMarker);
+    farmMapMarker = L.marker([lat,lng],{
+      icon: L.divIcon({className:'',html:'<div style="width:18px;height:18px;border-radius:50%;background:#155EEF;border:3px solid #fff;box-shadow:0 2px 8px rgba(21,94,239,.5)"></div>',iconAnchor:[9,9]})
+    }).addTo(farmMapPicker);
+  });
+  setTimeout(()=>farmMapPicker.invalidateSize(),150);
+}
+
+/* ── Crop selector ── */
+function selectCrop(btn){
+  document.querySelectorAll('#ff-crop-grid .crop-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('ff-crop').value = btn.dataset.crop;
+  document.getElementById('ff-crop-err').style.display='none';
+}
+
+/* ── District helper ── */
+const DISTRICTS = {
+  'Andijon':['Andijon','Asaka','Baliqchi','Bo\'z','Buloqboshi','Izbaskan','Jalaquduq','Xo\'jaobod','Qo\'rg\'ontepa','Marhamat','Oltinko\'l','Paxtaobod','Shahrixon','Ulug\'nor'],
+  'Farg\'ona':['Farg\'ona','Oltiariq','Bag\'dod','Beshariq','Buvayda','Dang\'ara','Furqat','Qo\'shtepa','Quva','Rishton','So\'x','Toshloq','Uchko\'prik','O\'zbekiston','Yozyovon'],
+  'Namangan':['Namangan','Chortoq','Chust','Kosonsoy','Ming\'buloq','Norin','Pop','To\'raqo\'rg\'on','Uychi','Yangiqo\'rg\'on'],
+  'Toshkent viloyati':['Bekobod','Bo\'stonliq','Buka','Chinoz','Qibray','Ohangaron','Oqqo\'rg\'on','O\'rtachirchiq','Parkent','Piskent','Quyi Chirchiq','Toshkent tumani','Yuqori Chirchiq','Zangiota','Yangiyo\'l'],
+  'Samarqand':['Samarqand','Bulung\'ur','Ishtixon','Jomboy','Kattaqo\'rg\'on','Narpay','Nurobod','Oqdaryo','Pastdarg\'om','Paxtachi','Payariq','Qo\'shrabot','Toyloq','Urgut'],
+  'Buxoro':['Buxoro','G\'ijduvon','Jondor','Kogon','Olot','Peshku','Qorakol','Qorovulbozor','Romitan','Shofirkon','Vobkent'],
+  'default':['Tuman nomi kiriting']
+};
+function updateDistricts(targetId, region){
+  const el = document.getElementById(targetId);
+  if(!el) return;
+  el.value = '';
+  el.placeholder = (DISTRICTS[region]||DISTRICTS.default)[0];
+}
+
+/* ── Form validation & submit ── */
+function submitFarmForm(){
+  let valid = true;
+  const req = [
+    {id:'ff-name', check: v=>v.trim().length>1},
+    {id:'ff-phone', check: v=>v.trim().length>7},
+    {id:'ff-region', check: v=>v!==''},
+    {id:'ff-area', check: v=>parseFloat(v)>0},
+  ];
+  req.forEach(({id,check})=>{
+    const el=document.getElementById(id);
+    const ok=check(el.value);
+    el.classList.toggle('err',!ok);
+    if(!ok) valid=false;
+  });
+  if(!document.getElementById('ff-crop').value){
+    document.getElementById('ff-crop-err').style.display='block';
+    valid=false;
+  }
+  if(!valid) return;
+
+  /* Success */
+  closeModal('farmModal');
+  showToast('✅ Ferma muvaffaqiyatli qo\'shildi!');
+  document.getElementById('farmForm').reset();
+  document.querySelectorAll('#ff-crop-grid .crop-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('ff-crop').value='';
+  document.getElementById('ff-lat').textContent='—';
+  document.getElementById('ff-lon').textContent='—';
+  if(farmMapMarker){ farmMapPicker.removeLayer(farmMapMarker); farmMapMarker=null; }
+  document.getElementById('farmMapHint').style.display='';
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  document.getElementById('toast-msg').textContent=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
 </script>
 </body>
 </html>
